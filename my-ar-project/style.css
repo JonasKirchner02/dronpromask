@@ -1,0 +1,113 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.example-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.carousel-wrapper {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      width: 90vw;
+    }
+
+   
+    .carousel-container {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    
+    .ikony {
+      display: flex;
+      gap: 10px;
+      transition: transform 0.5s ease-in-out;
+      align-items: center;
+      justify-content: center;
+    }
+
+    
+    .obrazky {
+      flex: 0 0 auto;
+      height: 8vh; 
+      width: auto;
+      cursor: pointer;
+      object-fit: cover;
+      transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
+      background-color: aquamarine;
+      opacity: 0.6; 
+    }
+
+    
+    .obrazky.active {
+      height: 10vh; 
+      opacity: 1;
+      transform: scale(1.1); 
+    }
+
+    
+    .obrazky:hover {
+      transform: scale(1.1); 
+      opacity: 1; 
+    }
+
+
+ .drak{
+  opacity: 0.5;
+ }
+
+ .edit {
+  position: fixed;
+  bottom: 10px;  
+  left: 95.5vw;   
+  
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+  width: 90vw;
+}
+
+
+.edit-button {
+  flex: 0 0 auto;
+  height: 8vh; 
+  width: auto;
+  cursor: pointer;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
+  background-color: aquamarine;
+  opacity: 0.6; 
+}
+
+
+.edit-button.active {
+  height: 10vh; 
+  opacity: 1;
+  transform: scale(1.1); 
+}
+
+
+.edit-button:hover {
+  transform: scale(1.1); 
+  opacity: 1; 
+}
+
+
+  
+
+    
