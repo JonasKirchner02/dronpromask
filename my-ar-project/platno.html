@@ -52,6 +52,10 @@
     canvas#paintCanvas {
       z-index: 2;
     }
+
+    .saved-textures {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -76,9 +80,13 @@
     </label>
     <button onclick="clearCanvas()">Clear</button>
     <button onclick="undoLastStroke()">Undo</button>
+    <button onclick="saveCanvasAndGo()">Save Texture</button>
   </div>
 
-  <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
+  <div class="saved-textures">
+    <select id="savedTextures"></select>
+    <button onclick="applySavedTexture()">Apply Selected Texture</button>
+  </div>
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
@@ -127,14 +135,12 @@
     const scaleX = canvasWidth / displayWidth;
     const scaleY = canvasHeight / displayHeight;
 
-    // Load background image
     const bgImage = new Image();
     bgImage.src = "/UV212.png";
     bgImage.onload = () => {
       bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
     };
 
-    
     const effectImage = new Image();
     effectImage.src = "/overlinky.png";
     effectImage.onload = () => {
@@ -253,10 +259,45 @@
       mergedCtx.drawImage(paintCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
-      localStorage.setItem("customMaskTexture", dataURL);
-      window.location.href = "index.html";
+
+      const textureKey = `customTexture_${Date.now()}`;
+      localStorage.setItem(textureKey, dataURL);
+
+      const textureList = JSON.parse(localStorage.getItem("textureList") || "[]");
+      textureList.push(textureKey);
+      localStorage.setItem("textureList", JSON.stringify(textureList));
+
+      loadSavedTextures(); // Refresh dropdown list
+      alert("Texture saved!");
     }
 
+    function loadSavedTextures() {
+      const textureList = JSON.parse(localStorage.getItem("textureList") || "[]");
+      const dropdown = document.getElementById("savedTextures");
+      dropdown.innerHTML = "";
+      textureList.forEach(key => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = key;
+        dropdown.appendChild(option);
+      });
+    }
+
+    function applySavedTexture() {
+      const dropdown = document.getElementById("savedTextures");
+      const selectedKey = dropdown.value;
+      const dataURL = localStorage.getItem(selectedKey);
+      if (!dataURL) return;
+
+      const img = new Image();
+      img.onload = () => {
+        paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        paintCtx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+      };
+      img.src = dataURL;
+    }
+
+    // Input listeners
     paintCanvas.addEventListener("mousedown", startPainting);
     paintCanvas.addEventListener("mouseup", endPainting);
     paintCanvas.addEventListener("mousemove", draw);
@@ -266,6 +307,9 @@
     paintCanvas.addEventListener("touchend", endPainting, { passive: false });
     paintCanvas.addEventListener("touchmove", draw, { passive: false });
     paintCanvas.addEventListener("touchcancel", endPainting, { passive: false });
+
+    // Load texture list on page load
+    window.onload = loadSavedTextures;
   </script>
 </body>
 </html>
