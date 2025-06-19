@@ -127,12 +127,14 @@
     const scaleX = canvasWidth / displayWidth;
     const scaleY = canvasHeight / displayHeight;
 
+    // Load background image
     const bgImage = new Image();
     bgImage.src = "/UV212.png";
     bgImage.onload = () => {
       bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
     };
 
+    
     const effectImage = new Image();
     effectImage.src = "/overlinky.png";
     effectImage.onload = () => {
@@ -238,7 +240,6 @@
     function clearCanvas() {
       paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
       effectCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-      historyStack = []; // Clear history stack
     }
 
     function saveCanvasAndGo() {
@@ -249,7 +250,7 @@
 
       mergedCtx.drawImage(bgCanvas, 0, 0);
       mergedCtx.drawImage(effectCanvas, 0, 0);
-      mergedCtx.drawImage(paintCanvas, 0, 0); // Ensure all paint strokes are included
+      mergedCtx.drawImage(paintCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
       localStorage.setItem("customMaskTexture", dataURL);
