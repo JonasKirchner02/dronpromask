@@ -87,6 +87,7 @@
   </div>
 
   <script>
+    let brushStrokes = []; // Array to store each stroke
     let historyStack = [];
     const maxHistory = 50;
     let lastX = 0;
@@ -127,7 +128,6 @@
     const scaleX = canvasWidth / displayWidth;
     const scaleY = canvasHeight / displayHeight;
 
-    // Load background image
     const bgImage = new Image();
     bgImage.src = "/UV212.png";
     bgImage.onload = () => {
@@ -150,9 +150,8 @@
       };
     }
 
-    function saveToHistory() {
-      if (historyStack.length >= maxHistory) historyStack.shift();
-      historyStack.push(paintCtx.getImageData(0, 0, canvasWidth, canvasHeight));
+    function saveBrushStroke(strokeData) {
+      brushStrokes.push(strokeData); // Save stroke data to array
     }
 
     function startPainting(e) {
@@ -181,22 +180,34 @@
 
       const { x, y } = getCoordinates(e);
       const mirrorX = canvasWidth - x;
-
-      paintCtx.lineCap = "round";
-      paintCtx.strokeStyle = colorPicker.value;
+      
+      let strokeData = {
+        type: brushType.value,
+        startX: lastX,
+        startY: lastY,
+        endX: x,
+        endY: y,
+        color: colorPicker.value,
+        size: brushSize.value,
+        brushImage: brushImage.src
+      };
 
       if (brushType.value === "classic") {
+        paintCtx.lineCap = "round";
+        paintCtx.strokeStyle = colorPicker.value;
         paintCtx.lineWidth = brushSize.value;
         paintCtx.beginPath();
         paintCtx.moveTo(lastX, lastY);
         paintCtx.lineTo(x, y);
         paintCtx.stroke();
 
+        // Save stroke for history
+        saveBrushStroke(strokeData);
+
         paintCtx.beginPath();
         paintCtx.moveTo(canvasWidth - lastX, lastY);
         paintCtx.lineTo(mirrorX, y);
         paintCtx.stroke();
-
       } else if (brushType.value === "soft") {
         const dx = x - lastX;
         const dy = y - lastY;
@@ -211,7 +222,6 @@
           drawSoftDot(interpX, interpY);
           drawSoftDot(mirrorInterpX, interpY);
         }
-
       } else if (brushType.value === "image" && brushImage.complete) {
         const size = parseInt(brushSize.value);
         paintCtx.drawImage(brushImage, x - size / 2, y - size / 2, size, size);
@@ -239,6 +249,7 @@
     function clearCanvas() {
       paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
       effectCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+      brushStrokes = []; // Clear the strokes array as well
     }
 
     function saveCanvasAndGo() {
@@ -249,23 +260,52 @@
 
       mergedCtx.drawImage(bgCanvas, 0, 0, canvasWidth, canvasHeight);
       mergedCtx.drawImage(effectCanvas, 0, 0, canvasWidth, canvasHeight);
-      mergedCtx.drawImage(paintCanvas, 0, 0, canvasWidth, canvasHeight);
+
+      // Redraw all the brush strokes onto the canvas
+      brushStrokes.forEach(stroke => {
+        mergedCtx.strokeStyle = stroke.color;
+        mergedCtx.lineWidth = stroke.size;
+        if (stroke.type === "classic") {
+          mergedCtx.beginPath();
+          mergedCtx.moveTo(stroke.startX, stroke.startY);
+          mergedCtx.lineTo(stroke.endX, stroke.endY);
+          mergedCtx.stroke();
+        } else if (stroke.type === "soft") {
+          const dx = stroke.endX - stroke.startX;
+          const dy = stroke.endY - stroke.startY;
+          const distance = Math.hypot(dx, dy);
+          const steps = Math.ceil(distance / softSteps.value);
+
+          for (let i = 0; i < steps; i++) {
+            const t = i / steps;
+            const interpX = stroke.startX + dx * t;
+            const interpY = stroke.startY + dy * t;
+            drawSoftDot(interpX, interpY);
+          }
+        } else if (stroke.type === "image" && brushImage.complete) {
+          const size = parseInt(stroke.size);
+          mergedCtx.drawImage(brushImage, stroke.endX - size / 2, stroke.endY - size / 2, size, size);
+        }
+      });
 
       const dataURL = mergedCanvas.toDataURL("image/png");
-      console.log(dataURL);  // Log the data URL for debugging
+      console.log(dataURL);  
+      
+      // Save the final image to localStorage or handle it as needed
       localStorage.setItem("customMaskTexture", dataURL);
       window.location.href = "index.html";
     }
 
+    // Attach events
     paintCanvas.addEventListener("mousedown", startPainting);
-    paintCanvas.addEventListener("mouseup", endPainting);
     paintCanvas.addEventListener("mousemove", draw);
+    paintCanvas.addEventListener("mouseup", endPainting);
     paintCanvas.addEventListener("mouseleave", endPainting);
 
-    paintCanvas.addEventListener("touchstart", startPainting, { passive: false });
-    paintCanvas.addEventListener("touchend", endPainting, { passive: false });
-    paintCanvas.addEventListener("touchmove", draw, { passive: false });
-    paintCanvas.addEventListener("touchcancel", endPainting, { passive: false });
+    paintCanvas.addEventListener("touchstart", startPainting);
+    paintCanvas.addEventListener("touchmove", draw);
+    paintCanvas.addEventListener("touchend", endPainting);
+    paintCanvas.addEventListener("touchcancel", endPainting);
   </script>
 </body>
 </html>
