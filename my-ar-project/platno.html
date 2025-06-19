@@ -40,18 +40,9 @@
       touch-action: none;
     }
 
-    canvas#backgroundCanvas {
-      z-index: 1;
-    }
-
-    canvas#effectCanvas {
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    canvas#paintCanvas {
-      z-index: 2;
-    }
+    canvas#backgroundCanvas { z-index: 1; }
+    canvas#paintCanvas { z-index: 2; }
+    canvas#effectCanvas { z-index: 3; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -76,32 +67,17 @@
     </label>
     <button onclick="clearCanvas()">Clear</button>
     <button onclick="undoLastStroke()">Undo</button>
+    <button onclick="saveCurrentTexture()">💾 Save Texture</button>
+    <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
   </div>
-  
-  <button onclick="saveCurrentTexture()">💾 Save Texture</button>
-  <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
-  
-
-  <label style="margin-top: 20px;">
-    Load Saved Texture:
-    <select id="savedTexturesDropdown">
-      <option value="">-- Select --</option>
-    </select>
-    <button onclick="loadSelectedTexture()">Load</button>
-  </label>
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
-    <canvas id="effectCanvas" width="2000" height="2000"></canvas>
     <canvas id="paintCanvas" width="2000" height="2000"></canvas>
+    <canvas id="effectCanvas" width="2000" height="2000"></canvas>
   </div>
 
   <script>
-    let historyStack = [];
-    const maxHistory = 50;
-    let lastX = 0;
-    let lastY = 0;
-
     const paintCanvas = document.getElementById("paintCanvas");
     const paintCtx = paintCanvas.getContext("2d");
 
@@ -118,9 +94,36 @@
     const imageBrushPicker = document.getElementById("imageBrushPicker");
     const imageBrushSelect = document.getElementById("imageBrushSelect");
 
+    const canvasWidth = 2000;
+    const canvasHeight = 2000;
+    const displayWidth = 500;
+    const displayHeight = 500;
+    const scaleX = canvasWidth / displayWidth;
+    const scaleY = canvasHeight / displayHeight;
+
     let painting = false;
+    let lastX = 0;
+    let lastY = 0;
+    let historyStack = [];
+    const maxHistory = 50;
+
     let brushImage = new Image();
     brushImage.src = imageBrushSelect.value;
+
+    // Load background and effect images
+    const bgImage = new Image();
+    bgImage.src = "/UV212.png";
+    bgImage.onload = () => {
+      bgCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+      bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
+    };
+
+    const effectImage = new Image();
+    effectImage.src = "/overlinky.png";
+    effectImage.onload = () => {
+      effectCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+      effectCtx.drawImage(effectImage, 0, 0, canvasWidth, canvasHeight);
+    };
 
     brushType.addEventListener("change", () => {
       imageBrushPicker.style.display = brushType.value === "image" ? "inline" : "none";
@@ -129,25 +132,6 @@
     imageBrushSelect.addEventListener("change", () => {
       brushImage.src = imageBrushSelect.value;
     });
-
-    const canvasWidth = 2000;
-    const canvasHeight = 2000;
-    const displayWidth = 500;
-    const displayHeight = 500;
-    const scaleX = canvasWidth / displayWidth;
-    const scaleY = canvasHeight / displayHeight;
-
-    const bgImage = new Image();
-    bgImage.src = "/UV212.png";
-    bgImage.onload = () => {
-      bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
-    };
-
-    const effectImage = new Image();
-    effectImage.src = "/overlinky.png";
-    effectImage.onload = () => {
-      effectCtx.drawImage(effectImage, 0, 0, canvasWidth, canvasHeight);
-    };
 
     function getCoordinates(e) {
       const rect = paintCanvas.getBoundingClientRect();
@@ -165,6 +149,7 @@
     }
 
     function startPainting(e) {
+      e.preventDefault();
       saveToHistory();
       painting = true;
       const { x, y } = getCoordinates(e);
@@ -172,14 +157,7 @@
       lastY = y;
     }
 
-    function undoLastStroke() {
-      if (historyStack.length > 0) {
-        const imageData = historyStack.pop();
-        paintCtx.putImageData(imageData, 0, 0);
-      }
-    }
-
-    function endPainting() {
+    function endPainting(e) {
       painting = false;
       paintCtx.beginPath();
     }
@@ -205,7 +183,6 @@
         paintCtx.moveTo(canvasWidth - lastX, lastY);
         paintCtx.lineTo(mirrorX, y);
         paintCtx.stroke();
-
       } else if (brushType.value === "soft") {
         const dx = x - lastX;
         const dy = y - lastY;
@@ -220,7 +197,6 @@
           drawSoftDot(interpX, interpY);
           drawSoftDot(mirrorInterpX, interpY);
         }
-
       } else if (brushType.value === "image" && brushImage.complete) {
         const size = parseInt(brushSize.value);
         paintCtx.drawImage(brushImage, x - size / 2, y - size / 2, size, size);
@@ -247,91 +223,55 @@
 
     function clearCanvas() {
       paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-      effectCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     }
 
-    function saveCanvasAndGo() {
+    function undoLastStroke() {
+      if (historyStack.length > 0) {
+        const imageData = historyStack.pop();
+        paintCtx.putImageData(imageData, 0, 0);
+      }
+    }
+
+    function mergeCanvases() {
       const mergedCanvas = document.createElement("canvas");
       mergedCanvas.width = canvasWidth;
       mergedCanvas.height = canvasHeight;
       const mergedCtx = mergedCanvas.getContext("2d");
 
       mergedCtx.drawImage(bgCanvas, 0, 0);
-      mergedCtx.drawImage(effectCanvas, 0, 0);
       mergedCtx.drawImage(paintCanvas, 0, 0);
+      mergedCtx.drawImage(effectCanvas, 0, 0);
 
+      return mergedCanvas;
+    }
+
+    function saveCurrentTexture() {
+      const mergedCanvas = mergeCanvases();
       const dataURL = mergedCanvas.toDataURL("image/png");
 
-      
       let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
       savedTextures.push(dataURL);
       localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
 
-      
-      localStorage.setItem("customMaskTexture", dataURL);
+      alert("Texture saved!");
+    }
 
+    function saveCanvasAndGo() {
+      const mergedCanvas = mergeCanvases();
+      const dataURL = mergedCanvas.toDataURL("image/png");
+      localStorage.setItem("customMaskTexture", dataURL);
       window.location.href = "index.html";
     }
 
-    function populateTextureDropdown() {
-      const dropdown = document.getElementById("savedTexturesDropdown");
-      const textures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-
-      dropdown.innerHTML = '<option value="">-- Select --</option>';
-      textures.forEach((texture, index) => {
-        const option = document.createElement("option");
-        option.value = index;
-        option.textContent = `Texture ${index + 1}`;
-        dropdown.appendChild(option);
-      });
-    }
-
-    function loadSelectedTexture() {
-      const index = document.getElementById("savedTexturesDropdown").value;
-      if (index === "") return;
-
-      const textures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-      const dataURL = textures[index];
-      const img = new Image();
-      img.onload = () => {
-        paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-        paintCtx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-      };
-      img.src = dataURL;
-    }
-
-    function saveCurrentTexture() {
-  const mergedCanvas = document.createElement("canvas");
-  mergedCanvas.width = canvasWidth;
-  mergedCanvas.height = canvasHeight;
-  const mergedCtx = mergedCanvas.getContext("2d");
-
-  mergedCtx.drawImage(bgCanvas, 0, 0);
-  mergedCtx.drawImage(effectCanvas, 0, 0);
-  mergedCtx.drawImage(paintCanvas, 0, 0);
-
-  const dataURL = mergedCanvas.toDataURL("image/png");
-
-  let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-  savedTextures.push(dataURL);
-  localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
-
-  alert("Texture saved!");
-  populateTextureDropdown();
-}
-
-
+    // Events
     paintCanvas.addEventListener("mousedown", startPainting);
     paintCanvas.addEventListener("mouseup", endPainting);
     paintCanvas.addEventListener("mousemove", draw);
     paintCanvas.addEventListener("mouseleave", endPainting);
-
     paintCanvas.addEventListener("touchstart", startPainting, { passive: false });
     paintCanvas.addEventListener("touchend", endPainting, { passive: false });
     paintCanvas.addEventListener("touchmove", draw, { passive: false });
     paintCanvas.addEventListener("touchcancel", endPainting, { passive: false });
-
-    window.addEventListener("load", populateTextureDropdown);
   </script>
 </body>
 </html>
