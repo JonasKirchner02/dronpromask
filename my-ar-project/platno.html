@@ -79,6 +79,8 @@
   </div>
 
   <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
+  <button onclick="savePainting()">Save Painting</button>
+  <button onclick="loadSavedPainting()">Load Saved Painting</button>
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="500" height="500"></canvas>
@@ -268,6 +270,31 @@
     paintCanvas.addEventListener("touchend", endPainting, { passive: false });
     paintCanvas.addEventListener("touchmove", draw, { passive: false });
     paintCanvas.addEventListener("touchcancel", endPainting, { passive: false });
+    function savePainting() {
+  const savedCanvas = document.createElement("canvas");
+  savedCanvas.width = canvasWidth;
+  savedCanvas.height = canvasHeight;
+  const savedCtx = savedCanvas.getContext("2d");
+
+  savedCtx.drawImage(paintCanvas, 0, 0);
+
+  const paintDataURL = savedCanvas.toDataURL("image/png");
+  localStorage.setItem("savedPainting", paintDataURL);
+  alert("Painting saved!");
+}
+function loadSavedPainting() {
+  const dataURL = localStorage.getItem("savedPainting");
+  if (dataURL) {
+    const img = new Image();
+    img.onload = () => {
+      paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+      paintCtx.drawImage(img, 0, 0);
+    };
+    img.src = dataURL;
+  } else {
+    alert("No saved painting found.");
+  }
+}
   </script>
 </body>
 </html>
