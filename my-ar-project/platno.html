@@ -60,12 +60,11 @@
         <option value="/supina2.png">Brush 2</option>
       </select>
     </label>
-    
+    <button onclick="clearCanvas()">Clear</button>
+    <button onclick="undoLastStroke()">Undo</button>
   </div>
 
   <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
-  <button onclick="clearCanvas()">Clear</button>
-  <button onclick="undoLastStroke()">Undo</button>
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
