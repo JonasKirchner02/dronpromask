@@ -237,7 +237,7 @@
 
       mergedCtx.drawImage(bgCanvas, 0, 0);
       mergedCtx.drawImage(paintCanvas, 0, 0);
-      mergedCtx.drawImage(refCanvas, 0, 0);
+      
 
       const dataURL = mergedCanvas.toDataURL("image/png");
       localStorage.setItem("customMaskTexture", dataURL);
