@@ -77,18 +77,8 @@
     <button onclick="clearCanvas()">Clear</button>
     <button onclick="undoLastStroke()">Undo</button>
   </div>
-  
-  <button onclick="saveCurrentTexture()">💾 Save Texture</button>
-  <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
-  
 
-  <label style="margin-top: 20px;">
-    Load Saved Texture:
-    <select id="savedTexturesDropdown">
-      <option value="">-- Select --</option>
-    </select>
-    <button onclick="loadSelectedTexture()">Load</button>
-  </label>
+  <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
@@ -137,12 +127,14 @@
     const scaleX = canvasWidth / displayWidth;
     const scaleY = canvasHeight / displayHeight;
 
+    
     const bgImage = new Image();
     bgImage.src = "/UV212.png";
     bgImage.onload = () => {
       bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
     };
 
+    
     const effectImage = new Image();
     effectImage.src = "/overlinky.png";
     effectImage.onload = () => {
@@ -193,15 +185,15 @@
 
       paintCtx.lineCap = "round";
       paintCtx.strokeStyle = colorPicker.value;
-      paintCtx.lineWidth = brushSize.value;
 
       if (brushType.value === "classic") {
-        paintCtx.beginPath();  // Ensure each stroke starts fresh
+        paintCtx.lineWidth = brushSize.value;
+        paintCtx.beginPath();
         paintCtx.moveTo(lastX, lastY);
         paintCtx.lineTo(x, y);
         paintCtx.stroke();
 
-        paintCtx.beginPath();  // Ensure the mirrored stroke is separate
+        paintCtx.beginPath();
         paintCtx.moveTo(canvasWidth - lastX, lastY);
         paintCtx.lineTo(mirrorX, y);
         paintCtx.stroke();
@@ -261,61 +253,8 @@
       mergedCtx.drawImage(paintCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
-
-      let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-      savedTextures.push(dataURL);
-      localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
-
       localStorage.setItem("customMaskTexture", dataURL);
-
       window.location.href = "index.html";
-    }
-
-    function populateTextureDropdown() {
-      const dropdown = document.getElementById("savedTexturesDropdown");
-      const textures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-
-      dropdown.innerHTML = '<option value="">-- Select --</option>';
-      textures.forEach((texture, index) => {
-        const option = document.createElement("option");
-        option.value = index;
-        option.textContent = `Texture ${index + 1}`;
-        dropdown.appendChild(option);
-      });
-    }
-
-    function loadSelectedTexture() {
-      const index = document.getElementById("savedTexturesDropdown").value;
-      if (index === "") return;
-
-      const textures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-      const dataURL = textures[index];
-      const img = new Image();
-      img.onload = () => {
-        paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-        paintCtx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-      };
-      img.src = dataURL;
-    }
-
-    function saveCurrentTexture() {
-      const mergedCanvas = document.createElement("canvas");
-      mergedCanvas.width = canvasWidth;
-      mergedCanvas.height = canvasHeight;
-      const mergedCtx = mergedCanvas.getContext("2d");
-
-      mergedCtx.drawImage(bgCanvas, 0, 0);
-      mergedCtx.drawImage(effectCanvas, 0, 0);
-      mergedCtx.drawImage(paintCanvas, 0, 0);
-
-      const dataURL = mergedCanvas.toDataURL("image/png");
-
-      let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-      savedTextures.push(dataURL);
-      localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
-
-      alert("Texture saved!");
-      populateTextureDropdown();
     }
 
     paintCanvas.addEventListener("mousedown", startPainting);
@@ -327,8 +266,6 @@
     paintCanvas.addEventListener("touchend", endPainting, { passive: false });
     paintCanvas.addEventListener("touchmove", draw, { passive: false });
     paintCanvas.addEventListener("touchcancel", endPainting, { passive: false });
-
-    window.addEventListener("load", populateTextureDropdown);
   </script>
 </body>
 </html>
