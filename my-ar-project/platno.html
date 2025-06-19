@@ -193,15 +193,15 @@
 
       paintCtx.lineCap = "round";
       paintCtx.strokeStyle = colorPicker.value;
+      paintCtx.lineWidth = brushSize.value;
 
       if (brushType.value === "classic") {
-        paintCtx.lineWidth = brushSize.value;
-        paintCtx.beginPath();
+        paintCtx.beginPath();  // Ensure each stroke starts fresh
         paintCtx.moveTo(lastX, lastY);
         paintCtx.lineTo(x, y);
         paintCtx.stroke();
 
-        paintCtx.beginPath();
+        paintCtx.beginPath();  // Ensure the mirrored stroke is separate
         paintCtx.moveTo(canvasWidth - lastX, lastY);
         paintCtx.lineTo(mirrorX, y);
         paintCtx.stroke();
@@ -262,12 +262,10 @@
 
       const dataURL = mergedCanvas.toDataURL("image/png");
 
-      
       let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
       savedTextures.push(dataURL);
       localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
 
-      
       localStorage.setItem("customMaskTexture", dataURL);
 
       window.location.href = "index.html";
@@ -301,25 +299,24 @@
     }
 
     function saveCurrentTexture() {
-  const mergedCanvas = document.createElement("canvas");
-  mergedCanvas.width = canvasWidth;
-  mergedCanvas.height = canvasHeight;
-  const mergedCtx = mergedCanvas.getContext("2d");
+      const mergedCanvas = document.createElement("canvas");
+      mergedCanvas.width = canvasWidth;
+      mergedCanvas.height = canvasHeight;
+      const mergedCtx = mergedCanvas.getContext("2d");
 
-  mergedCtx.drawImage(bgCanvas, 0, 0);
-  mergedCtx.drawImage(effectCanvas, 0, 0);
-  mergedCtx.drawImage(paintCanvas, 0, 0);
+      mergedCtx.drawImage(bgCanvas, 0, 0);
+      mergedCtx.drawImage(effectCanvas, 0, 0);
+      mergedCtx.drawImage(paintCanvas, 0, 0);
 
-  const dataURL = mergedCanvas.toDataURL("image/png");
+      const dataURL = mergedCanvas.toDataURL("image/png");
 
-  let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
-  savedTextures.push(dataURL);
-  localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
+      let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
+      savedTextures.push(dataURL);
+      localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
 
-  alert("Texture saved!");
-  populateTextureDropdown();
-}
-
+      alert("Texture saved!");
+      populateTextureDropdown();
+    }
 
     paintCanvas.addEventListener("mousedown", startPainting);
     paintCanvas.addEventListener("mouseup", endPainting);
