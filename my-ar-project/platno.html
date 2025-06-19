@@ -69,9 +69,18 @@
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
     <canvas id="paintCanvas" width="2000" height="2000"></canvas>
+    <canvas id="referenceCanvas" width="2000" height="2000"></canvas>
   </div>
 
   <script>
+    const refCanvas = document.getElementById("referenceCanvas");
+    const refCtx = refCanvas.getContext("2d");
+
+    const refImage = new Image();
+    refImage.src = "/overlinky.png"; // Replace with your image path
+    refImage.onload = () => {
+    refCtx.drawImage(refImage, 0, 0, refCanvas.width, refCanvas.height);
+    };
     let historyStack = [];
     const maxHistory = 50;
     let lastX = 0;
@@ -228,6 +237,7 @@
 
       mergedCtx.drawImage(bgCanvas, 0, 0);
       mergedCtx.drawImage(paintCanvas, 0, 0);
+      mergedCtx.drawImage(refCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
       localStorage.setItem("customMaskTexture", dataURL);
