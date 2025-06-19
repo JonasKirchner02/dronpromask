@@ -37,6 +37,19 @@
       left: 0;
       width: 100%;
       height: 100%;
+      touch-action: none;
+    }
+
+    canvas#backgroundCanvas {
+      z-index: 1;
+    }
+
+    canvas#effectCanvas {
+      z-index: 2;
+    }
+
+    canvas#paintCanvas {
+      z-index: 3;
     }
   </style>
 </head>
@@ -68,6 +81,7 @@
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
+    <canvas id="effectCanvas" width="2000" height="2000"></canvas>
     <canvas id="paintCanvas" width="2000" height="2000"></canvas>
   </div>
 
@@ -79,8 +93,12 @@
 
     const paintCanvas = document.getElementById("paintCanvas");
     const paintCtx = paintCanvas.getContext("2d");
+
     const bgCanvas = document.getElementById("backgroundCanvas");
     const bgCtx = bgCanvas.getContext("2d");
+
+    const effectCanvas = document.getElementById("effectCanvas");
+    const effectCtx = effectCanvas.getContext("2d");
 
     const colorPicker = document.getElementById("colorPicker");
     const brushSize = document.getElementById("brushSize");
@@ -93,13 +111,8 @@
     let brushImage = new Image();
     brushImage.src = imageBrushSelect.value;
 
-   
     brushType.addEventListener("change", () => {
-      if (brushType.value === "image") {
-        imageBrushPicker.style.display = "inline";
-      } else {
-        imageBrushPicker.style.display = "none";
-      }
+      imageBrushPicker.style.display = brushType.value === "image" ? "inline" : "none";
     });
 
     imageBrushSelect.addEventListener("change", () => {
@@ -113,10 +126,18 @@
     const scaleX = canvasWidth / displayWidth;
     const scaleY = canvasHeight / displayHeight;
 
+    // Load background image
     const bgImage = new Image();
     bgImage.src = "/UV212.png";
     bgImage.onload = () => {
-      bgCtx.drawImage(bgImage, 0, 0, bgCanvas.width, bgCanvas.height);
+      bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
+    };
+
+    // Load effect image (NEW)
+    const effectImage = new Image();
+    effectImage.src = "/effectImage.png";
+    effectImage.onload = () => {
+      effectCtx.drawImage(effectImage, 0, 0, canvasWidth, canvasHeight);
     };
 
     function getCoordinates(e) {
@@ -128,10 +149,12 @@
         y: (clientY - rect.top) * scaleY
       };
     }
-      function saveToHistory() {
+
+    function saveToHistory() {
       if (historyStack.length >= maxHistory) historyStack.shift();
-      historyStack.push(paintCtx.getImageData(0, 0, paintCanvas.width, paintCanvas.height));
-      }
+      historyStack.push(paintCtx.getImageData(0, 0, canvasWidth, canvasHeight));
+    }
+
     function startPainting(e) {
       saveToHistory();
       painting = true;
@@ -139,12 +162,14 @@
       lastX = x;
       lastY = y;
     }
-      function undoLastStroke() {
+
+    function undoLastStroke() {
       if (historyStack.length > 0) {
-      const imageData = historyStack.pop();
-      paintCtx.putImageData(imageData, 0, 0);
+        const imageData = historyStack.pop();
+        paintCtx.putImageData(imageData, 0, 0);
       }
     }
+
     function endPainting() {
       painting = false;
       paintCtx.beginPath();
@@ -162,7 +187,6 @@
 
       if (brushType.value === "classic") {
         paintCtx.lineWidth = brushSize.value;
-
         paintCtx.beginPath();
         paintCtx.moveTo(lastX, lastY);
         paintCtx.lineTo(x, y);
@@ -184,7 +208,6 @@
           const interpX = lastX + dx * t;
           const interpY = lastY + dy * t;
           const mirrorInterpX = canvasWidth - interpX;
-
           drawSoftDot(interpX, interpY);
           drawSoftDot(mirrorInterpX, interpY);
         }
@@ -200,16 +223,13 @@
     }
 
     function drawSoftDot(x, y) {
-      const baseRadius = brushSize.value;
-      const radius = baseRadius * 2;
+      const radius = brushSize.value * 2;
       const color = colorPicker.value;
-
       const gradient = paintCtx.createRadialGradient(x, y, 0, x, y, radius);
       gradient.addColorStop(0.0, color + "AA");
       gradient.addColorStop(0.2, color + "66");
       gradient.addColorStop(0.5, color + "22");
       gradient.addColorStop(1.0, color + "00");
-
       paintCtx.fillStyle = gradient;
       paintCtx.beginPath();
       paintCtx.arc(x, y, radius, 0, Math.PI * 2);
@@ -217,7 +237,8 @@
     }
 
     function clearCanvas() {
-      paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+      paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+      effectCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     }
 
     function saveCanvasAndGo() {
@@ -227,6 +248,7 @@
       const mergedCtx = mergedCanvas.getContext("2d");
 
       mergedCtx.drawImage(bgCanvas, 0, 0);
+      mergedCtx.drawImage(effectCanvas, 0, 0);
       mergedCtx.drawImage(paintCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
@@ -234,7 +256,6 @@
       window.location.href = "index.html";
     }
 
-    
     paintCanvas.addEventListener("mousedown", startPainting);
     paintCanvas.addEventListener("mouseup", endPainting);
     paintCanvas.addEventListener("mousemove", draw);
