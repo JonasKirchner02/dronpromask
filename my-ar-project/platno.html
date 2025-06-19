@@ -76,6 +76,12 @@
     </label>
     <button onclick="clearCanvas()">Clear</button>
     <button onclick="undoLastStroke()">Undo</button>
+    <input type="text" id="paintingName" placeholder="Enter name">
+<button onclick="savePainting()">Save Painting</button>
+
+<select id="paintingList" onchange="loadSelectedPainting()">
+  <option value="">-- Select a saved painting --</option>
+</select>
   </div>
 
   <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
@@ -270,18 +276,33 @@
     paintCanvas.addEventListener("touchend", endPainting, { passive: false });
     paintCanvas.addEventListener("touchmove", draw, { passive: false });
     paintCanvas.addEventListener("touchcancel", endPainting, { passive: false });
-    function savePainting() {
+   function savePainting() {
+  const nameInput = document.getElementById("paintingName");
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    alert("Please enter a name for your painting.");
+    return;
+  }
+
   const savedCanvas = document.createElement("canvas");
   savedCanvas.width = canvasWidth;
   savedCanvas.height = canvasHeight;
   const savedCtx = savedCanvas.getContext("2d");
 
   savedCtx.drawImage(paintCanvas, 0, 0);
+  const dataURL = savedCanvas.toDataURL("image/png");
 
-  const paintDataURL = savedCanvas.toDataURL("image/png");
-  localStorage.setItem("savedPainting", paintDataURL);
-  alert("Painting saved!");
+  // Get existing saved paintings or create a new object
+  const savedPaintings = JSON.parse(localStorage.getItem("savedPaintings") || "{}");
+  savedPaintings[name] = dataURL;
+  localStorage.setItem("savedPaintings", JSON.stringify(savedPaintings));
+
+  updatePaintingList();
+  nameInput.value = "";
+  alert(`Painting "${name}" saved!`);
 }
+
 function loadSavedPainting() {
   const dataURL = localStorage.getItem("savedPainting");
   if (dataURL) {
@@ -295,6 +316,42 @@ function loadSavedPainting() {
     alert("No saved painting found.");
   }
 }
+
+function loadSelectedPainting() {
+  const select = document.getElementById("paintingList");
+  const selectedName = select.value;
+
+  if (!selectedName) return;
+
+  const savedPaintings = JSON.parse(localStorage.getItem("savedPaintings") || "{}");
+  const dataURL = savedPaintings[selectedName];
+
+  if (dataURL) {
+    const img = new Image();
+    img.onload = () => {
+      paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+      paintCtx.drawImage(img, 0, 0);
+    };
+    img.src = dataURL;
+  }
+}
+
+function updatePaintingList() {
+  const select = document.getElementById("paintingList");
+  const savedPaintings = JSON.parse(localStorage.getItem("savedPaintings") || "{}");
+
+  // Clear existing options except the placeholder
+  select.innerHTML = `<option value="">-- Select a saved painting --</option>`;
+
+  Object.keys(savedPaintings).forEach(name => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  });
+}
+
+updatePaintingList();
   </script>
 </body>
 </html>
