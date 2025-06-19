@@ -134,7 +134,6 @@
       bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
     };
 
-    
     const effectImage = new Image();
     effectImage.src = "/overlinky.png";
     effectImage.onload = () => {
@@ -248,11 +247,12 @@
       mergedCanvas.height = canvasHeight;
       const mergedCtx = mergedCanvas.getContext("2d");
 
-      mergedCtx.drawImage(bgCanvas, 0, 0);
-      mergedCtx.drawImage(effectCanvas, 0, 0);
-      mergedCtx.drawImage(paintCanvas, 0, 0);
+      mergedCtx.drawImage(bgCanvas, 0, 0, canvasWidth, canvasHeight);
+      mergedCtx.drawImage(effectCanvas, 0, 0, canvasWidth, canvasHeight);
+      mergedCtx.drawImage(paintCanvas, 0, 0, canvasWidth, canvasHeight);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
+      console.log(dataURL);  // Log the data URL for debugging
       localStorage.setItem("customMaskTexture", dataURL);
       window.location.href = "index.html";
     }
