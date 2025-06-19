@@ -77,8 +77,10 @@
     <button onclick="clearCanvas()">Clear</button>
     <button onclick="undoLastStroke()">Undo</button>
   </div>
-
+  
+  <button onclick="saveCurrentTexture()">💾 Save Texture</button>
   <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
+  
 
   <label style="margin-top: 20px;">
     Load Saved Texture:
@@ -297,6 +299,27 @@
       };
       img.src = dataURL;
     }
+
+    function saveCurrentTexture() {
+  const mergedCanvas = document.createElement("canvas");
+  mergedCanvas.width = canvasWidth;
+  mergedCanvas.height = canvasHeight;
+  const mergedCtx = mergedCanvas.getContext("2d");
+
+  mergedCtx.drawImage(bgCanvas, 0, 0);
+  mergedCtx.drawImage(effectCanvas, 0, 0);
+  mergedCtx.drawImage(paintCanvas, 0, 0);
+
+  const dataURL = mergedCanvas.toDataURL("image/png");
+
+  let savedTextures = JSON.parse(localStorage.getItem("savedTextures") || "[]");
+  savedTextures.push(dataURL);
+  localStorage.setItem("savedTextures", JSON.stringify(savedTextures));
+
+  alert("Texture saved!");
+  populateTextureDropdown();
+}
+
 
     paintCanvas.addEventListener("mousedown", startPainting);
     paintCanvas.addEventListener("mouseup", endPainting);
