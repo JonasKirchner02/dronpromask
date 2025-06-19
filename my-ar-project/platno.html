@@ -45,11 +45,11 @@
     }
 
     canvas#effectCanvas {
-      z-index: 2;
+      z-index: 3;
     }
 
     canvas#paintCanvas {
-      z-index: 3;
+      z-index: 2;
     }
   </style>
 </head>
@@ -135,7 +135,7 @@
 
     // Load effect image (NEW)
     const effectImage = new Image();
-    effectImage.src = "/effectImage.png";
+    effectImage.src = "/overlinky.png";
     effectImage.onload = () => {
       effectCtx.drawImage(effectImage, 0, 0, canvasWidth, canvasHeight);
     };
