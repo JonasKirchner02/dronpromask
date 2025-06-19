@@ -78,7 +78,8 @@
     <button onclick="undoLastStroke()">Undo</button>
   </div>
 
-  <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
+  <button onclick="saveCanvas()">Save</button>
+  <button onclick="applySavedTexture()">Apply to my own mask</button>
 
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="500" height="500"></canvas>
@@ -134,7 +135,6 @@
       bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
     };
 
-    
     const effectImage = new Image();
     effectImage.src = "/overlinky.png";
     effectImage.onload = () => {
@@ -242,7 +242,7 @@
       effectCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     }
 
-    function saveCanvasAndGo() {
+    function saveCanvas() {
       const mergedCanvas = document.createElement("canvas");
       mergedCanvas.width = canvasWidth;
       mergedCanvas.height = canvasHeight;
@@ -253,10 +253,22 @@
       mergedCtx.drawImage(paintCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
-      localStorage.clear();
-      localStorage.setItem("returnIndex", 3)
       localStorage.setItem("customMaskTexture", dataURL);
-      window.location.href = "index.html";
+      alert("Canvas saved!");
+    }
+
+    function applySavedTexture() {
+      const savedTexture = localStorage.getItem("customMaskTexture");
+      if (savedTexture) {
+        const image = new Image();
+        image.onload = function() {
+          paintCtx.clearRect(0, 0, canvasWidth, canvasHeight); // Clear any previous content
+          paintCtx.drawImage(image, 0, 0, canvasWidth, canvasHeight); // Draw the saved texture
+        };
+        image.src = savedTexture;
+      } else {
+        alert("No saved texture found.");
+      }
     }
 
     paintCanvas.addEventListener("mousedown", startPainting);
