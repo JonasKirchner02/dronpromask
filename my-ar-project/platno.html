@@ -38,10 +38,6 @@
       width: 100%;
       height: 100%;
     }
-
-    #overlayCanvas {
-      pointer-events: none; /* Make it non-interactive */
-    }
   </style>
 </head>
 <body>
@@ -73,7 +69,6 @@
   <div class="canvas-container">
     <canvas id="backgroundCanvas" width="2000" height="2000"></canvas>
     <canvas id="paintCanvas" width="2000" height="2000"></canvas>
-    <canvas id="overlayCanvas" width="2000" height="2000"></canvas>
   </div>
 
   <script>
@@ -86,8 +81,6 @@
     const paintCtx = paintCanvas.getContext("2d");
     const bgCanvas = document.getElementById("backgroundCanvas");
     const bgCtx = bgCanvas.getContext("2d");
-    const overlayCanvas = document.getElementById("overlayCanvas");
-    const overlayCtx = overlayCanvas.getContext("2d");
 
     const colorPicker = document.getElementById("colorPicker");
     const brushSize = document.getElementById("brushSize");
@@ -100,8 +93,13 @@
     let brushImage = new Image();
     brushImage.src = imageBrushSelect.value;
 
+   
     brushType.addEventListener("change", () => {
-      imageBrushPicker.style.display = brushType.value === "image" ? "inline" : "none";
+      if (brushType.value === "image") {
+        imageBrushPicker.style.display = "inline";
+      } else {
+        imageBrushPicker.style.display = "none";
+      }
     });
 
     imageBrushSelect.addEventListener("change", () => {
@@ -121,12 +119,6 @@
       bgCtx.drawImage(bgImage, 0, 0, bgCanvas.width, bgCanvas.height);
     };
 
-    const overlayImage = new Image();
-    overlayImage.src = "/your-overlay.png"; // Replace with your actual overlay image
-    overlayImage.onload = () => {
-      overlayCtx.drawImage(overlayImage, 0, 0, overlayCanvas.width, overlayCanvas.height);
-    };
-
     function getCoordinates(e) {
       const rect = paintCanvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -136,12 +128,10 @@
         y: (clientY - rect.top) * scaleY
       };
     }
-
-    function saveToHistory() {
+      function saveToHistory() {
       if (historyStack.length >= maxHistory) historyStack.shift();
       historyStack.push(paintCtx.getImageData(0, 0, paintCanvas.width, paintCanvas.height));
-    }
-
+      }
     function startPainting(e) {
       saveToHistory();
       painting = true;
@@ -149,14 +139,12 @@
       lastX = x;
       lastY = y;
     }
-
-    function undoLastStroke() {
+      function undoLastStroke() {
       if (historyStack.length > 0) {
-        const imageData = historyStack.pop();
-        paintCtx.putImageData(imageData, 0, 0);
+      const imageData = historyStack.pop();
+      paintCtx.putImageData(imageData, 0, 0);
       }
     }
-
     function endPainting() {
       painting = false;
       paintCtx.beginPath();
@@ -240,13 +228,13 @@
 
       mergedCtx.drawImage(bgCanvas, 0, 0);
       mergedCtx.drawImage(paintCanvas, 0, 0);
-      // Do not draw overlayCanvas
 
       const dataURL = mergedCanvas.toDataURL("image/png");
       localStorage.setItem("customMaskTexture", dataURL);
       window.location.href = "index.html";
     }
 
+    
     paintCanvas.addEventListener("mousedown", startPainting);
     paintCanvas.addEventListener("mouseup", endPainting);
     paintCanvas.addEventListener("mousemove", draw);
