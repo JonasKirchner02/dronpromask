@@ -61,6 +61,7 @@
       </select>
     </label>
     <button onclick="clearCanvas()">Clear</button>
+    <button onclick="undoLastStroke()">Undo</button>
   </div>
 
   <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
@@ -71,6 +72,8 @@
   </div>
 
   <script>
+    let historyStack = [];
+    const maxHistory = 50;
     let lastX = 0;
     let lastY = 0;
 
@@ -125,14 +128,23 @@
         y: (clientY - rect.top) * scaleY
       };
     }
-
+      function saveToHistory() {
+      if (historyStack.length >= maxHistory) historyStack.shift();
+      historyStack.push(paintCtx.getImageData(0, 0, paintCanvas.width, paintCanvas.height));
+      }
     function startPainting(e) {
+      saveToHistory();
       painting = true;
       const { x, y } = getCoordinates(e);
       lastX = x;
       lastY = y;
     }
-
+      function undoLastStroke() {
+      if (historyStack.length > 0) {
+      const imageData = historyStack.pop();
+      paintCtx.putImageData(imageData, 0, 0);
+      }
+    }
     function endPainting() {
       painting = false;
       paintCtx.beginPath();
