@@ -284,7 +284,7 @@
               });
 
               const overlayMesh = new THREE.Mesh(node.geometry.clone(), overlayMaterial);
-              overlayMesh.position.set(node.position.x, node.position.y, node.position.z + 0.001);
+              overlayMesh.position.set(node.position.x, node.position.y, node.position.z + 0.1);
               overlayMesh.rotation.copy(node.rotation);
               overlayMesh.scale.copy(node.scale);
 
