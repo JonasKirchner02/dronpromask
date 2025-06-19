@@ -253,7 +253,8 @@
       mergedCtx.drawImage(paintCanvas, 0, 0);
 
       const dataURL = mergedCanvas.toDataURL("image/png");
-      localStorage.clear("customMaskTexture");
+      localStorage.clear();
+      localStorage.setItem("returnIndex", 3)
       localStorage.setItem("customMaskTexture", dataURL);
       window.location.href = "index.html";
     }
