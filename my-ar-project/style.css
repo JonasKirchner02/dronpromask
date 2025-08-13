@@ -28,6 +28,18 @@ body {
   width: 90vw;
 }
 
+.carousel-wrapper-top {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  width: 90vw;
+}
+
 .carousel-container {
   overflow: hidden;
   width: 100%;
