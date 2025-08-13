@@ -13,13 +13,34 @@
   </head>
 
   <body>
-    
     <div class="carousel-wrapper">
       <div class="ikony">
-        <img class="obrazky" id="img1" src="/ikony/zelena.png" alt="Green Icon" />
-        <img class="obrazky" id="img2" src="/ikony/cervena.png" alt="Red Icon" />
+        <img
+          class="obrazky"
+          id="img1"
+          src="/ikony/zelena.png"
+          alt="Green Icon"
+        />
+        <img
+          class="obrazky"
+          id="img2"
+          src="/ikony/cervena.png"
+          alt="Red Icon"
+        />
         <img class="obrazky" id="img3" src="/ikony/modra.png" alt="Blue Icon" />
-        <img class="obrazky" id="img4" src="/ikony/myowntext.png" alt="My Own Mask" />
+        <img
+          class="obrazky"
+          id="img4"
+          src="/ikony/myowntext.png"
+          alt="My Own Mask"
+        />
+        <img
+          class="edit-button"
+          id="img5"
+          src="/ikony/myowntextedit.png"
+          alt="Edit Icon"
+          onclick="{localStorage.setItem('returnIndex', 3); window.location.href = 'platno.html'}"
+        />
       </div>
     </div>
 
@@ -30,11 +51,9 @@
         src="/ikony/myowntextedit.png"
         alt="Edit Icon"
         onclick="{localStorage.setItem('returnIndex', 3); window.location.href = 'platno.html'}"
-        
       />
     </div>
 
-    
     <div class="example-container">
       <a-scene
         mindar-face
@@ -45,7 +64,10 @@
         device-orientation-permission-ui="enabled: false"
       >
         <a-assets>
-          <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
+          <a-asset-item
+            id="headModel"
+            src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/sparkar/headOccluder.glb"
+          ></a-asset-item>
           <a-asset-item id="maska1" src="/models/maskanew.glb"></a-asset-item>
           <a-asset-item id="maska2" src="/models/ironmanweb.glb"></a-asset-item>
           <a-asset-item id="maska3" src="/models/supinky7.glb"></a-asset-item>
@@ -94,7 +116,7 @@
           ></a-gltf-model>
         </a-entity>
 
-        <a-entity mindar-face-target="anchorIndex: 9" >
+        <a-entity mindar-face-target="anchorIndex: 9">
           <a-gltf-model
             class="maska3-entity"
             src="#maska3"
@@ -104,9 +126,7 @@
             rotation="0 0 0"
             metalness="0.2"
           ></a-gltf-model>
-          
         </a-entity>
-       
 
         <a-entity mindar-face-target="anchorIndex: 9">
           <a-gltf-model
@@ -126,23 +146,22 @@
       document.addEventListener("DOMContentLoaded", function () {
         const list = ["maska1", "maska3", "maska2", "maskaown"];
         const visibles = [false, false, false, false];
-        const allEntities = list.map(item =>
+        const allEntities = list.map((item) =>
           document.querySelectorAll("." + item + "-entity")
         );
         let currentIndex = 0;
 
-        
         let returnIndex = localStorage.getItem("returnIndex");
         if (returnIndex !== null) {
           currentIndex = parseInt(returnIndex, 10);
-          localStorage.removeItem("returnIndex"); 
-        } 
+          localStorage.removeItem("returnIndex");
+        }
 
         function showOnly(index) {
           list.forEach((_, i) => {
             const visible = i === index;
             visibles[i] = visible;
-            allEntities[i].forEach(entity => {
+            allEntities[i].forEach((entity) => {
               entity.setAttribute("visible", visible);
               if (visible) {
                 entity.removeAttribute("animation-mixer");
@@ -167,7 +186,7 @@
             });
           });
           currentIndex = index;
-          localStorage.setItem("returnIndex", `${index}`)
+          localStorage.setItem("returnIndex", `${index}`);
         }
 
         const customMaskTexture = localStorage.getItem("customMaskTexture");
@@ -200,7 +219,7 @@
         const headModelEntity = document.querySelector("#headModelEntity");
         headModelEntity.addEventListener("click", () => {
           const currentEntities = allEntities[currentIndex];
-          currentEntities.forEach(entity => {
+          currentEntities.forEach((entity) => {
             if (visibles[currentIndex]) {
               entity.removeAttribute("animation-mixer");
 
@@ -273,10 +292,10 @@
 
       function applyTextureFromData(model, dataURL) {
         const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(dataURL, texture => {
+        textureLoader.load(dataURL, (texture) => {
           texture.flipY = false;
 
-          model.getObject3D("mesh").traverse(node => {
+          model.getObject3D("mesh").traverse((node) => {
             if (node.isMesh) {
               const originalMaterial = node.material;
               const overlayMaterial = new THREE.MeshStandardMaterial({
@@ -286,8 +305,15 @@
                 depthWrite: false,
               });
 
-              const overlayMesh = new THREE.Mesh(node.geometry.clone(), overlayMaterial);
-              overlayMesh.position.set(node.position.x, node.position.y, node.position.z + 0.001);
+              const overlayMesh = new THREE.Mesh(
+                node.geometry.clone(),
+                overlayMaterial
+              );
+              overlayMesh.position.set(
+                node.position.x,
+                node.position.y,
+                node.position.z + 0.001
+              );
               overlayMesh.rotation.copy(node.rotation);
               overlayMesh.scale.copy(node.scale);
 
