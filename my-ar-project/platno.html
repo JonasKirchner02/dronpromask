@@ -30,8 +30,8 @@
 
       .canvas-container {
         position: relative;
-        width: 800px;
-        height: 800px;
+        width: 50vw;
+        height: 50vh;
         border: 1px solid #ccc;
         display: flex;
         justify-content: center;
@@ -149,8 +149,8 @@
 
       const canvasWidth = 500;
       const canvasHeight = 500;
-      const displayWidth = 800;
-      const displayHeight = 800;
+      const displayWidth = window.innerWidth * 0.5; // 50vw
+      const displayHeight = window.innerHeight * 0.5; // 80vh
       const scaleX = canvasWidth / displayWidth;
       const scaleY = canvasHeight / displayHeight;
 
