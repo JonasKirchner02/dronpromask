@@ -5,10 +5,9 @@
     <style>
       @media only screen and (orientation: landscape) and (max-width: 1366px) {
         body {
-          overflow: hidden; /* Disable scrolling */
-          height: 100vh; /* Prevent body from growing beyond viewport height */
+          overflow: hidden;
+          height: 100vh;
         }
-
         body::before {
           content: "Please rotate your device";
           position: fixed;
@@ -16,8 +15,6 @@
           left: 0;
           width: 100vw;
           height: 100vh;
-          overflow: hidden;
-
           color: #00ffff;
           display: flex;
           align-items: center;
@@ -25,8 +22,6 @@
           font-size: 3.64rem;
           text-align: center;
           z-index: 999999;
-
-          /* position: relative;  remove this, fixed is better */
           background: #000064;
         }
       }
@@ -34,8 +29,6 @@
       @font-face {
         font-family: "MyFont";
         src: url("fonts/RapidVariableSt.ttf") format("truetype");
-        font-weight: normal;
-        font-style: normal;
       }
 
       body {
@@ -54,7 +47,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        color: rgb(0, 0, 0);
       }
 
       .canvas-container {
@@ -65,20 +57,13 @@
         display: flex;
         justify-content: center;
         align-items: center;
-
         transform: translateY(5%);
       }
 
       @media only screen and (max-width: 1366px) {
         .canvas-container {
-          position: relative;
           width: 90vw;
           height: 45vh;
-          border: 1px solid #ccc;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-
           transform: translateY(20%);
         }
       }
@@ -95,18 +80,12 @@
       canvas#backgroundCanvas {
         z-index: 1;
       }
-
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
       }
-
       canvas#paintCanvas {
         z-index: 2;
-      }
-
-      .button {
-        background: aqua;
       }
     </style>
   </head>
@@ -142,7 +121,6 @@
       <button onclick="undoLastStroke()">Undo</button>
       <input type="text" id="paintingName" placeholder="Enter name" />
       <button onclick="savePainting()">Save Painting</button>
-
       <select id="paintingList" onchange="loadSelectedPainting()">
         <option value="">-- Select a saved painting --</option>
       </select>
@@ -151,16 +129,18 @@
     <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
 
     <div class="canvas-container">
-      <canvas id="backgroundCanvas" width="500" height="500"></canvas>
-      <canvas id="effectCanvas" width="500" height="500"></canvas>
-      <canvas id="paintCanvas" width="500" height="500"></canvas>
+      <canvas id="backgroundCanvas"></canvas>
+      <canvas id="effectCanvas"></canvas>
+      <canvas id="paintCanvas"></canvas>
     </div>
 
     <script>
       let historyStack = [];
       const maxHistory = 50;
-      let lastX = 0;
-      let lastY = 0;
+      let lastX = 0,
+        lastY = 0;
+      let scaleX = 1,
+        scaleY = 1;
 
       const paintCanvas = document.getElementById("paintCanvas");
       const paintCtx = paintCanvas.getContext("2d");
@@ -191,25 +171,40 @@
         brushImage.src = imageBrushSelect.value;
       });
 
-      const canvasWidth = 500; // 50vw
-      const canvasHeight = 500; // 80vh
-      const displayWidth = window.innerWidth * 0.4; // 50vw
-      const displayHeight = window.innerHeight * 0.8; // 80vh
-      const scaleX = canvasWidth / displayWidth;
-      const scaleY = canvasHeight / displayHeight;
+      // Dynamically set canvas sizes
+      function resizeCanvases() {
+        const container = document.querySelector(".canvas-container");
+        const rect = container.getBoundingClientRect();
 
-      // Load background image
+        [paintCanvas, bgCanvas, effectCanvas].forEach((canvas) => {
+          canvas.width = rect.width;
+          canvas.height = rect.height;
+        });
+
+        scaleX = paintCanvas.width / rect.width;
+        scaleY = paintCanvas.height / rect.height;
+
+        // Redraw background/effects when resizing
+        bgCtx.drawImage(bgImage, 0, 0, paintCanvas.width, paintCanvas.height);
+        effectCtx.drawImage(
+          effectImage,
+          0,
+          0,
+          paintCanvas.width,
+          paintCanvas.height
+        );
+      }
+
+      // Load background and effect images
       const bgImage = new Image();
       bgImage.src = "/UV212.png";
-      bgImage.onload = () => {
-        bgCtx.drawImage(bgImage, 0, 0, canvasWidth, canvasHeight);
-      };
+      bgImage.onload = () => resizeCanvases();
 
       const effectImage = new Image();
       effectImage.src = "/overlinky.png";
-      effectImage.onload = () => {
-        effectCtx.drawImage(effectImage, 0, 0, canvasWidth, canvasHeight);
-      };
+      effectImage.onload = () => resizeCanvases();
+
+      window.addEventListener("resize", resizeCanvases);
 
       function getCoordinates(e) {
         const rect = paintCanvas.getBoundingClientRect();
@@ -224,7 +219,7 @@
       function saveToHistory() {
         if (historyStack.length >= maxHistory) historyStack.shift();
         historyStack.push(
-          paintCtx.getImageData(0, 0, canvasWidth, canvasHeight)
+          paintCtx.getImageData(0, 0, paintCanvas.width, paintCanvas.height)
         );
       }
 
@@ -253,7 +248,7 @@
         e.preventDefault();
 
         const { x, y } = getCoordinates(e);
-        const mirrorX = canvasWidth - x;
+        const mirrorX = paintCanvas.width - x;
 
         paintCtx.lineCap = "round";
         paintCtx.strokeStyle = colorPicker.value;
@@ -266,7 +261,7 @@
           paintCtx.stroke();
 
           paintCtx.beginPath();
-          paintCtx.moveTo(canvasWidth - lastX, lastY);
+          paintCtx.moveTo(paintCanvas.width - lastX, lastY);
           paintCtx.lineTo(mirrorX, y);
           paintCtx.stroke();
         } else if (brushType.value === "soft") {
@@ -279,7 +274,7 @@
             const t = i / steps;
             const interpX = lastX + dx * t;
             const interpY = lastY + dy * t;
-            const mirrorInterpX = canvasWidth - interpX;
+            const mirrorInterpX = paintCanvas.width - interpX;
             drawSoftDot(interpX, interpY);
             drawSoftDot(mirrorInterpX, interpY);
           }
@@ -320,13 +315,13 @@
       }
 
       function clearCanvas() {
-        paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
       }
 
       function saveCanvasAndGo() {
         const mergedCanvas = document.createElement("canvas");
-        mergedCanvas.width = canvasWidth;
-        mergedCanvas.height = canvasHeight;
+        mergedCanvas.width = paintCanvas.width;
+        mergedCanvas.height = paintCanvas.height;
         const mergedCtx = mergedCanvas.getContext("2d");
 
         mergedCtx.drawImage(bgCanvas, 0, 0);
@@ -334,7 +329,6 @@
         mergedCtx.drawImage(paintCanvas, 0, 0);
 
         const dataURL = mergedCanvas.toDataURL("image/png");
-
         localStorage.setItem("returnIndex", 3);
         localStorage.setItem("customMaskTexture", dataURL);
         window.location.href = "index.html";
@@ -353,64 +347,42 @@
       paintCanvas.addEventListener("touchcancel", endPainting, {
         passive: false,
       });
+
       function savePainting() {
         const nameInput = document.getElementById("paintingName");
         const name = nameInput.value.trim();
-
         if (!name) {
           alert("Please enter a name for your painting.");
           return;
         }
-
         const savedCanvas = document.createElement("canvas");
-        savedCanvas.width = canvasWidth;
-        savedCanvas.height = canvasHeight;
+        savedCanvas.width = paintCanvas.width;
+        savedCanvas.height = paintCanvas.height;
         const savedCtx = savedCanvas.getContext("2d");
-
         savedCtx.drawImage(paintCanvas, 0, 0);
         const dataURL = savedCanvas.toDataURL("image/png");
-
-        // Get existing saved paintings or create a new object
         const savedPaintings = JSON.parse(
           localStorage.getItem("savedPaintings") || "{}"
         );
         savedPaintings[name] = dataURL;
         localStorage.setItem("savedPaintings", JSON.stringify(savedPaintings));
-
         updatePaintingList();
         nameInput.value = "";
         alert(`Painting "${name}" saved!`);
       }
 
-      function loadSavedPainting() {
-        const dataURL = localStorage.getItem("savedPainting");
-        if (dataURL) {
-          const img = new Image();
-          img.onload = () => {
-            paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-            paintCtx.drawImage(img, 0, 0);
-          };
-          img.src = dataURL;
-        } else {
-          alert("No saved painting found.");
-        }
-      }
-
       function loadSelectedPainting() {
         const select = document.getElementById("paintingList");
         const selectedName = select.value;
-
         if (!selectedName) return;
-
         const savedPaintings = JSON.parse(
           localStorage.getItem("savedPaintings") || "{}"
         );
         const dataURL = savedPaintings[selectedName];
-
         if (dataURL) {
           const img = new Image();
           img.onload = () => {
-            paintCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
             paintCtx.drawImage(img, 0, 0);
           };
           img.src = dataURL;
@@ -422,10 +394,7 @@
         const savedPaintings = JSON.parse(
           localStorage.getItem("savedPaintings") || "{}"
         );
-
-        // Clear existing options except the placeholder
         select.innerHTML = `<option value="">-- Select a saved painting --</option>`;
-
         Object.keys(savedPaintings).forEach((name) => {
           const option = document.createElement("option");
           option.value = name;
