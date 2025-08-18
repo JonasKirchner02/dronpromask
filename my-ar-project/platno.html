@@ -107,12 +107,12 @@
       </label>
       <label
         >BRUSH SIZE:
-        <input type="range" id="brushSize" min="5" max="150" value="5" />
-      </label>
+        <input type="range" id="brushSize" min="5" max="150" value="5"
+      /></label>
       <label
         >SOFT BRUSH STEPS:
-        <input type="range" id="softSteps" min="1" max="50" value="10" />
-      </label>
+        <input type="range" id="softSteps" min="1" max="50" value="10"
+      /></label>
       <label id="imageBrushPicker" style="display: none"
         >BRUSH IMAGE:
         <select id="imageBrushSelect">
@@ -180,16 +180,19 @@
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
+        // Save current painting
         const oldPaint = document.createElement("canvas");
         oldPaint.width = paintCanvas.width;
         oldPaint.height = paintCanvas.height;
         oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
 
+        // Resize canvases
         [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
           c.width = rect.width;
           c.height = rect.height;
         });
 
+        // Restore painting
         paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
         bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
         drawEffect();
@@ -207,6 +210,7 @@
       }
 
       window.addEventListener("resize", resizeCanvases);
+
       bgImage.onload = () => resizeCanvases();
       effectImage.onload = drawEffect;
 
@@ -289,69 +293,43 @@
         paintCtx.beginPath();
         paintCtx.globalAlpha = 1;
 
-        // Save current canvas automatically
         localStorage.setItem("lastPainting", paintCanvas.toDataURL());
-      }
-
-      paintCanvas.addEventListener("mousedown", startPainting);
-      paintCanvas.addEventListener("touchstart", startPainting);
-      paintCanvas.addEventListener("mousemove", draw);
-      paintCanvas.addEventListener("touchmove", draw);
-      paintCanvas.addEventListener("mouseup", endPainting);
-      paintCanvas.addEventListener("touchend", endPainting);
-
-      function clearCanvas() {
-        paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
       }
 
       function undoLastStroke() {
         if (historyStack.length > 0) {
-          const imageData = historyStack.pop();
-          paintCtx.putImageData(imageData, 0, 0);
+          const imgData = historyStack.pop();
+          paintCtx.putImageData(imgData, 0, 0);
         }
       }
 
-      // Save painting with a prefix
+      function clearCanvas() {
+        saveToHistory();
+        paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+      }
+
       function savePainting() {
         const name = document.getElementById("paintingName").value.trim();
-        if (!name) return alert("Enter a painting name!");
-        localStorage.setItem("painting_" + name, paintCanvas.toDataURL());
-        populatePaintingList();
-        alert("Saved!");
-      }
+        if (!name) return alert("Enter a name!");
+        const dataURL = paintCanvas.toDataURL();
+        localStorage.setItem(`painting_${name}`, dataURL);
 
-      // Populate only saved paintings
-      function populatePaintingList() {
-        const select = document.getElementById("paintingList");
-        select.innerHTML = '<option value="">MY PAINTINGS</option>';
-
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (!key.startsWith("painting_")) continue;
+        const paintingList = document.getElementById("paintingList");
+        if (![...paintingList.options].some((o) => o.value === name)) {
           const option = document.createElement("option");
-          option.value = key;
-          option.text = key.replace("painting_", "");
-          select.appendChild(option);
+          option.value = name;
+          option.textContent = name;
+          paintingList.appendChild(option);
         }
-      }
-
-      // Load last painting if exists
-      const lastPainting = localStorage.getItem("lastPainting");
-      if (lastPainting) {
-        const img = new Image();
-        img.onload = () => {
-          paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-          paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
-        };
-        img.src = lastPainting;
       }
 
       function loadSelectedPainting() {
         const select = document.getElementById("paintingList");
-        const key = select.value;
-        if (!key) return;
-        const dataURL = localStorage.getItem(key);
+        const name = select.value;
+        if (!name) return;
+        const dataURL = localStorage.getItem(`painting_${name}`);
         if (!dataURL) return;
+
         const img = new Image();
         img.onload = () => {
           paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
@@ -361,14 +339,50 @@
       }
 
       function saveCanvasAndGo() {
-        const dataURL = paintCanvas.toDataURL();
-        localStorage.setItem("customMaskTexture", dataURL);
-
-        window.location.href = "/index.html"; // Uncomment to navigate
+        const finalImage = paintCanvas.toDataURL();
+        localStorage.setItem("myMaskPainting", finalImage);
+        alert("Painting saved for your mask!");
       }
 
+      paintCanvas.addEventListener("mousedown", startPainting);
+      paintCanvas.addEventListener("touchstart", startPainting);
+      paintCanvas.addEventListener("mousemove", draw);
+      paintCanvas.addEventListener("touchmove", draw);
+      paintCanvas.addEventListener("mouseup", endPainting);
+      paintCanvas.addEventListener("mouseleave", endPainting);
+      paintCanvas.addEventListener("touchend", endPainting);
+
       // Initialize
-      populatePaintingList();
+      window.addEventListener("load", () => {
+        resizeCanvases();
+
+        // Load last painting
+        const lastPainting = localStorage.getItem("lastPainting");
+        if (lastPainting) {
+          const img = new Image();
+          img.onload = () =>
+            paintCtx.drawImage(
+              img,
+              0,
+              0,
+              paintCanvas.width,
+              paintCanvas.height
+            );
+          img.src = lastPainting;
+        }
+
+        // Load painting list
+        const paintingList = document.getElementById("paintingList");
+        for (let key in localStorage) {
+          if (key.startsWith("painting_")) {
+            const name = key.replace("painting_", "");
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = name;
+            paintingList.appendChild(option);
+          }
+        }
+      });
     </script>
   </body>
 </html>
