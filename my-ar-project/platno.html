@@ -159,7 +159,7 @@
       <input type="text" id="paintingName" placeholder="ENTER NAME" />
       <button onclick="savePainting()">SAVE PAINTING</button>
       <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">SELECT A PAINTING</option>
+        <option value="">MY PAINTINGS</option>
       </select>
     </div>
 
@@ -172,7 +172,7 @@
     </div>
 
     <script>
-      const placeholderText = "SELECT A PAINTING"; // customizable placeholder
+      const placeholderText = "MY PAINTINGS"; // customizable placeholder
 
       let historyStack = [];
       const maxHistory = 50;
