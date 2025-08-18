@@ -76,8 +76,8 @@
       }
 
       input::placeholder {
-        color: #00ffff;
-        opacity: 1;
+        color: #00ffff; /* same as your normal text color */
+        opacity: 1; /* some browsers apply opacity by default */
       }
 
       canvas#backgroundCanvas {
@@ -97,8 +97,8 @@
       <label
         >COLOR: <input type="color" id="colorPicker" value="#000000"
       /></label>
-      <label>
-        BRUSH TYPE:
+      <label
+        >BRUSH TYPE:
         <select id="brushType">
           <option value="classic">CLASSIC</option>
           <option value="soft">SOFTER</option>
@@ -107,17 +107,17 @@
       </label>
       <label
         >BRUSH SIZE:
-        <input type="range" id="brushSize" min="5" max="150" value="5"
-      /></label>
+        <input type="range" id="brushSize" min="5" max="150" value="5" />
+      </label>
       <label
         >SOFT BRUSH STEPS:
-        <input type="range" id="softSteps" min="1" max="50" value="10"
-      /></label>
-      <label id="imageBrushPicker" style="display: none">
-        BRUSH IMAGE:
+        <input type="range" id="softSteps" min="1" max="50" value="10" />
+      </label>
+      <label id="imageBrushPicker" style="display: none"
+        >BRUSH IMAGE:
         <select id="imageBrushSelect">
-          <option value="supina.png">BRUSH 1</option>
-          <option value="supina2.png">BRUSH 2</option>
+          <option value="/supina.png">BRUSH 1</option>
+          <option value="/supina2.png">BRUSH 2</option>
         </select>
       </label>
       <button onclick="clearCanvas()">CLEAR</button>
@@ -146,8 +146,10 @@
 
       const paintCanvas = document.getElementById("paintCanvas");
       const paintCtx = paintCanvas.getContext("2d");
+
       const bgCanvas = document.getElementById("backgroundCanvas");
       const bgCtx = bgCanvas.getContext("2d");
+
       const effectCanvas = document.getElementById("effectCanvas");
       const effectCtx = effectCanvas.getContext("2d");
 
@@ -171,10 +173,10 @@
       });
 
       const bgImage = new Image();
-      bgImage.src = "UV212.png";
+      bgImage.src = "/UV212.png";
 
       const effectImage = new Image();
-      effectImage.src = "overlinky.png";
+      effectImage.src = "/overlinky.png";
 
       function resizeCanvases() {
         const container = document.querySelector(".canvas-container");
@@ -277,96 +279,59 @@
           }
           paintCtx.globalAlpha = 1;
         } else if (brushType.value === "image") {
-          const size = brushSize.value;
-          paintCtx.drawImage(
-            brushImage,
-            x - size / 2,
-            y - size / 2,
-            size,
-            size
-          );
-          paintCtx.drawImage(
-            brushImage,
-            mirrorX - size / 2,
-            y - size / 2,
-            size,
-            size
-          );
+          const w = brushSize.value;
+          const h = brushSize.value;
+          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
+          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
         }
 
         lastX = x;
         lastY = y;
       }
 
-      function stopPainting() {
+      function endPainting() {
         painting = false;
+        paintCtx.beginPath();
+        paintCtx.globalAlpha = 1;
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
-      paintCanvas.addEventListener("mousemove", draw);
-      paintCanvas.addEventListener("mouseup", stopPainting);
-      paintCanvas.addEventListener("mouseout", stopPainting);
       paintCanvas.addEventListener("touchstart", startPainting);
+      paintCanvas.addEventListener("mousemove", draw);
       paintCanvas.addEventListener("touchmove", draw);
-      paintCanvas.addEventListener("touchend", stopPainting);
+      paintCanvas.addEventListener("mouseup", endPainting);
+      paintCanvas.addEventListener("touchend", endPainting);
 
       function clearCanvas() {
-        saveToHistory();
         paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
       }
 
       function undoLastStroke() {
         if (historyStack.length > 0) {
-          const last = historyStack.pop();
-          paintCtx.putImageData(last, 0, 0);
+          const imageData = historyStack.pop();
+          paintCtx.putImageData(imageData, 0, 0);
         }
       }
 
       function savePainting() {
-        const nameInput = document.getElementById("paintingName");
-        const name = nameInput.value.trim();
+        const name = document.getElementById("paintingName").value.trim();
         if (!name) return alert("Enter a painting name!");
-
-        const dataURL = paintCanvas.toDataURL();
-        localStorage.setItem(name, dataURL);
-
-        let savedPaintings =
-          JSON.parse(localStorage.getItem("savedPaintings")) || [];
-        if (!savedPaintings.includes(name)) {
-          savedPaintings.push(name);
-          localStorage.setItem(
-            "savedPaintings",
-            JSON.stringify(savedPaintings)
-          );
-        }
-        populatePaintingList();
-        nameInput.value = "";
-      }
-
-      function populatePaintingList() {
-        const select = document.getElementById("paintingList");
-        select.innerHTML = '<option value="">MY PAINTINGS</option>';
-        let savedPaintings =
-          JSON.parse(localStorage.getItem("savedPaintings")) || [];
-        savedPaintings.forEach((name) => {
-          const option = document.createElement("option");
-          option.value = name;
-          option.textContent = name;
-          select.appendChild(option);
-        });
+        localStorage.setItem(name, paintCanvas.toDataURL());
+        const option = document.createElement("option");
+        option.value = name;
+        option.text = name;
+        document.getElementById("paintingList").appendChild(option);
+        alert("Saved!");
       }
 
       function loadSelectedPainting() {
         const select = document.getElementById("paintingList");
         const name = select.value;
         if (!name) return;
-
         const dataURL = localStorage.getItem(name);
         if (!dataURL) return;
-
         const img = new Image();
         img.onload = () => {
-          resizeCanvases();
           paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
           paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
         };
@@ -375,11 +340,10 @@
 
       function saveCanvasAndGo() {
         const dataURL = paintCanvas.toDataURL();
-        localStorage.setItem("myMaskPainting", dataURL);
-        alert("Painting saved for mask!");
-      }
+        localStorage.setItem("customMaskTexture", dataURL);
 
-      populatePaintingList();
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>
