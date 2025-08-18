@@ -299,7 +299,7 @@
             const iy = lastY + (y - lastY) * t;
             const mirrorIX = paintCanvas.width - ix;
             const mirrorIY = iy;
-            const radius = brushSize.value * (1 - t * 0.8); // optional taper
+            const radius = brushSize.value * (1 - t * 0.2); // optional taper
 
             paintCtx.globalAlpha = 0.15; // soft, low opacity
             paintCtx.beginPath();
