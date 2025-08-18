@@ -145,20 +145,20 @@
       <label id="imageBrushPicker" style="display: none">
         BRUSH IMAGE:
         <select id="imageBrushSelect">
-          <option value="/supina.png">Brush 1</option>
-          <option value="/supina2.png">Brush 2</option>
+          <option value="/supina.png">BRUSH 1</option>
+          <option value="/supina2.png">BRUSH 2</option>
         </select>
       </label>
-      <button onclick="clearCanvas()">Clear</button>
-      <button onclick="undoLastStroke()">Undo</button>
+      <button onclick="clearCanvas()">CLEAR</button>
+      <button onclick="undoLastStroke()">UNDO</button>
       <input type="text" id="paintingName" placeholder="Enter name" />
-      <button onclick="savePainting()">Save Painting</button>
+      <button onclick="savePainting()">SAVE PAINTING</button>
       <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">-- Select a saved painting --</option>
+        <option value="">MY PAINTINGS</option>
       </select>
     </div>
 
-    <button onclick="saveCanvasAndGo()">Apply to my own mask</button>
+    <button onclick="saveCanvasAndGo()">APPLY TO MY OWN MASK</button>
 
     <div class="canvas-container">
       <canvas id="backgroundCanvas"></canvas>
