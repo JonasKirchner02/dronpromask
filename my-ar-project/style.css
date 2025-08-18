@@ -27,7 +27,13 @@ body {
     text-align: center;
     z-index: 999999;
     background: #000064;
+    font-family: "MyFont", sans-serif;
   }
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("fonts/RapidVariableSt.ttf") format("truetype");
 }
 
 .example-container {
