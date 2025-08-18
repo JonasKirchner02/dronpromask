@@ -50,8 +50,8 @@
 
       .canvas-container {
         position: relative;
-        width: 90vw;
-        height: 90vh;
+        width: 90vw; /* scales with screen width */
+        aspect-ratio: 4 / 4; /* keeps rectangle shape */
         border: 1px solid #ccc;
         display: flex;
         justify-content: center;
@@ -62,8 +62,8 @@
       @media only screen and (max-width: 1366px) {
         .canvas-container {
           width: 90vw;
-          height: 90vh;
-          transform: translateY(20%);
+          aspect-ratio: 4 / 4;
+          transform: translateY(5%);
         }
       }
 
@@ -71,8 +71,8 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 90vw;
-        height: 90vh;
+        width: 100%; /* always match container */
+        height: 100%;
         touch-action: none;
       }
 
@@ -95,12 +95,12 @@
       /></label>
       <label
         >Brush size:
-        <input type="range" id="brushSize" min="5" max="150" value="5"
-      /></label>
+        <input type="range" id="brushSize" min="5" max="150" value="5" />
+      </label>
       <label
         >Soft Brush Steps:
-        <input type="range" id="softSteps" min="1" max="50" value="1"
-      /></label>
+        <input type="range" id="softSteps" min="1" max="50" value="1" />
+      </label>
       <label
         >Brush type:
         <select id="brushType">
@@ -183,7 +183,6 @@
         scaleX = paintCanvas.width / rect.width;
         scaleY = paintCanvas.height / rect.height;
 
-        // Redraw background/effects when resizing
         bgCtx.drawImage(bgImage, 0, 0, paintCanvas.width, paintCanvas.height);
         effectCtx.drawImage(
           effectImage,
