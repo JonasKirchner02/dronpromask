@@ -4,6 +4,28 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
+        body {
+          overflow: hidden;
+          height: 100vh;
+        }
+        body::before {
+          content: "Please rotate your device";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          color: #00ffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 3.64rem;
+          text-align: center;
+          z-index: 999999;
+          background: #000064;
+        }
+      }
       @font-face {
         font-family: "MyFont";
         src: url("fonts/RapidVariableSt.ttf") format("truetype");
