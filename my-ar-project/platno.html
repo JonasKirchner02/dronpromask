@@ -340,6 +340,8 @@
       function saveCanvasAndGo() {
         const dataURL = paintCanvas.toDataURL();
         localStorage.setItem("lastMaskPaint", dataURL);
+
+        window.location.href = "index.html";
       }
     </script>
   </body>
