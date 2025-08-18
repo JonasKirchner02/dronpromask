@@ -161,7 +161,7 @@
       <input type="text" id="paintingName" placeholder="ENTER NAME" />
       <button onclick="savePainting()">SAVE PAINTING</button>
       <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="MY PAINTINGS">MY PAINTINGS</option>
+        <option value="">MY PAINTINGS</option>
       </select>
     </div>
 
@@ -432,7 +432,7 @@
         const savedPaintings = JSON.parse(
           localStorage.getItem("savedPaintings") || "{}"
         );
-        select.innerHTML = `<option value="">-- Select a saved painting --</option>`;
+        select.innerHTML = `<option value="">MY PAINTINGS</option>`;
         Object.keys(savedPaintings).forEach((name) => {
           const option = document.createElement("option");
           option.value = name;
