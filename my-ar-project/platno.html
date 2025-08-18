@@ -337,15 +337,12 @@
         img.src = dataURL;
       }
 
-      function saveCanvasAndGo()
-      { const mergedCanvas = document.createElement("canvas");
-      mergedCanvas.width = canvasWidth;
-      mergedCanvas.height = canvasHeight;
-      const mergedCtx = mergedCanvas.getContext("2d");
-      mergedCtx.drawImage(bgCanvas, 0, 0); mergedCtx.drawImage(effectCanvas, 0, 0);
-       mergedCtx.drawImage(paintCanvas, 0, 0); const dataURL = mergedCanvas.toDataURL("image/png");
-       localStorage.setItem("returnIndex", 3) localStorage.setItem("customMaskTexture", dataURL);
-       window.location.href = "index.html"; }
+      function saveCanvasAndGo() {
+        const dataURL = paintCanvas.toDataURL();
+        localStorage.setItem("lastMaskPaint", dataURL);
+
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>
