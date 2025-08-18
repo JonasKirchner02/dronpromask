@@ -116,8 +116,8 @@
       <label id="imageBrushPicker" style="display: none">
         BRUSH IMAGE:
         <select id="imageBrushSelect">
-          <option value="/supina.png">BRUSH 1</option>
-          <option value="/supina2.png">BRUSH 2</option>
+          <option value="supina.png">BRUSH 1</option>
+          <option value="supina2.png">BRUSH 2</option>
         </select>
       </label>
       <button onclick="clearCanvas()">CLEAR</button>
@@ -171,10 +171,10 @@
       });
 
       const bgImage = new Image();
-      bgImage.src = "/UV212.png";
+      bgImage.src = "UV212.png";
 
       const effectImage = new Image();
-      effectImage.src = "/overlinky.png";
+      effectImage.src = "overlinky.png";
 
       function resizeCanvases() {
         const container = document.querySelector(".canvas-container");
@@ -311,26 +311,27 @@
       paintCanvas.addEventListener("touchend", stopPainting);
 
       function clearCanvas() {
+        saveToHistory();
         paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-        historyStack = [];
       }
 
       function undoLastStroke() {
-        if (historyStack.length === 0) return;
-        const previous = historyStack.pop();
-        paintCtx.putImageData(previous, 0, 0);
+        if (historyStack.length > 0) {
+          const last = historyStack.pop();
+          paintCtx.putImageData(last, 0, 0);
+        }
       }
 
-      // --- PAINTING STORAGE LOGIC ---
       function savePainting() {
-        const name = document.getElementById("paintingName").value.trim();
+        const nameInput = document.getElementById("paintingName");
+        const name = nameInput.value.trim();
         if (!name) return alert("Enter a painting name!");
 
-        localStorage.setItem(name, paintCanvas.toDataURL());
+        const dataURL = paintCanvas.toDataURL();
+        localStorage.setItem(name, dataURL);
 
-        let savedPaintings = JSON.parse(
-          localStorage.getItem("savedPaintings") || "[]"
-        );
+        let savedPaintings =
+          JSON.parse(localStorage.getItem("savedPaintings")) || [];
         if (!savedPaintings.includes(name)) {
           savedPaintings.push(name);
           localStorage.setItem(
@@ -338,20 +339,19 @@
             JSON.stringify(savedPaintings)
           );
         }
-
         populatePaintingList();
+        nameInput.value = "";
       }
 
       function populatePaintingList() {
         const select = document.getElementById("paintingList");
         select.innerHTML = '<option value="">MY PAINTINGS</option>';
-        const savedPaintings = JSON.parse(
-          localStorage.getItem("savedPaintings") || "[]"
-        );
+        let savedPaintings =
+          JSON.parse(localStorage.getItem("savedPaintings")) || [];
         savedPaintings.forEach((name) => {
           const option = document.createElement("option");
           option.value = name;
-          option.text = name;
+          option.textContent = name;
           select.appendChild(option);
         });
       }
@@ -366,19 +366,20 @@
 
         const img = new Image();
         img.onload = () => {
+          resizeCanvases();
           paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
           paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
         };
         img.src = dataURL;
       }
 
-      populatePaintingList();
-
       function saveCanvasAndGo() {
-        alert(
-          "This would apply your painting to your mask (implement your mask logic here)."
-        );
+        const dataURL = paintCanvas.toDataURL();
+        localStorage.setItem("myMaskPainting", dataURL);
+        alert("Painting saved for mask!");
       }
+
+      populatePaintingList();
     </script>
   </body>
 </html>
