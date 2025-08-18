@@ -146,10 +146,8 @@
 
       const paintCanvas = document.getElementById("paintCanvas");
       const paintCtx = paintCanvas.getContext("2d");
-
       const bgCanvas = document.getElementById("backgroundCanvas");
       const bgCtx = bgCanvas.getContext("2d");
-
       const effectCanvas = document.getElementById("effectCanvas");
       const effectCtx = effectCanvas.getContext("2d");
 
@@ -182,19 +180,16 @@
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
-        // Save current painting
         const oldPaint = document.createElement("canvas");
         oldPaint.width = paintCanvas.width;
         oldPaint.height = paintCanvas.height;
         oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
 
-        // Resize canvases
         [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
           c.width = rect.width;
           c.height = rect.height;
         });
 
-        // Redraw contents
         paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
         bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
         drawEffect();
@@ -313,19 +308,35 @@
         }
       }
 
+      // Save painting with a prefix
       function savePainting() {
         const name = document.getElementById("paintingName").value.trim();
         if (!name) return alert("Enter a painting name!");
-        localStorage.setItem(name, paintCanvas.toDataURL());
+        localStorage.setItem("painting_" + name, paintCanvas.toDataURL());
         populatePaintingList();
         alert("Saved!");
       }
 
+      // Populate only saved paintings
+      function populatePaintingList() {
+        const select = document.getElementById("paintingList");
+        select.innerHTML = '<option value="">MY PAINTINGS</option>';
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key.startsWith("painting_")) continue;
+          const option = document.createElement("option");
+          option.value = key;
+          option.text = key.replace("painting_", "");
+          select.appendChild(option);
+        }
+      }
+
       function loadSelectedPainting() {
         const select = document.getElementById("paintingList");
-        const name = select.value;
-        if (!name) return;
-        const dataURL = localStorage.getItem(name);
+        const key = select.value;
+        if (!key) return;
+        const dataURL = localStorage.getItem(key);
         if (!dataURL) return;
         const img = new Image();
         img.onload = () => {
@@ -335,26 +346,15 @@
         img.src = dataURL;
       }
 
-      function populatePaintingList() {
-        const select = document.getElementById("paintingList");
-        select.innerHTML = '<option value="">MY PAINTINGS</option>';
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key === "customMaskTexture") continue;
-          const option = document.createElement("option");
-          option.value = key;
-          option.text = key;
-          select.appendChild(option);
-        }
-      }
-
-      window.addEventListener("load", populatePaintingList);
-
       function saveCanvasAndGo() {
         const dataURL = paintCanvas.toDataURL();
         localStorage.setItem("customMaskTexture", dataURL);
-        window.location.href = "index.html";
+        alert("Saved custom mask texture!");
+        // window.location.href = "/mask.html"; // Uncomment to navigate
       }
+
+      // Initialize
+      populatePaintingList();
     </script>
   </body>
 </html>
