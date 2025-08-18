@@ -76,8 +76,8 @@
       }
 
       input::placeholder {
-        color: #00ffff; /* same as your normal text color */
-        opacity: 1; /* some browsers apply opacity by default */
+        color: #00ffff;
+        opacity: 1;
       }
 
       canvas#backgroundCanvas {
@@ -317,10 +317,8 @@
         const name = document.getElementById("paintingName").value.trim();
         if (!name) return alert("Enter a painting name!");
         localStorage.setItem(name, paintCanvas.toDataURL());
-        const option = document.createElement("option");
-        option.value = name;
-        option.text = name;
-        document.getElementById("paintingList").appendChild(option);
+        populatePaintingList();
+        alert("Saved!");
       }
 
       function loadSelectedPainting() {
@@ -337,10 +335,24 @@
         img.src = dataURL;
       }
 
+      function populatePaintingList() {
+        const select = document.getElementById("paintingList");
+        select.innerHTML = '<option value="">MY PAINTINGS</option>';
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key === "customMaskTexture") continue;
+          const option = document.createElement("option");
+          option.value = key;
+          option.text = key;
+          select.appendChild(option);
+        }
+      }
+
+      window.addEventListener("load", populatePaintingList);
+
       function saveCanvasAndGo() {
         const dataURL = paintCanvas.toDataURL();
         localStorage.setItem("customMaskTexture", dataURL);
-
         window.location.href = "index.html";
       }
     </script>
