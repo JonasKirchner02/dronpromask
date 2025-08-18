@@ -58,13 +58,17 @@
       input,
       input[type="text"],
       input[type="color"],
-      input[type="range"],
-      input[type="placeholder"] {
+      input[type="range"] {
         background-color: #2626ff;
         color: #00ffff; /* so the text stays readable */
         border: none; /* optional: cleaner look */
         padding: 2px 4px;
         border-radius: 4px; /* optional: rounded edges */
+      }
+
+      input::placeholder {
+        color: #00ffff; /* same as your normal text color */
+        opacity: 1; /* some browsers apply opacity by default */
       }
 
       .canvas-container {
