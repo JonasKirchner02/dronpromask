@@ -316,36 +316,55 @@
       function savePainting() {
         const name = document.getElementById("paintingName").value.trim();
         if (!name) return alert("Enter a painting name!");
+
+        // Save painting data
         localStorage.setItem(name, paintCanvas.toDataURL());
+
+        // Update a dedicated list of painting names
+        let savedPaintings = JSON.parse(
+          localStorage.getItem("savedPaintings") || "[]"
+        );
+        if (!savedPaintings.includes(name)) {
+          savedPaintings.push(name);
+          localStorage.setItem(
+            "savedPaintings",
+            JSON.stringify(savedPaintings)
+          );
+        }
+
         populatePaintingList();
-        alert("Saved!");
+      }
+
+      function populatePaintingList() {
+        const select = document.getElementById("paintingList");
+        select.innerHTML = '<option value="">MY PAINTINGS</option>';
+
+        const savedPaintings = JSON.parse(
+          localStorage.getItem("savedPaintings") || "[]"
+        );
+
+        savedPaintings.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.text = name;
+          select.appendChild(option);
+        });
       }
 
       function loadSelectedPainting() {
         const select = document.getElementById("paintingList");
         const name = select.value;
         if (!name) return;
+
         const dataURL = localStorage.getItem(name);
         if (!dataURL) return;
+
         const img = new Image();
         img.onload = () => {
           paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
           paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
         };
         img.src = dataURL;
-      }
-
-      function populatePaintingList() {
-        const select = document.getElementById("paintingList");
-        select.innerHTML = '<option value="">MY PAINTINGS</option>';
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key === "customMaskTexture") continue;
-          const option = document.createElement("option");
-          option.value = key;
-          option.text = key;
-          select.appendChild(option);
-        }
       }
 
       window.addEventListener("load", populatePaintingList);
