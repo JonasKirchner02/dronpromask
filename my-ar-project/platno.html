@@ -77,12 +77,12 @@
       canvas#backgroundCanvas {
         z-index: 1;
       }
+      canvas#paintCanvas {
+        z-index: 2;
+      }
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
-      }
-      canvas#paintCanvas {
-        z-index: 2;
       }
     </style>
   </head>
@@ -127,16 +127,16 @@
 
     <div class="canvas-container">
       <canvas id="backgroundCanvas"></canvas>
-      <canvas id="effectCanvas"></canvas>
       <canvas id="paintCanvas"></canvas>
+      <canvas id="effectCanvas"></canvas>
     </div>
 
     <script>
-      const placeholderText = "MY PAINTINGS";
       let historyStack = [];
       const maxHistory = 50;
       let lastX = 0,
         lastY = 0;
+      let painting = false;
 
       const paintCanvas = document.getElementById("paintCanvas");
       const paintCtx = paintCanvas.getContext("2d");
@@ -154,7 +154,6 @@
       const imageBrushPicker = document.getElementById("imageBrushPicker");
       const imageBrushSelect = document.getElementById("imageBrushSelect");
 
-      let painting = false;
       let brushImage = new Image();
       brushImage.src = imageBrushSelect.value;
 
@@ -169,6 +168,7 @@
 
       const bgImage = new Image();
       bgImage.src = "/UV212.png";
+
       const effectImage = new Image();
       effectImage.src = "/overlinky.png";
 
@@ -176,15 +176,11 @@
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
+        // Save current painting
         const oldPaint = document.createElement("canvas");
         oldPaint.width = paintCanvas.width;
         oldPaint.height = paintCanvas.height;
         oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
-
-        const oldEffect = document.createElement("canvas");
-        oldEffect.width = effectCanvas.width;
-        oldEffect.height = effectCanvas.height;
-        oldEffect.getContext("2d").drawImage(effectCanvas, 0, 0);
 
         // Resize canvases
         [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
@@ -192,23 +188,32 @@
           c.height = rect.height;
         });
 
-        // Draw content scaled to new size
+        // Redraw contents
         paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
         bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
-        effectCtx.drawImage(oldEffect, 0, 0, rect.width, rect.height);
+        drawEffect();
+      }
+
+      function drawEffect() {
+        effectCtx.clearRect(0, 0, effectCanvas.width, effectCanvas.height);
+        effectCtx.drawImage(
+          effectImage,
+          0,
+          0,
+          effectCanvas.width,
+          effectCanvas.height
+        );
       }
 
       window.addEventListener("resize", resizeCanvases);
-      bgImage.onload = effectImage.onload = resizeCanvases;
+      bgImage.onload = () => resizeCanvases();
+      effectImage.onload = drawEffect;
 
       function getCoordinates(e) {
         const rect = paintCanvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-          x: clientX - rect.left,
-          y: clientY - rect.top,
-        };
+        return { x: clientX - rect.left, y: clientY - rect.top };
       }
 
       function saveToHistory() {
