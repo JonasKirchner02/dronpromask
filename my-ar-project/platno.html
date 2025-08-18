@@ -46,7 +46,19 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+      }
+
+      label,
+      button,
+      select,
+      input[type="text"],
+      input[type="color"],
+      input[type="range"] {
         background-color: red;
+        color: white; /* so the text stays readable */
+        border: none; /* optional: cleaner look */
+        padding: 5px 10px; /* optional: spacing */
+        border-radius: 4px; /* optional: rounded edges */
       }
 
       .canvas-container {
