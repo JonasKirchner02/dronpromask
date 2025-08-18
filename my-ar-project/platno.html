@@ -299,11 +299,11 @@
             const iy = lastY + (y - lastY) * t;
             const mirrorIX = paintCanvas.width - ix;
             const mirrorIY = iy;
-            const radius = brushSize.value * (1 - t * 0.2); // optional taper
+            const radius = brushSize.value * (1 - t * 0.8); // optional taper
 
             paintCtx.globalAlpha = 0.15; // soft, low opacity
             paintCtx.beginPath();
-            paintCtx.arc(ix, iy, radius / 2, 0, Math.PI * 2);
+            paintCtx.arc(ix, iy, radius / 2, 0, Math.PI * 1);
             paintCtx.fillStyle = colorPicker.value;
             paintCtx.fill();
 
