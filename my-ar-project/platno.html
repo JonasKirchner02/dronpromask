@@ -288,6 +288,9 @@
         painting = false;
         paintCtx.beginPath();
         paintCtx.globalAlpha = 1;
+
+        // Save current canvas automatically
+        localStorage.setItem("lastPainting", paintCanvas.toDataURL());
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
@@ -330,6 +333,17 @@
           option.text = key.replace("painting_", "");
           select.appendChild(option);
         }
+      }
+
+      // Load last painting if exists
+      const lastPainting = localStorage.getItem("lastPainting");
+      if (lastPainting) {
+        const img = new Image();
+        img.onload = () => {
+          paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+          paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
+        };
+        img.src = lastPainting;
       }
 
       function loadSelectedPainting() {
