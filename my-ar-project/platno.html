@@ -213,38 +213,59 @@
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
-        // Save current painting
-        const paintingData = paintCtx.getImageData(
+        // Store current canvas contents
+        const paintData = paintCtx.getImageData(
           0,
           0,
           paintCanvas.width,
           paintCanvas.height
         );
+        const bgData = bgCtx.getImageData(
+          0,
+          0,
+          bgCanvas.width,
+          bgCanvas.height
+        );
+        const effectData = effectCtx.getImageData(
+          0,
+          0,
+          effectCanvas.width,
+          effectCanvas.height
+        );
+
+        const oldWidth = paintCanvas.width;
+        const oldHeight = paintCanvas.height;
 
         [paintCanvas, bgCanvas, effectCanvas].forEach((canvas) => {
           canvas.width = rect.width;
           canvas.height = rect.height;
         });
 
-        scaleX = paintCanvas.width / rect.width;
-        scaleY = paintCanvas.height / rect.height;
+        const scaleX = rect.width / oldWidth;
+        const scaleY = rect.height / oldHeight;
 
-        // Redraw background and effect layers
-        bgCtx.drawImage(bgImage, 0, 0, paintCanvas.width, paintCanvas.height);
-        effectCtx.drawImage(
-          effectImage,
-          0,
-          0,
-          paintCanvas.width,
-          paintCanvas.height
-        );
+        // Scale and redraw painting
+        paintCtx.putImageData(paintData, 0, 0);
+        paintCtx.save();
+        paintCtx.scale(scaleX, scaleY);
+        paintCtx.drawImage(paintCanvas, 0, 0);
+        paintCtx.restore();
 
-        // Restore painting
-        paintCtx.putImageData(paintingData, 0, 0);
+        // Scale and redraw background
+        bgCtx.save();
+        bgCtx.scale(scaleX, scaleY);
+        bgCtx.drawImage(bgImage, 0, 0, oldWidth, oldHeight);
+        bgCtx.restore();
+
+        // Scale and redraw effect layer
+        effectCtx.save();
+        effectCtx.scale(scaleX, scaleY);
+        effectCtx.drawImage(effectImage, 0, 0, oldWidth, oldHeight);
+        effectCtx.restore();
       }
 
-      bgImage.onload = effectImage.onload = () => resizeCanvases();
       window.addEventListener("resize", resizeCanvases);
+      bgImage.onload = effectImage.onload = resizeCanvases;
 
       function getCoordinates(e) {
         const rect = paintCanvas.getBoundingClientRect();
