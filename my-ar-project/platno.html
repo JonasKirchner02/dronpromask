@@ -32,7 +32,7 @@
           text-align: center;
           z-index: 999999;
           background: #000064;
-          font-family: "MyFont", sans-serif; /* custom font */
+          font-family: "MyFont", sans-serif;
         }
       }
 
@@ -51,7 +51,6 @@
         font-size: 1rem;
       }
 
-      /* --- REST OF YOUR CSS --- */
       .controls {
         margin-bottom: 10px;
         display: flex;
@@ -69,7 +68,6 @@
         background-color: #2626ff;
         color: #00ffff;
         border: none;
-
         border-radius: 4px;
         font-family: "MyFont", sans-serif;
       }
@@ -83,7 +81,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 6px 6px; /* increase top/bottom padding */
+        padding: 6px 6px;
       }
 
       .canvas-container {
@@ -161,7 +159,7 @@
       <input type="text" id="paintingName" placeholder="ENTER NAME" />
       <button onclick="savePainting()">SAVE PAINTING</button>
       <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">MY PAINTINGS</option>
+        <option value="">SELECT A PAINTING</option>
       </select>
     </div>
 
@@ -174,6 +172,8 @@
     </div>
 
     <script>
+      const placeholderText = "SELECT A PAINTING"; // customizable placeholder
+
       let historyStack = [];
       const maxHistory = 50;
       let lastX = 0,
@@ -210,7 +210,6 @@
         brushImage.src = imageBrushSelect.value;
       });
 
-      // Dynamically set canvas sizes
       function resizeCanvases() {
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
@@ -233,7 +232,6 @@
         );
       }
 
-      // Load background and effect images
       const bgImage = new Image();
       bgImage.src = "/UV212.png";
       bgImage.onload = () => resizeCanvases();
@@ -303,142 +301,98 @@
           paintCtx.lineTo(mirrorX, y);
           paintCtx.stroke();
         } else if (brushType.value === "soft") {
-          const dx = x - lastX;
-          const dy = y - lastY;
-          const distance = Math.hypot(dx, dy);
-          const steps = Math.ceil(distance / softSteps.value);
-
+          const steps = parseInt(softSteps.value);
           for (let i = 0; i < steps; i++) {
             const t = i / steps;
-            const interpX = lastX + dx * t;
-            const interpY = lastY + dy * t;
-            const mirrorInterpX = paintCanvas.width - interpX;
-            drawSoftDot(interpX, interpY);
-            drawSoftDot(mirrorInterpX, interpY);
+            const ix = lastX + (x - lastX) * t;
+            const iy = lastY + (y - lastY) * t;
+            const mirrorIX = paintCanvas.width - ix;
+            const mirrorIY = iy;
+            paintCtx.beginPath();
+            paintCtx.arc(ix, iy, brushSize.value / 2, 0, Math.PI * 2);
+            paintCtx.fillStyle = colorPicker.value;
+            paintCtx.fill();
+
+            paintCtx.beginPath();
+            paintCtx.arc(
+              mirrorIX,
+              mirrorIY,
+              brushSize.value / 2,
+              0,
+              Math.PI * 2
+            );
+            paintCtx.fillStyle = colorPicker.value;
+            paintCtx.fill();
           }
-        } else if (brushType.value === "image" && brushImage.complete) {
-          const size = parseInt(brushSize.value);
-          paintCtx.drawImage(
-            brushImage,
-            x - size / 2,
-            y - size / 2,
-            size,
-            size
-          );
-          paintCtx.drawImage(
-            brushImage,
-            mirrorX - size / 2,
-            y - size / 2,
-            size,
-            size
-          );
+        } else if (brushType.value === "image") {
+          const w = brushSize.value;
+          const h = brushSize.value;
+          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
+          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
         }
 
         lastX = x;
         lastY = y;
       }
 
-      function drawSoftDot(x, y) {
-        const radius = brushSize.value * 2;
-        const color = colorPicker.value;
-        const gradient = paintCtx.createRadialGradient(x, y, 0, x, y, radius);
-        gradient.addColorStop(0.0, color + "AA");
-        gradient.addColorStop(0.2, color + "66");
-        gradient.addColorStop(0.5, color + "22");
-        gradient.addColorStop(1.0, color + "00");
-        paintCtx.fillStyle = gradient;
-        paintCtx.beginPath();
-        paintCtx.arc(x, y, radius, 0, Math.PI * 2);
-        paintCtx.fill();
-      }
+      paintCanvas.addEventListener("mousedown", startPainting);
+      paintCanvas.addEventListener("touchstart", startPainting);
+
+      paintCanvas.addEventListener("mouseup", endPainting);
+      paintCanvas.addEventListener("touchend", endPainting);
+
+      paintCanvas.addEventListener("mousemove", draw);
+      paintCanvas.addEventListener("touchmove", draw);
 
       function clearCanvas() {
+        saveToHistory();
         paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
       }
-
-      function saveCanvasAndGo() {
-        const mergedCanvas = document.createElement("canvas");
-        mergedCanvas.width = paintCanvas.width;
-        mergedCanvas.height = paintCanvas.height;
-        const mergedCtx = mergedCanvas.getContext("2d");
-
-        mergedCtx.drawImage(bgCanvas, 0, 0);
-        mergedCtx.drawImage(effectCanvas, 0, 0);
-        mergedCtx.drawImage(paintCanvas, 0, 0);
-
-        const dataURL = mergedCanvas.toDataURL("image/png");
-        localStorage.setItem("returnIndex", 3);
-        localStorage.setItem("customMaskTexture", dataURL);
-        window.location.href = "index.html";
-      }
-
-      paintCanvas.addEventListener("mousedown", startPainting);
-      paintCanvas.addEventListener("mouseup", endPainting);
-      paintCanvas.addEventListener("mousemove", draw);
-      paintCanvas.addEventListener("mouseleave", endPainting);
-
-      paintCanvas.addEventListener("touchstart", startPainting, {
-        passive: false,
-      });
-      paintCanvas.addEventListener("touchend", endPainting, { passive: false });
-      paintCanvas.addEventListener("touchmove", draw, { passive: false });
-      paintCanvas.addEventListener("touchcancel", endPainting, {
-        passive: false,
-      });
 
       function savePainting() {
         const nameInput = document.getElementById("paintingName");
         const name = nameInput.value.trim();
-        if (!name) {
-          alert("Please enter a name for your painting.");
-          return;
-        }
-        const savedCanvas = document.createElement("canvas");
-        savedCanvas.width = paintCanvas.width;
-        savedCanvas.height = paintCanvas.height;
-        const savedCtx = savedCanvas.getContext("2d");
-        savedCtx.drawImage(paintCanvas, 0, 0);
-        const dataURL = savedCanvas.toDataURL("image/png");
-        const savedPaintings = JSON.parse(
-          localStorage.getItem("savedPaintings") || "{}"
-        );
-        savedPaintings[name] = dataURL;
-        localStorage.setItem("savedPaintings", JSON.stringify(savedPaintings));
+        if (!name) return alert("Please enter a name for your painting.");
+
+        const dataUrl = paintCanvas.toDataURL();
+        localStorage.setItem("painting_" + name, dataUrl);
+
         updatePaintingList();
         nameInput.value = "";
-        alert(`Painting "${name}" saved!`);
-      }
-
-      function loadSelectedPainting() {
-        const select = document.getElementById("paintingList");
-        const selectedName = select.value;
-        if (!selectedName) return;
-        const savedPaintings = JSON.parse(
-          localStorage.getItem("savedPaintings") || "{}"
-        );
-        const dataURL = savedPaintings[selectedName];
-        if (dataURL) {
-          const img = new Image();
-          img.onload = () => {
-            paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-            paintCtx.drawImage(img, 0, 0);
-          };
-          img.src = dataURL;
-        }
       }
 
       function updatePaintingList() {
         const select = document.getElementById("paintingList");
-        const savedPaintings = JSON.parse(
-          localStorage.getItem("savedPaintings") || "{}"
-        );
-        select.innerHTML = `<option value="">MY PAINTINGS</option>`;
-        Object.keys(savedPaintings).forEach((name) => {
-          const option = document.createElement("option");
-          option.value = name;
-          option.textContent = name;
-          select.appendChild(option);
-        });
+        select.innerHTML = `<option value="">${placeholderText}</option>`;
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith("painting_")) {
+            const name = key.replace("painting_", "");
+            const option = document.createElement("option");
+            option.value = key;
+            option.textContent = name;
+            select.appendChild(option);
+          }
+        }
+      }
+
+      function loadSelectedPainting() {
+        const select = document.getElementById("paintingList");
+        const key = select.value;
+        if (!key) return;
+        const dataUrl = localStorage.getItem(key);
+
+        const img = new Image();
+        img.onload = () =>
+          paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
+        img.src = dataUrl;
+      }
+
+      function saveCanvasAndGo() {
+        const finalDataUrl = paintCanvas.toDataURL();
+        localStorage.setItem("my_mask_painting", finalDataUrl);
+        alert("Canvas saved! You can now apply it to your mask.");
       }
 
       updatePaintingList();
