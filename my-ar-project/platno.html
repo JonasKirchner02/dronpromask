@@ -97,8 +97,8 @@
       <label
         >COLOR: <input type="color" id="colorPicker" value="#000000"
       /></label>
-      <label
-        >BRUSH TYPE:
+      <label>
+        BRUSH TYPE:
         <select id="brushType">
           <option value="classic">CLASSIC</option>
           <option value="soft">SOFTER</option>
@@ -107,14 +107,14 @@
       </label>
       <label
         >BRUSH SIZE:
-        <input type="range" id="brushSize" min="5" max="150" value="5" />
-      </label>
+        <input type="range" id="brushSize" min="5" max="150" value="5"
+      /></label>
       <label
         >SOFT BRUSH STEPS:
-        <input type="range" id="softSteps" min="1" max="50" value="10" />
-      </label>
-      <label id="imageBrushPicker" style="display: none"
-        >BRUSH IMAGE:
+        <input type="range" id="softSteps" min="1" max="50" value="10"
+      /></label>
+      <label id="imageBrushPicker" style="display: none">
+        BRUSH IMAGE:
         <select id="imageBrushSelect">
           <option value="/supina.png">BRUSH 1</option>
           <option value="/supina2.png">BRUSH 2</option>
@@ -146,10 +146,8 @@
 
       const paintCanvas = document.getElementById("paintCanvas");
       const paintCtx = paintCanvas.getContext("2d");
-
       const bgCanvas = document.getElementById("backgroundCanvas");
       const bgCtx = bgCanvas.getContext("2d");
-
       const effectCanvas = document.getElementById("effectCanvas");
       const effectCtx = effectCanvas.getContext("2d");
 
@@ -279,48 +277,57 @@
           }
           paintCtx.globalAlpha = 1;
         } else if (brushType.value === "image") {
-          const w = brushSize.value;
-          const h = brushSize.value;
-          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
-          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
+          const size = brushSize.value;
+          paintCtx.drawImage(
+            brushImage,
+            x - size / 2,
+            y - size / 2,
+            size,
+            size
+          );
+          paintCtx.drawImage(
+            brushImage,
+            mirrorX - size / 2,
+            y - size / 2,
+            size,
+            size
+          );
         }
 
         lastX = x;
         lastY = y;
       }
 
-      function endPainting() {
+      function stopPainting() {
         painting = false;
-        paintCtx.beginPath();
-        paintCtx.globalAlpha = 1;
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
-      paintCanvas.addEventListener("touchstart", startPainting);
       paintCanvas.addEventListener("mousemove", draw);
+      paintCanvas.addEventListener("mouseup", stopPainting);
+      paintCanvas.addEventListener("mouseout", stopPainting);
+      paintCanvas.addEventListener("touchstart", startPainting);
       paintCanvas.addEventListener("touchmove", draw);
-      paintCanvas.addEventListener("mouseup", endPainting);
-      paintCanvas.addEventListener("touchend", endPainting);
+      paintCanvas.addEventListener("touchend", stopPainting);
 
       function clearCanvas() {
         paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+        historyStack = [];
       }
 
       function undoLastStroke() {
-        if (historyStack.length > 0) {
-          const imageData = historyStack.pop();
-          paintCtx.putImageData(imageData, 0, 0);
-        }
+        if (historyStack.length === 0) return;
+        const previous = historyStack.pop();
+        paintCtx.putImageData(previous, 0, 0);
       }
 
+      // --- PAINTING STORAGE LOGIC ---
       function savePainting() {
         const name = document.getElementById("paintingName").value.trim();
         if (!name) return alert("Enter a painting name!");
 
-        // Save painting data
         localStorage.setItem(name, paintCanvas.toDataURL());
 
-        // Update a dedicated list of painting names
         let savedPaintings = JSON.parse(
           localStorage.getItem("savedPaintings") || "[]"
         );
@@ -338,11 +345,9 @@
       function populatePaintingList() {
         const select = document.getElementById("paintingList");
         select.innerHTML = '<option value="">MY PAINTINGS</option>';
-
         const savedPaintings = JSON.parse(
           localStorage.getItem("savedPaintings") || "[]"
         );
-
         savedPaintings.forEach((name) => {
           const option = document.createElement("option");
           option.value = name;
@@ -367,12 +372,12 @@
         img.src = dataURL;
       }
 
-      window.addEventListener("load", populatePaintingList);
+      populatePaintingList();
 
       function saveCanvasAndGo() {
-        const dataURL = paintCanvas.toDataURL();
-        localStorage.setItem("customMaskTexture", dataURL);
-        window.location.href = "index.html";
+        alert(
+          "This would apply your painting to your mask (implement your mask logic here)."
+        );
       }
     </script>
   </body>
