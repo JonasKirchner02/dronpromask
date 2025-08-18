@@ -339,7 +339,7 @@
 
       function saveCanvasAndGo() {
         const dataURL = paintCanvas.toDataURL();
-        localStorage.setItem("lastMaskPaint", dataURL);
+        localStorage.setItem("customMaskTexture", dataURL);
 
         window.location.href = "index.html";
       }
