@@ -340,8 +340,8 @@
 
       function saveCanvasAndGo() {
         const finalImage = paintCanvas.toDataURL();
-        localStorage.setItem("myMaskPainting", finalImage);
-        alert("Painting saved for your mask!");
+        localStorage.setItem("customMaskTexture", finalImage);
+        window.location.href = "index.html";
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
