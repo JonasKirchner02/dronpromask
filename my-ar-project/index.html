@@ -145,94 +145,37 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-          const list = ["maska1", "maska3", "maska2", "maskaown"];
-          const visibles = [false, false, false, false];
-          const allEntities = list.map((item) =>
-            document.querySelectorAll("." + item + "-entity")
-          );
-          let currentIndex = 0;
+      document.addEventListener("DOMContentLoaded", function () {
+        const list = ["maska1", "maska3", "maska2", "maskaown"];
+        const visibles = [false, false, false, false];
+        const allEntities = list.map((item) =>
+          document.querySelectorAll("." + item + "-entity")
+        );
+        let currentIndex = 0;
 
-          let returnIndex = localStorage.getItem("returnIndex");
-          if (returnIndex !== null) {
-            currentIndex = parseInt(returnIndex, 10);
-            localStorage.removeItem("returnIndex");
-          }
+        let returnIndex = localStorage.getItem("returnIndex");
+        if (returnIndex !== null) {
+          currentIndex = parseInt(returnIndex, 10);
+          localStorage.removeItem("returnIndex");
+        }
 
-          function showOnly(index) {
-            list.forEach((_, i) => {
-              const visible = i === index;
-              visibles[i] = visible;
-              allEntities[i].forEach((entity) => {
-                entity.setAttribute("visible", visible);
-                if (visible) {
-                  entity.removeAttribute("animation-mixer");
-
-                  const clipName =
-                    list[i] === "maska1"
-                      ? "animace zelena"
-                      : list[i] === "maska2"
-                      ? "animace masky"
-                      : list[i] === "maska3"
-                      ? "animace cerv"
-                      : list[i] === "maskaown"
-                      ? "myanimace"
-                      : "";
-
-                  entity.setAttribute("animation-mixer", {
-                    clip: clipName,
-                    loop: "once",
-                    clampWhenFinished: true,
-                  });
-                }
-              });
-            });
-            currentIndex = index;
-            localStorage.setItem("returnIndex", `${index}`);
-          }
-
-          const customMaskTexture = localStorage.getItem("customMaskTexture");
-          if (customMaskTexture) {
-            const maskModel = document.querySelector(".maskaown-entity");
-            if (maskModel.getObject3D("mesh")) {
-              applyTextureFromData(maskModel, customMaskTexture);
-            } else {
-              maskModel.addEventListener("model-loaded", () => {
-                applyTextureFromData(maskModel, customMaskTexture);
-              });
-            }
-          }
-
-          showOnly(currentIndex);
-
-          document.querySelector("#img1").addEventListener("click", () => {
-            showOnly(0);
-          });
-          document.querySelector("#img2").addEventListener("click", () => {
-            showOnly(1);
-          });
-          document.querySelector("#img3").addEventListener("click", () => {
-            showOnly(2);
-          });
-          document.querySelector("#img4").addEventListener("click", () => {
-            showOnly(3);
-          });
-
-          const headModelEntity = document.querySelector("#headModelEntity");
-          headModelEntity.addEventListener("click", () => {
-            const currentEntities = allEntities[currentIndex];
-            currentEntities.forEach((entity) => {
-              if (visibles[currentIndex]) {
+        function showOnly(index) {
+          list.forEach((_, i) => {
+            const visible = i === index;
+            visibles[i] = visible;
+            allEntities[i].forEach((entity) => {
+              entity.setAttribute("visible", visible);
+              if (visible) {
                 entity.removeAttribute("animation-mixer");
 
                 const clipName =
-                  list[currentIndex] === "maska1"
+                  list[i] === "maska1"
                     ? "animace zelena"
-                    : list[currentIndex] === "maska2"
+                    : list[i] === "maska2"
                     ? "animace masky"
-                    : list[currentIndex] === "maska3"
+                    : list[i] === "maska3"
                     ? "animace cerv"
-                    : list[currentIndex] === "maskaown"
+                    : list[i] === "maskaown"
                     ? "myanimace"
                     : "";
 
@@ -244,114 +187,143 @@
               }
             });
           });
+          currentIndex = index;
+          localStorage.setItem("returnIndex", `${index}`);
+        }
 
-          let startX = 0;
-          let isDragging = false;
+        const customMaskTexture = localStorage.getItem("customMaskTexture");
+        if (customMaskTexture) {
+          const maskModel = document.querySelector(".maskaown-entity");
+          if (maskModel.getObject3D("mesh")) {
+            applyTextureFromData(maskModel, customMaskTexture);
+          } else {
+            maskModel.addEventListener("model-loaded", () => {
+              applyTextureFromData(maskModel, customMaskTexture);
+            });
+          }
+        }
 
-          document.body.addEventListener("mousedown", function (event) {
-            isDragging = true;
-            startX = event.clientX;
-          });
+        showOnly(currentIndex);
 
-          document.body.addEventListener("mousemove", function (event) {
-            if (isDragging) {
-              const diff = event.clientX - startX;
-              if (Math.abs(diff) > 50) {
-                if (diff < 0) {
-                  currentIndex = (currentIndex + 1) % list.length;
-                } else if (diff > 0) {
-                  currentIndex = (currentIndex - 1 + list.length) % list.length;
-                }
-                showOnly(currentIndex);
-                isDragging = false;
-              }
-            }
-          });
+        document.querySelector("#img1").addEventListener("click", () => {
+          showOnly(0);
+        });
+        document.querySelector("#img2").addEventListener("click", () => {
+          showOnly(1);
+        });
+        document.querySelector("#img3").addEventListener("click", () => {
+          showOnly(2);
+        });
+        document.querySelector("#img4").addEventListener("click", () => {
+          showOnly(3);
+        });
 
-          document.body.addEventListener("mouseup", function () {
-            isDragging = false;
-          });
+        const headModelEntity = document.querySelector("#headModelEntity");
+        headModelEntity.addEventListener("click", () => {
+          const currentEntities = allEntities[currentIndex];
+          currentEntities.forEach((entity) => {
+            if (visibles[currentIndex]) {
+              entity.removeAttribute("animation-mixer");
 
-          let startTouchX = 0;
+              const clipName =
+                list[currentIndex] === "maska1"
+                  ? "animace zelena"
+                  : list[currentIndex] === "maska2"
+                  ? "animace masky"
+                  : list[currentIndex] === "maska3"
+                  ? "animace cerv"
+                  : list[currentIndex] === "maskaown"
+                  ? "myanimace"
+                  : "";
 
-          document.body.addEventListener("touchstart", function (event) {
-            startTouchX = event.touches[0].clientX;
-          });
-
-          document.body.addEventListener("touchmove", function (event) {
-            const diff = event.touches[0].clientX - startTouchX;
-            if (Math.abs(diff) > 50) {
-              if (diff < 0) {
-                currentIndex = (currentIndex + 1) % list.length;
-              } else {
-                currentIndex = (currentIndex - 1 + list.length) % list.length;
-              }
-              showOnly(currentIndex);
-              startTouchX = event.touches[0].clientX;
+              entity.setAttribute("animation-mixer", {
+                clip: clipName,
+                loop: "once",
+                clampWhenFinished: true,
+              });
             }
           });
         });
 
-        function applyTextureFromData(model, dataURL) {
-          const textureLoader = new THREE.TextureLoader();
-          textureLoader.load(dataURL, (texture) => {
-            texture.flipY = false;
+        let startX = 0;
+        let isDragging = false;
 
-            model.getObject3D("mesh").traverse((node) => {
-              if (node.isMesh) {
-                const originalMaterial = node.material;
-                const overlayMaterial = new THREE.MeshStandardMaterial({
-                  map: texture,
-                  transparent: true,
-                  opacity: 1,
-                  depthWrite: false,
-                });
+        document.body.addEventListener("mousedown", function (event) {
+          isDragging = true;
+          startX = event.clientX;
+        });
 
-                const overlayMesh = new THREE.Mesh(
-                  node.geometry.clone(),
-                  overlayMaterial
-                );
-                overlayMesh.position.set(
-                  node.position.x,
-                  node.position.y,
-                  node.position.z + 0.001
-                );
-                overlayMesh.rotation.copy(node.rotation);
-                overlayMesh.scale.copy(node.scale);
-
-                node.parent.add(overlayMesh);
+        document.body.addEventListener("mousemove", function (event) {
+          if (isDragging) {
+            const diff = event.clientX - startX;
+            if (Math.abs(diff) > 50) {
+              if (diff < 0) {
+                currentIndex = (currentIndex + 1) % list.length;
+              } else if (diff > 0) {
+                currentIndex = (currentIndex - 1 + list.length) % list.length;
               }
+              showOnly(currentIndex);
+              isDragging = false;
+            }
+          }
+        });
 
-              document.getElementById("downloadBtn").addEventListener("click", () => {
-      const scene = document.querySelector("a-scene");
-      const renderer = scene.renderer;
-      const canvas = renderer.domElement;
+        document.body.addEventListener("mouseup", function () {
+          isDragging = false;
+        });
 
-      // Save current visibility
-      const maskaown = document.querySelector(".maskaown-entity");
-      const allMasks = [
-        ...document.querySelectorAll(".maska1-entity, .maska2-entity, .maska3-entity")
-      ];
+        let startTouchX = 0;
 
-      // Hide other masks
-      allMasks.forEach(m => m.setAttribute("visible", false));
-      maskaown.setAttribute("visible", true);
+        document.body.addEventListener("touchstart", function (event) {
+          startTouchX = event.touches[0].clientX;
+        });
 
-      // Render one frame, then capture
-      renderer.render(scene.object3D, scene.camera);
-      const dataURL = canvas.toDataURL("image/png");
+        document.body.addEventListener("touchmove", function (event) {
+          const diff = event.touches[0].clientX - startTouchX;
+          if (Math.abs(diff) > 50) {
+            if (diff < 0) {
+              currentIndex = (currentIndex + 1) % list.length;
+            } else {
+              currentIndex = (currentIndex - 1 + list.length) % list.length;
+            }
+            showOnly(currentIndex);
+            startTouchX = event.touches[0].clientX;
+          }
+        });
+      });
 
-      // Create download link
-      const link = document.createElement("a");
-      link.href = dataURL;
-      link.download = "maskaown.png";
-      link.click();
+      function applyTextureFromData(model, dataURL) {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(dataURL, (texture) => {
+          texture.flipY = false;
 
-      // Restore visibility
-      allMasks.forEach(m => m.setAttribute("visible", false));
-            });
+          model.getObject3D("mesh").traverse((node) => {
+            if (node.isMesh) {
+              const originalMaterial = node.material;
+              const overlayMaterial = new THREE.MeshStandardMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 1,
+                depthWrite: false,
+              });
+
+              const overlayMesh = new THREE.Mesh(
+                node.geometry.clone(),
+                overlayMaterial
+              );
+              overlayMesh.position.set(
+                node.position.x,
+                node.position.y,
+                node.position.z + 0.001
+              );
+              overlayMesh.rotation.copy(node.rotation);
+              overlayMesh.scale.copy(node.scale);
+
+              node.parent.add(overlayMesh);
+            }
           });
-        }
+        });
+      }
     </script>
   </body>
 </html>
