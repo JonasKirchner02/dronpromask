@@ -116,37 +116,37 @@
   <body>
     <div class="controls">
       <label
-        >COLOR: <input type="color" id="colorPicker" value="#000000"
+        >Color: <input type="color" id="colorPicker" value="#000000"
       /></label>
       <label
-        >BRUSH TYPE:
+        >Brush type:
         <select id="brushType">
-          <option value="classic">CLASSIC</option>
-          <option value="soft">SOFTER</option>
-          <option value="image">IMAGE BRUSH</option>
+          <option value="classic">Classic</option>
+          <option value="soft">Softer</option>
+          <option value="image">Image brush</option>
         </select>
       </label>
       <label
-        >BRUSH SIZE:
+        >Brush size:
         <input type="range" id="brushSize" min="5" max="150" value="5"
       /></label>
       <label
-        >SOFT BRUSH STEPS:
+        >Soft brush steps:
         <input type="range" id="softSteps" min="1" max="50" value="10"
       /></label>
       <label id="imageBrushPicker" style="display: none"
-        >BRUSH IMAGE:
+        >Brush image:
         <select id="imageBrushSelect">
-          <option value="/supina.png">BRUSH 1</option>
-          <option value="/supina2.png">BRUSH 2</option>
+          <option value="/supina.png">Image 1</option>
+          <option value="/supina2.png">Image 2</option>
         </select>
       </label>
-      <button onclick="clearCanvas()">CLEAR</button>
-      <button onclick="undoLastStroke()">UNDO</button>
-      <input type="text" id="paintingName" placeholder="ENTER NAME:" />
-      <button onclick="savePainting()">SAVE PAINTING</button>
+      <button onclick="clearCanvas()">Clear</button>
+      <button onclick="undoLastStroke()">Undo</button>
+      <input type="text" id="paintingName" placeholder="Enter name:" />
+      <button onclick="savePainting()">Save painting</button>
       <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">MY PAINTINGS</option>
+        <option value="">My paintings</option>
       </select>
     </div>
 
