@@ -1,17 +1,48 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://use.typekit.net/dfq5tse.css" />
+    <link
+      href="C:\Users\kirch\OneDrive - VUT\Plocha\DronPro\my-ar-project\fonts\RapidVariableSt.ttf"
+      rel="stylesheet"
+    />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
+        body {
+          overflow: hidden;
+          height: 100vh;
+        }
+        body::before {
+          content: "Please rotate your device";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          color: #00ffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 3.64rem;
+          text-align: center;
+          z-index: 999999;
+          background: #000064;
+        }
+      }
+
       body {
-        font-family: sans-serif;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
         margin: 0;
         padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
         background-color: #00ffff;
       }
 
@@ -25,20 +56,66 @@
       label,
       button,
       select,
-      input {
+      input,
+      input[type="text"],
+      input[type="color"],
+      input[type="range"],
+      #paintingList {
         background-color: #2626ff;
         color: #ffffff;
         border: none;
-        border-radius: 10px;
+        border-radius: 10.43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: 3px 6px;
         font-size: 0.8rem;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+      }
+
+      label:hover,
+      button:hover,
+      select:hover,
+      input:hover,
+      input[type="text"]:hover,
+      input[type="color"]:hover,
+      input[type="range"]:hover,
+      #paintingList:hover {
+        background-color: #000064;
+        color: #ffffff;
+        border: none;
+        border-radius: 10.43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px 6px;
+        font-size: 0.8rem;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
         cursor: pointer;
       }
 
       .canvas-container {
         position: relative;
-        width: 50vw;
-        aspect-ratio: 1/1;
+        width: 35vw;
+        aspect-ratio: 1 / 1;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(4%);
+        padding: 2%;
+      }
+
+      @media only screen and (max-width: 1366px) {
+        .canvas-container {
+          width: 80vw;
+          aspect-ratio: 1 / 1;
+          transform: translateY(15%);
+        }
       }
 
       canvas {
@@ -48,6 +125,28 @@
         width: 100%;
         height: 100%;
         touch-action: none;
+      }
+
+      input::placeholder {
+        color: #ffffff;
+        opacity: 1;
+      }
+
+      canvas#backgroundCanvas {
+        z-index: 1;
+      }
+      canvas#paintCanvas {
+        z-index: 2;
+      }
+      canvas#effectCanvas {
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      @font-face {
+        font-family: "Rapid";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
+          format("truetype");
       }
     </style>
   </head>
@@ -60,51 +159,123 @@
         >Brush type:
         <select id="brushType">
           <option value="classic">Classic</option>
-          <option value="soft">Soft</option>
-          <option value="image1">Image Brush 1</option>
-          <option value="image2">Image Brush 2</option>
+          <option value="soft">Softer</option>
+          <option value="image">Image brush</option>
         </select>
+        <label id="imageBrushPicker" style="display: none"
+          >Brush image:
+          <select id="imageBrushSelect">
+            <option value="/supina.png">Image 1</option>
+            <option value="/supina2.png">Image 2</option>
+          </select>
+        </label>
       </label>
       <label
         >Brush size:
-        <input type="range" id="brushSize" min="5" max="150" value="20"
+        <input type="range" id="brushSize" min="5" max="150" value="5"
       /></label>
       <label
         >Soft brush steps:
         <input type="range" id="softSteps" min="1" max="50" value="10"
       /></label>
+      <label id="imageBrushPicker" style="display: none"
+        >Brush image:
+        <select id="imageBrushSelect">
+          <option value="/supina.png">Image 1</option>
+          <option value="/supina2.png">Image 2</option>
+        </select>
+      </label>
       <button onclick="clearCanvas()">Clear</button>
+      <button onclick="undoLastStroke()">Undo</button>
+      <input type="text" id="paintingName" placeholder="Enter name:" />
+      <button onclick="savePainting()">Save painting</button>
+      <select id="paintingList" onchange="loadSelectedPainting()">
+        <option value="">My paintings</option>
+      </select>
+      <!-- NEW DOWNLOAD BUTTON -->
+      <button onclick="downloadCanvas()">Download PNG</button>
     </div>
 
+    <button onclick="saveCanvasAndGo()">APPLY</button>
+
     <div class="canvas-container">
+      <canvas id="backgroundCanvas"></canvas>
       <canvas id="paintCanvas"></canvas>
+      <canvas id="effectCanvas"></canvas>
     </div>
 
     <script>
-      const paintCanvas = document.getElementById("paintCanvas");
-      const ctx = paintCanvas.getContext("2d");
-
-      let painting = false;
+      let historyStack = [];
+      const maxHistory = 50;
       let lastX = 0,
         lastY = 0;
+      let painting = false;
+
+      const paintCanvas = document.getElementById("paintCanvas");
+      const paintCtx = paintCanvas.getContext("2d");
+      const bgCanvas = document.getElementById("backgroundCanvas");
+      const bgCtx = bgCanvas.getContext("2d");
+      const effectCanvas = document.getElementById("effectCanvas");
+      const effectCtx = effectCanvas.getContext("2d");
 
       const colorPicker = document.getElementById("colorPicker");
       const brushSize = document.getElementById("brushSize");
       const softSteps = document.getElementById("softSteps");
       const brushType = document.getElementById("brushType");
+      const imageBrushPicker = document.getElementById("imageBrushPicker");
+      const imageBrushSelect = document.getElementById("imageBrushSelect");
 
-      const imageBrush1 = new Image();
-      imageBrush1.src = "/supina.png";
+      let brushImage = new Image();
+      brushImage.src = imageBrushSelect.value;
 
-      const imageBrush2 = new Image();
-      imageBrush2.src = "/supina2.png";
+      brushType.addEventListener("change", () => {
+        imageBrushPicker.style.display =
+          brushType.value === "image" ? "inline" : "none";
+      });
 
-      function resizeCanvas() {
-        paintCanvas.width = paintCanvas.offsetWidth;
-        paintCanvas.height = paintCanvas.offsetHeight;
+      imageBrushSelect.addEventListener("change", () => {
+        brushImage.src = imageBrushSelect.value;
+      });
+
+      const bgImage = new Image();
+      bgImage.src = "/UVtransparent.png";
+
+      const effectImage = new Image();
+      effectImage.src = "/overlinky.png";
+
+      function resizeCanvases() {
+        const container = document.querySelector(".canvas-container");
+        const rect = container.getBoundingClientRect();
+
+        const oldPaint = document.createElement("canvas");
+        oldPaint.width = paintCanvas.width;
+        oldPaint.height = paintCanvas.height;
+        oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
+
+        [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
+          c.width = rect.width;
+          c.height = rect.height;
+        });
+
+        paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
+        bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
+        drawEffect();
       }
-      window.addEventListener("resize", resizeCanvas);
-      window.addEventListener("load", resizeCanvas);
+
+      function drawEffect() {
+        effectCtx.clearRect(0, 0, effectCanvas.width, effectCanvas.height);
+        effectCtx.drawImage(
+          effectImage,
+          0,
+          0,
+          effectCanvas.width,
+          effectCanvas.height
+        );
+      }
+
+      window.addEventListener("resize", resizeCanvases);
+      bgImage.onload = () => resizeCanvases();
+      effectImage.onload = drawEffect;
 
       function getCoordinates(e) {
         const rect = paintCanvas.getBoundingClientRect();
@@ -113,7 +284,15 @@
         return { x: clientX - rect.left, y: clientY - rect.top };
       }
 
+      function saveToHistory() {
+        if (historyStack.length >= maxHistory) historyStack.shift();
+        historyStack.push(
+          paintCtx.getImageData(0, 0, paintCanvas.width, paintCanvas.height)
+        );
+      }
+
       function startPainting(e) {
+        saveToHistory();
         painting = true;
         const { x, y } = getCoordinates(e);
         lastX = x;
@@ -124,37 +303,48 @@
         if (!painting) return;
         e.preventDefault();
         const { x, y } = getCoordinates(e);
+        const mirrorX = paintCanvas.width - x;
+
+        paintCtx.lineCap = "round";
+        paintCtx.strokeStyle = colorPicker.value;
 
         if (brushType.value === "classic") {
-          ctx.strokeStyle = colorPicker.value;
-          ctx.lineWidth = brushSize.value;
-          ctx.lineCap = "round";
-          ctx.beginPath();
-          ctx.moveTo(lastX, lastY);
-          ctx.lineTo(x, y);
-          ctx.stroke();
+          paintCtx.lineWidth = brushSize.value;
+          paintCtx.beginPath();
+          paintCtx.moveTo(lastX, lastY);
+          paintCtx.lineTo(x, y);
+          paintCtx.stroke();
+
+          paintCtx.beginPath();
+          paintCtx.moveTo(paintCanvas.width - lastX, lastY);
+          paintCtx.lineTo(mirrorX, y);
+          paintCtx.stroke();
         } else if (brushType.value === "soft") {
           const steps = parseInt(softSteps.value);
           for (let i = 0; i < steps; i++) {
             const t = i / steps;
             const ix = lastX + (x - lastX) * t;
             const iy = lastY + (y - lastY) * t;
+            const mirrorIX = paintCanvas.width - ix;
             const radius = brushSize.value * (1 - t * 0.8);
-            ctx.globalAlpha = 0.15;
-            ctx.beginPath();
-            ctx.arc(ix, iy, radius / 2, 0, Math.PI * 2);
-            ctx.fillStyle = colorPicker.value;
-            ctx.fill();
+
+            paintCtx.globalAlpha = 0.15;
+            paintCtx.beginPath();
+            paintCtx.arc(ix, iy, radius / 2, 0, Math.PI * 2);
+            paintCtx.fillStyle = colorPicker.value;
+            paintCtx.fill();
+
+            paintCtx.beginPath();
+            paintCtx.arc(mirrorIX, iy, radius / 2, 0, Math.PI * 2);
+            paintCtx.fillStyle = colorPicker.value;
+            paintCtx.fill();
           }
-          ctx.globalAlpha = 1;
-        } else if (brushType.value === "image1") {
-          const w = brushSize.value,
-            h = brushSize.value;
-          ctx.drawImage(imageBrush1, x - w / 2, y - h / 2, w, h);
-        } else if (brushType.value === "image2") {
-          const w = brushSize.value,
-            h = brushSize.value;
-          ctx.drawImage(imageBrush2, x - w / 2, y - h / 2, w, h);
+          paintCtx.globalAlpha = 1;
+        } else if (brushType.value === "image") {
+          const w = brushSize.value;
+          const h = brushSize.value;
+          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
+          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
         }
 
         lastX = x;
@@ -163,11 +353,87 @@
 
       function endPainting() {
         painting = false;
-        ctx.beginPath();
+        paintCtx.beginPath();
+        paintCtx.globalAlpha = 1;
+
+        localStorage.setItem("lastPainting", paintCanvas.toDataURL());
+      }
+
+      function undoLastStroke() {
+        if (historyStack.length > 0) {
+          const imgData = historyStack.pop();
+          paintCtx.putImageData(imgData, 0, 0);
+        }
       }
 
       function clearCanvas() {
-        ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+        saveToHistory();
+        paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+      }
+
+      function savePainting() {
+        const name = document.getElementById("paintingName").value.trim();
+        if (!name) return alert("Enter a name!");
+        const dataURL = paintCanvas.toDataURL();
+        localStorage.setItem(`painting_${name}`, dataURL);
+
+        const paintingList = document.getElementById("paintingList");
+        if (![...paintingList.options].some((o) => o.value === name)) {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          paintingList.appendChild(option);
+        }
+      }
+
+      function loadSelectedPainting() {
+        const select = document.getElementById("paintingList");
+        const name = select.value;
+        if (!name) return;
+        const dataURL = localStorage.getItem(`painting_${name}`);
+        if (!dataURL) return;
+
+        const img = new Image();
+        img.onload = () => {
+          paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+          paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
+        };
+        img.src = dataURL;
+      }
+
+      function saveCanvasAndGo() {
+        const finalImage = paintCanvas.toDataURL();
+        localStorage.setItem("customMaskTexture", finalImage);
+        window.location.href = "index.html";
+      }
+
+      // NEW FUNCTION: download PNG
+      function downloadCanvas() {
+        const width = paintCanvas.width;
+        const height = paintCanvas.height;
+
+        if (width === 0 || height === 0) {
+          alert("Canvas has no size yet — try painting first.");
+          return;
+        }
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        tempCtx.drawImage(bgCanvas, 0, 0);
+        tempCtx.drawImage(paintCanvas, 0, 0);
+
+        tempCanvas.toBlob(function (blob) {
+          const link = document.createElement("a");
+          link.download =
+            (document.getElementById("paintingName").value.trim() || "") +
+            ".png";
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+        });
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
@@ -177,6 +443,35 @@
       paintCanvas.addEventListener("mouseup", endPainting);
       paintCanvas.addEventListener("mouseleave", endPainting);
       paintCanvas.addEventListener("touchend", endPainting);
+
+      window.addEventListener("load", () => {
+        resizeCanvases();
+
+        const lastPainting = localStorage.getItem("lastPainting");
+        if (lastPainting) {
+          const img = new Image();
+          img.onload = () =>
+            paintCtx.drawImage(
+              img,
+              0,
+              0,
+              paintCanvas.width,
+              paintCanvas.height
+            );
+          img.src = lastPainting;
+        }
+
+        const paintingList = document.getElementById("paintingList");
+        for (let key in localStorage) {
+          if (key.startsWith("painting_")) {
+            const name = key.replace("painting_", "");
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = name;
+            paintingList.appendChild(option);
+          }
+        }
+      });
     </script>
   </body>
 </html>
