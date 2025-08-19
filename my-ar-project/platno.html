@@ -178,6 +178,7 @@
           <option value="/supina2.png">Image 2</option>
         </select>
       </label>
+      <button onclick="downloadCanvas()">Download PNG</button>
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
       <input type="text" id="paintingName" placeholder="Enter name:" />
@@ -439,6 +440,28 @@
             option.textContent = name;
             paintingList.appendChild(option);
           }
+        }
+
+        function downloadCanvas() {
+          const container = document.querySelector(".canvas-container");
+          const width = paintCanvas.width;
+          const height = paintCanvas.height;
+
+          // Create a temporary canvas
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = width;
+          tempCanvas.height = height;
+          const tempCtx = tempCanvas.getContext("2d");
+
+          // Draw all layers in order
+          tempCtx.drawImage(bgCanvas, 0, 0);
+          tempCtx.drawImage(paintCanvas, 0, 0);
+
+          // Convert to PNG and trigger download
+          const link = document.createElement("a");
+          link.download = "my-painting.png";
+          link.href = tempCanvas.toDataURL("image/png");
+          link.click();
         }
       });
     </script>
