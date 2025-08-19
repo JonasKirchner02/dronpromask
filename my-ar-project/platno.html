@@ -161,9 +161,14 @@
           <option value="classic">Classic</option>
           <option value="soft">Softer</option>
           <option value="image">Image brush</option>
-          <option value="/supina.png">Image 1</option>
-          <option value="/supina2.png">Image 2</option>
         </select>
+        <label id="imageBrushPicker" style="display: none"
+          >Brush image:
+          <select id="imageBrushSelect">
+            <option value="/supina.png">Image 1</option>
+            <option value="/supina2.png">Image 2</option>
+          </select>
+        </label>
       </label>
       <label
         >Brush size:
@@ -173,7 +178,13 @@
         >Soft brush steps:
         <input type="range" id="softSteps" min="1" max="50" value="10"
       /></label>
-
+      <label id="imageBrushPicker" style="display: none"
+        >Brush image:
+        <select id="imageBrushSelect">
+          <option value="/supina.png">Image 1</option>
+          <option value="/supina2.png">Image 2</option>
+        </select>
+      </label>
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
       <input type="text" id="paintingName" placeholder="Enter name:" />
@@ -329,22 +340,11 @@
             paintCtx.fill();
           }
           paintCtx.globalAlpha = 1;
-        } else if (brushType.value.endsWith(".png")) {
-          const brushImage = new Image();
-          brushImage.src = brushType.value;
+        } else if (brushType.value === "image") {
           const w = brushSize.value;
           const h = brushSize.value;
-
-          brushImage.onload = () => {
-            paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
-            paintCtx.drawImage(
-              brushImage,
-              paintCanvas.width - x - w / 2,
-              y - h / 2,
-              w,
-              h
-            );
-          };
+          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
+          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
         }
 
         lastX = x;
