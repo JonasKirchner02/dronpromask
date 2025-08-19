@@ -159,8 +159,9 @@
         >Brush type:
         <select id="brushType">
           <option value="classic">Classic</option>
-          <option value="soft">Softer</option>
-          <option value="image">Image brush</option>
+  <option value="soft">Softer</option>
+  <option value="image1">Image 1</option>
+  <option value="image2">Image 2</option>
         </select>
       </label>
       <label
@@ -171,12 +172,7 @@
         >Soft brush steps:
         <input type="range" id="softSteps" min="1" max="50" value="10"
       /></label>
-      <label id="imageBrushPicker" style="display: none"
-        >Brush image:
-        <select id="imageBrushSelect">
-          <option value="/supina.png">Image 1</option>
-          <option value="/supina2.png">Image 2</option>
-        </select>
+      
       </label>
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
@@ -221,15 +217,19 @@
       let brushImage = new Image();
       brushImage.src = imageBrushSelect.value;
 
-      brushType.addEventListener("change", () => {
-        imageBrushPicker.style.display =
-          brushType.value === "image" ? "inline" : "none";
-      });
+     const brushType = document.getElementById("brushType");
+let brushImage = new Image();
+brushImage.src = "/supina.png"; // default image
 
-      imageBrushSelect.addEventListener("change", () => {
-        brushImage.src = imageBrushSelect.value;
-      });
+function updateBrushImage() {
+  if (brushType.value === "image1") {
+    brushImage.src = "/supina.png";
+  } else if (brushType.value === "image2") {
+    brushImage.src = "/supina2.png";
+  }
+}
 
+brushType.addEventListener("change", updateBrushImage);
       const bgImage = new Image();
       bgImage.src = "/UVtransparent.png";
 
@@ -333,11 +333,12 @@
             paintCtx.fill();
           }
           paintCtx.globalAlpha = 1;
-        } else if (brushType.value === "image") {
-          const w = brushSize.value;
-          const h = brushSize.value;
-          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
-          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
+        } else if (brushType.value === "image1" || brushType.value === "image2") {
+  const w = brushSize.value;
+  const h = brushSize.value;
+  paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
+  paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
+}
         }
 
         lastX = x;
