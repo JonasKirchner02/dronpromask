@@ -164,13 +164,6 @@
           <option value="/supina.png">Image 1</option>
           <option value="/supina2.png">Image 2</option>
         </select>
-        <label id="imageBrushPicker" style="display: none"
-          >Brush image:
-          <select id="imageBrushSelect">
-            <option value="/supina.png">Image 1</option>
-            <option value="/supina2.png">Image 2</option>
-          </select>
-        </label>
       </label>
       <label
         >Brush size:
@@ -336,11 +329,22 @@
             paintCtx.fill();
           }
           paintCtx.globalAlpha = 1;
-        } else if (brushType.value === "image") {
+        } else if (brushType.value.endsWith(".png")) {
+          const brushImage = new Image();
+          brushImage.src = brushType.value;
           const w = brushSize.value;
           const h = brushSize.value;
-          paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
-          paintCtx.drawImage(brushImage, mirrorX - w / 2, y - h / 2, w, h);
+
+          brushImage.onload = () => {
+            paintCtx.drawImage(brushImage, x - w / 2, y - h / 2, w, h);
+            paintCtx.drawImage(
+              brushImage,
+              paintCanvas.width - x - w / 2,
+              y - h / 2,
+              w,
+              h
+            );
+          };
         }
 
         lastX = x;
