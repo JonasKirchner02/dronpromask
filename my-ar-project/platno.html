@@ -3,7 +3,7 @@
   <head>
     <link rel="stylesheet" href="https://use.typekit.net/dfq5tse.css" />
     <link
-      href="C:\Users\kirch\OneDrive - VUT\Plocha\DronPro\my-ar-project\RapidVariableSt.ttf"
+      href="C:\Users\kirch\OneDrive - VUT\Plocha\DronPro\my-ar-project\fonts\RapidVariableSt.ttf"
       rel="stylesheet"
     />
     <meta charset="utf-8" />
@@ -144,9 +144,16 @@
       }
 
       @font-face {
-        font-family: "font";
-        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/RapidVariableSt.ttf")
+        font-family: "Rapid";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
           format("truetype");
+      }
+
+      .apply-btn {
+        font-size: 2rem;
+        font-family: "Rapid", sans-serif;
+        font-style: normal;
+        font-variation-settings: "wdth" 100, "wght" 100;
       }
     </style>
   </head>
@@ -187,17 +194,7 @@
       </select>
     </div>
 
-    <button
-      onclick="saveCanvasAndGo()"
-      style="
-        font-size: 2rem;
-        font-family: 'font', sans-serif;
-        font-style: normal;
-        font-variation-settings: 'wdth' 100, 'wght' 100;
-      "
-    >
-      Apply
-    </button>
+    <button onclick="saveCanvasAndGo()" class="apply-btn">Apply</button>
 
     <div class="canvas-container">
       <canvas id="backgroundCanvas"></canvas>
