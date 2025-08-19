@@ -5,7 +5,11 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.1/dist/aframe-extras.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
     <title>DRON PRO MASK</title>
+    <style></style>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js"></script>
   </head>
 
   <body>
@@ -40,7 +44,7 @@
           id="img5"
           src="/ikony/editmyownpod.png"
           alt="Edit Icon"
-          onclick="localStorage.setItem('returnIndex', 3); window.location.href='platno.html';"
+          onclick="{localStorage.setItem('returnIndex', 3); window.location.href = 'platno.html'}"
         />
         <button onclick="downloadMaskaown()">Download Mask PNG</button>
       </div>
@@ -96,6 +100,7 @@
             rotation="0 0 0"
           ></a-gltf-model>
         </a-entity>
+
         <a-entity mindar-face-target="anchorIndex: 9">
           <a-gltf-model
             class="maska2-entity"
@@ -106,6 +111,7 @@
             rotation="0 0 0"
           ></a-gltf-model>
         </a-entity>
+
         <a-entity mindar-face-target="anchorIndex: 9">
           <a-gltf-model
             class="maska3-entity"
@@ -117,6 +123,7 @@
             metalness="0.2"
           ></a-gltf-model>
         </a-entity>
+
         <a-entity mindar-face-target="anchorIndex: 9">
           <a-gltf-model
             class="maskaown-entity"
@@ -140,7 +147,7 @@
         );
         let currentIndex = 0;
 
-        const returnIndex = localStorage.getItem("returnIndex");
+        let returnIndex = localStorage.getItem("returnIndex");
         if (returnIndex !== null) {
           currentIndex = parseInt(returnIndex, 10);
           localStorage.removeItem("returnIndex");
@@ -154,6 +161,7 @@
               entity.setAttribute("visible", visible);
               if (visible) {
                 entity.removeAttribute("animation-mixer");
+
                 const clipName =
                   list[i] === "maska1"
                     ? "animace zelena"
@@ -164,6 +172,7 @@
                     : list[i] === "maskaown"
                     ? "myanimace"
                     : "";
+
                 entity.setAttribute("animation-mixer", {
                   clip: clipName,
                   loop: "once",
@@ -176,97 +185,173 @@
           localStorage.setItem("returnIndex", `${index}`);
         }
 
+        const customMaskTexture = localStorage.getItem("customMaskTexture");
+        if (customMaskTexture) {
+          const maskModel = document.querySelector(".maskaown-entity");
+          if (maskModel.getObject3D("mesh")) {
+            applyTextureFromData(maskModel, customMaskTexture);
+          } else {
+            maskModel.addEventListener("model-loaded", () => {
+              applyTextureFromData(maskModel, customMaskTexture);
+            });
+          }
+        }
+
         showOnly(currentIndex);
 
-        document
-          .querySelector("#img1")
-          .addEventListener("click", () => showOnly(0));
-        document
-          .querySelector("#img2")
-          .addEventListener("click", () => showOnly(1));
-        document
-          .querySelector("#img3")
-          .addEventListener("click", () => showOnly(2));
-        document
-          .querySelector("#img4")
-          .addEventListener("click", () => showOnly(3));
-
-        // Swipe / Drag
-        let startX = 0,
-          isDragging = false;
-        document.body.addEventListener("mousedown", (e) => {
-          isDragging = true;
-          startX = e.clientX;
+        document.querySelector("#img1").addEventListener("click", () => {
+          showOnly(0);
         });
-        document.body.addEventListener("mousemove", (e) => {
+        document.querySelector("#img2").addEventListener("click", () => {
+          showOnly(1);
+        });
+        document.querySelector("#img3").addEventListener("click", () => {
+          showOnly(2);
+        });
+        document.querySelector("#img4").addEventListener("click", () => {
+          showOnly(3);
+        });
+
+        const headModelEntity = document.querySelector("#headModelEntity");
+        headModelEntity.addEventListener("click", () => {
+          const currentEntities = allEntities[currentIndex];
+          currentEntities.forEach((entity) => {
+            if (visibles[currentIndex]) {
+              entity.removeAttribute("animation-mixer");
+
+              const clipName =
+                list[currentIndex] === "maska1"
+                  ? "animace zelena"
+                  : list[currentIndex] === "maska2"
+                  ? "animace masky"
+                  : list[currentIndex] === "maska3"
+                  ? "animace cerv"
+                  : list[currentIndex] === "maskaown"
+                  ? "myanimace"
+                  : "";
+
+              entity.setAttribute("animation-mixer", {
+                clip: clipName,
+                loop: "once",
+                clampWhenFinished: true,
+              });
+            }
+          });
+        });
+
+        let startX = 0;
+        let isDragging = false;
+
+        document.body.addEventListener("mousedown", function (event) {
+          isDragging = true;
+          startX = event.clientX;
+        });
+
+        document.body.addEventListener("mousemove", function (event) {
           if (isDragging) {
-            const diff = e.clientX - startX;
+            const diff = event.clientX - startX;
             if (Math.abs(diff) > 50) {
-              currentIndex =
-                diff < 0
-                  ? (currentIndex + 1) % list.length
-                  : (currentIndex - 1 + list.length) % list.length;
+              if (diff < 0) {
+                currentIndex = (currentIndex + 1) % list.length;
+              } else if (diff > 0) {
+                currentIndex = (currentIndex - 1 + list.length) % list.length;
+              }
               showOnly(currentIndex);
               isDragging = false;
             }
           }
         });
-        document.body.addEventListener("mouseup", () => {
+
+        document.body.addEventListener("mouseup", function () {
           isDragging = false;
         });
 
-        document.body.addEventListener("touchstart", (e) => {
-          startX = e.touches[0].clientX;
+        let startTouchX = 0;
+
+        document.body.addEventListener("touchstart", function (event) {
+          startTouchX = event.touches[0].clientX;
         });
-        document.body.addEventListener("touchmove", (e) => {
-          const diff = e.touches[0].clientX - startX;
+
+        document.body.addEventListener("touchmove", function (event) {
+          const diff = event.touches[0].clientX - startTouchX;
           if (Math.abs(diff) > 50) {
-            currentIndex =
-              diff < 0
-                ? (currentIndex + 1) % list.length
-                : (currentIndex - 1 + list.length) % list.length;
+            if (diff < 0) {
+              currentIndex = (currentIndex + 1) % list.length;
+            } else {
+              currentIndex = (currentIndex - 1 + list.length) % list.length;
+            }
             showOnly(currentIndex);
-            startX = e.touches[0].clientX;
+            startTouchX = event.touches[0].clientX;
           }
         });
       });
 
-      function downloadMaskaown() {
-        const maskModel = document.querySelector(".maskaown-entity");
-        if (!maskModel) {
-          alert("Mask object not found!");
-          return;
-        }
+      function applyTextureFromData(model, dataURL) {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(dataURL, (texture) => {
+          texture.flipY = false;
 
-        const scene = maskModel.object3D.parent;
-        const width = 512;
-        const height = 512;
+          model.getObject3D("mesh").traverse((node) => {
+            if (node.isMesh) {
+              const originalMaterial = node.material;
+              const overlayMaterial = new THREE.MeshStandardMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 1,
+                depthWrite: false,
+              });
 
-        const renderer = new THREE.WebGLRenderer({
-          preserveDrawingBuffer: true,
-          alpha: true,
-        });
-        renderer.setSize(width, height);
-        renderer.setClearColor(0x000000, 0); // transparent
+              const overlayMesh = new THREE.Mesh(
+                node.geometry.clone(),
+                overlayMaterial
+              );
+              overlayMesh.position.set(
+                node.position.x,
+                node.position.y,
+                node.position.z + 0.001
+              );
+              overlayMesh.rotation.copy(node.rotation);
+              overlayMesh.scale.copy(node.scale);
 
-        const camera = new THREE.PerspectiveCamera(
-          50,
-          width / height,
-          0.1,
-          1000
-        );
-        camera.position.set(0, 0.5, 1);
-        camera.lookAt(0, 0.5, 0);
+              node.parent.add(overlayMesh);
+            }
 
-        renderer.render(scene, camera);
+            function downloadMaskaown() {
+              if (!maskaown) {
+                alert("Mask object not found!");
+                return;
+              }
 
-        renderer.domElement.toBlob((blob) => {
-          const link = document.createElement("a");
-          link.download = "maskaown.png";
-          link.href = URL.createObjectURL(blob);
-          link.click();
-          URL.revokeObjectURL(link.href);
-          renderer.dispose();
+              const width = maskaown.width || maskaown.domElement?.width;
+              const height = maskaown.height || maskaown.domElement?.height;
+
+              if (!width || !height) {
+                alert("Mask has no size yet.");
+                return;
+              }
+
+              // If it's a Three.js renderer, get the canvas
+              const canvas = maskaown.domElement || maskaown;
+
+              // Create a temporary canvas to capture the content
+              const tempCanvas = document.createElement("canvas");
+              tempCanvas.width = width;
+              tempCanvas.height = height;
+              const tempCtx = tempCanvas.getContext("2d");
+
+              // Draw the mask onto the temp canvas
+              tempCtx.drawImage(canvas, 0, 0, width, height);
+
+              // Download as PNG
+              tempCanvas.toBlob(function (blob) {
+                const link = document.createElement("a");
+                link.download = "maskaown.png";
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                URL.revokeObjectURL(link.href);
+              });
+            }
+          });
         });
       }
     </script>
