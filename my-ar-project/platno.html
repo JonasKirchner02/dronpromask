@@ -2,6 +2,10 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://use.typekit.net/dfq5tse.css" />
+    <link
+      href="C:\Users\kirch\OneDrive - VUT\Plocha\DronPro\my-ar-project\RapidVariableSt.ttf"
+      rel="stylesheet"
+    />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
@@ -138,6 +142,12 @@
         z-index: 3;
         pointer-events: none;
       }
+
+      @font-face {
+        font-family: "font";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/RapidVariableSt.ttf")
+          format("truetype");
+      }
     </style>
   </head>
   <body>
@@ -177,7 +187,15 @@
       </select>
     </div>
 
-    <button onclick="saveCanvasAndGo()" style="font-size: 2rem">Apply</button>
+    <button
+      onclick="saveCanvasAndGo()"
+      style="font-size: 2rem, font-family: 'font', sans-serif
+             font-style: normal
+             font-size: 2rem
+             font-variation-settings: wdth 100, wght 100"
+    >
+      Apply
+    </button>
 
     <div class="canvas-container">
       <canvas id="backgroundCanvas"></canvas>
