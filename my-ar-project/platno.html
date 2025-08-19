@@ -3,7 +3,7 @@
   <head>
     <link rel="stylesheet" href="https://use.typekit.net/dfq5tse.css" />
     <link
-      href="C:\Users\kirch\OneDrive - VUT\Plocha\DronPro\animation letters\RapidVariableSt.ttf"
+      href="C:\Users\kirch\OneDrive - VUT\Plocha\DronPro\my-ar-project\fonts\RapidVariableSt.ttf"
       rel="stylesheet"
     />
     <meta charset="utf-8" />
@@ -145,7 +145,7 @@
 
       @font-face {
         font-family: "Rapid";
-        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/animation letters/RapidVariableSt.ttf")
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
           format("truetype");
       }
     </style>
@@ -178,7 +178,6 @@
           <option value="/supina2.png">Image 2</option>
         </select>
       </label>
-      <button onclick="downloadCanvas()">Download PNG</button>
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
       <input type="text" id="paintingName" placeholder="Enter name:" />
@@ -186,6 +185,8 @@
       <select id="paintingList" onchange="loadSelectedPainting()">
         <option value="">My paintings</option>
       </select>
+      <!-- NEW DOWNLOAD BUTTON -->
+      <button onclick="downloadCanvas()">Download PNG</button>
     </div>
 
     <button onclick="saveCanvasAndGo()">APPLY</button>
@@ -239,19 +240,16 @@
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
-        // Save current painting
         const oldPaint = document.createElement("canvas");
         oldPaint.width = paintCanvas.width;
         oldPaint.height = paintCanvas.height;
         oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
 
-        // Resize canvases
         [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
           c.width = rect.width;
           c.height = rect.height;
         });
 
-        // Restore painting
         paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
         bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
         drawEffect();
@@ -269,7 +267,6 @@
       }
 
       window.addEventListener("resize", resizeCanvases);
-
       bgImage.onload = () => resizeCanvases();
       effectImage.onload = drawEffect;
 
@@ -403,6 +400,36 @@
         window.location.href = "index.html";
       }
 
+      // NEW FUNCTION: download PNG
+      function downloadCanvas() {
+        const width = paintCanvas.width;
+        const height = paintCanvas.height;
+
+        if (width === 0 || height === 0) {
+          alert("Canvas has no size yet — try painting first.");
+          return;
+        }
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        tempCtx.drawImage(bgCanvas, 0, 0);
+        tempCtx.drawImage(paintCanvas, 0, 0);
+        tempCtx.drawImage(effectCanvas, 0, 0);
+
+        tempCanvas.toBlob(function (blob) {
+          const link = document.createElement("a");
+          link.download =
+            (document.getElementById("paintingName").value.trim() ||
+              "my-painting") + ".png";
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+        });
+      }
+
       paintCanvas.addEventListener("mousedown", startPainting);
       paintCanvas.addEventListener("touchstart", startPainting);
       paintCanvas.addEventListener("mousemove", draw);
@@ -411,11 +438,9 @@
       paintCanvas.addEventListener("mouseleave", endPainting);
       paintCanvas.addEventListener("touchend", endPainting);
 
-      // Initialize
       window.addEventListener("load", () => {
         resizeCanvases();
 
-        // Load last painting
         const lastPainting = localStorage.getItem("lastPainting");
         if (lastPainting) {
           const img = new Image();
@@ -430,7 +455,6 @@
           img.src = lastPainting;
         }
 
-        // Load painting list
         const paintingList = document.getElementById("paintingList");
         for (let key in localStorage) {
           if (key.startsWith("painting_")) {
@@ -440,28 +464,6 @@
             option.textContent = name;
             paintingList.appendChild(option);
           }
-        }
-
-        function downloadCanvas() {
-          const container = document.querySelector(".canvas-container");
-          const width = paintCanvas.width;
-          const height = paintCanvas.height;
-
-          // Create a temporary canvas
-          const tempCanvas = document.createElement("canvas");
-          tempCanvas.width = width;
-          tempCanvas.height = height;
-          const tempCtx = tempCanvas.getContext("2d");
-
-          // Draw all layers in order
-          tempCtx.drawImage(bgCanvas, 0, 0);
-          tempCtx.drawImage(paintCanvas, 0, 0);
-
-          // Convert to PNG and trigger download
-          const link = document.createElement("a");
-          link.download = "my-painting.png";
-          link.href = tempCanvas.toDataURL("image/png");
-          link.click();
         }
       });
     </script>
