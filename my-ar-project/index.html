@@ -5,11 +5,36 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.1/dist/aframe-extras.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
     <title>DRON PRO MASK</title>
-    <style></style>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      .carousel-wrapper {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+      }
+      .ikony img {
+        width: 50px;
+        margin: 0 5px;
+        cursor: pointer;
+      }
+      #downloadBtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        background: #222;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 10;
+      }
+    </style>
   </head>
 
   <body>
@@ -48,6 +73,8 @@
         />
       </div>
     </div>
+
+    <button id="downloadBtn">Download Mask PNG</button>
 
     <div class="example-container">
       <a-scene
@@ -125,6 +152,7 @@
 
         <a-entity mindar-face-target="anchorIndex: 9">
           <a-gltf-model
+            id="maskaown-entity"
             class="maskaown-entity"
             src="#maskaown"
             visible="false"
@@ -160,7 +188,6 @@
               entity.setAttribute("visible", visible);
               if (visible) {
                 entity.removeAttribute("animation-mixer");
-
                 const clipName =
                   list[i] === "maska1"
                     ? "animace zelena"
@@ -171,7 +198,6 @@
                     : list[i] === "maskaown"
                     ? "myanimace"
                     : "";
-
                 entity.setAttribute("animation-mixer", {
                   clip: clipName,
                   loop: "once",
@@ -182,18 +208,6 @@
           });
           currentIndex = index;
           localStorage.setItem("returnIndex", `${index}`);
-        }
-
-        const customMaskTexture = localStorage.getItem("customMaskTexture");
-        if (customMaskTexture) {
-          const maskModel = document.querySelector(".maskaown-entity");
-          if (maskModel.getObject3D("mesh")) {
-            applyTextureFromData(maskModel, customMaskTexture);
-          } else {
-            maskModel.addEventListener("model-loaded", () => {
-              applyTextureFromData(maskModel, customMaskTexture);
-            });
-          }
         }
 
         showOnly(currentIndex);
@@ -217,7 +231,6 @@
           currentEntities.forEach((entity) => {
             if (visibles[currentIndex]) {
               entity.removeAttribute("animation-mixer");
-
               const clipName =
                 list[currentIndex] === "maska1"
                   ? "animace zelena"
@@ -228,7 +241,6 @@
                   : list[currentIndex] === "maskaown"
                   ? "myanimace"
                   : "";
-
               entity.setAttribute("animation-mixer", {
                 clip: clipName,
                 loop: "once",
@@ -240,83 +252,81 @@
 
         let startX = 0;
         let isDragging = false;
-
-        document.body.addEventListener("mousedown", function (event) {
+        document.body.addEventListener("mousedown", (event) => {
           isDragging = true;
           startX = event.clientX;
         });
-
-        document.body.addEventListener("mousemove", function (event) {
+        document.body.addEventListener("mousemove", (event) => {
           if (isDragging) {
             const diff = event.clientX - startX;
             if (Math.abs(diff) > 50) {
-              if (diff < 0) {
-                currentIndex = (currentIndex + 1) % list.length;
-              } else if (diff > 0) {
-                currentIndex = (currentIndex - 1 + list.length) % list.length;
-              }
+              currentIndex =
+                diff < 0
+                  ? (currentIndex + 1) % list.length
+                  : (currentIndex - 1 + list.length) % list.length;
               showOnly(currentIndex);
               isDragging = false;
             }
           }
         });
-
-        document.body.addEventListener("mouseup", function () {
+        document.body.addEventListener("mouseup", () => {
           isDragging = false;
         });
-
         let startTouchX = 0;
-
-        document.body.addEventListener("touchstart", function (event) {
+        document.body.addEventListener("touchstart", (event) => {
           startTouchX = event.touches[0].clientX;
         });
-
-        document.body.addEventListener("touchmove", function (event) {
+        document.body.addEventListener("touchmove", (event) => {
           const diff = event.touches[0].clientX - startTouchX;
           if (Math.abs(diff) > 50) {
-            if (diff < 0) {
-              currentIndex = (currentIndex + 1) % list.length;
-            } else {
-              currentIndex = (currentIndex - 1 + list.length) % list.length;
-            }
+            currentIndex =
+              diff < 0
+                ? (currentIndex + 1) % list.length
+                : (currentIndex - 1 + list.length) % list.length;
             showOnly(currentIndex);
             startTouchX = event.touches[0].clientX;
           }
         });
-      });
 
-      function applyTextureFromData(model, dataURL) {
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(dataURL, (texture) => {
-          texture.flipY = false;
-
-          model.getObject3D("mesh").traverse((node) => {
-            if (node.isMesh) {
-              const originalMaterial = node.material;
-              const overlayMaterial = new THREE.MeshStandardMaterial({
-                map: texture,
-                transparent: true,
-                opacity: 1,
-                depthWrite: false,
-              });
-
-              const overlayMesh = new THREE.Mesh(
-                node.geometry.clone(),
-                overlayMaterial
-              );
-              overlayMesh.position.set(
-                node.position.x,
-                node.position.y,
-                node.position.z + 0.001
-              );
-              overlayMesh.rotation.copy(node.rotation);
-              overlayMesh.scale.copy(node.scale);
-
-              node.parent.add(overlayMesh);
+        // DOWNLOAD MASK PNG
+        document
+          .getElementById("downloadBtn")
+          .addEventListener("click", async () => {
+            const maskEntity = document.getElementById("maskaown-entity");
+            if (!maskEntity || !maskEntity.object3D) {
+              alert("Mask is not loaded yet!");
+              return;
             }
+
+            const maskScene = new THREE.Scene();
+            const maskClone = maskEntity.object3D.clone(true);
+            maskScene.add(maskClone);
+
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(1, 1, 2);
+            maskScene.add(light);
+            maskScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.set(0, 0, 2);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+            const renderer = new THREE.WebGLRenderer({
+              alpha: true,
+              preserveDrawingBuffer: true,
+            });
+            renderer.setSize(512, 512);
+            renderer.render(maskScene, camera);
+
+            const dataURL = renderer.domElement.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = "maskaown.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
           });
-        });
-      }
+      });
     </script>
   </body>
 </html>
