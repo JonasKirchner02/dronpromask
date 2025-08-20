@@ -189,6 +189,12 @@
       <button onclick="downloadCanvas()">Download PNG</button>
     </div>
 
+    <div class="canvas-container">
+      <canvas id="backgroundCanvas"></canvas>
+      <canvas id="paintCanvas"></canvas>
+      <canvas id="effectCanvas"></canvas>
+    </div>
+
     <button
       onclick="saveCanvasAndGo()"
       style="
@@ -207,12 +213,6 @@
         "
       />
     </button>
-
-    <div class="canvas-container">
-      <canvas id="backgroundCanvas"></canvas>
-      <canvas id="paintCanvas"></canvas>
-      <canvas id="effectCanvas"></canvas>
-    </div>
 
     <script>
       let historyStack = [];
