@@ -85,11 +85,13 @@
         button,
         select,
         input,
-        #paintingList,
-        ::placeholder {
+        #paintingList {
           padding: 1rem 3rem; /* fixed padding instead of clamp() */
           font-size: 0.8rem;
           min-width: 0; /* allow shrinking in grid */
+        }
+        ::placeholder {
+          font-size: 0.8rem;
         }
       }
       label:hover,
