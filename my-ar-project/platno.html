@@ -47,10 +47,16 @@
         grid-template-columns: repeat(10, auto);
         gap: 1vw;
         justify-content: center;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding: 0 2vw; /* more fluid padding */
       }
 
+      @media only screen and (max-width: 1366px) {
+        .controls {
+          grid-template-columns: repeat(3, auto);
+          gap: 2vw;
+          padding: 0 5vw; /* extra padding on mobile/tablet */
+        }
+      }
       label,
       button,
       select,
@@ -101,15 +107,6 @@
           width: 80vw;
           aspect-ratio: 1 / 1;
           transform: translateY(15%);
-        }
-      }
-
-      @media only screen and (max-width: 1366px) {
-        .controls {
-          display: grid;
-          grid-template-columns: repeat(3, auto);
-          gap: 1vw;
-          justify-content: center;
         }
       }
 
