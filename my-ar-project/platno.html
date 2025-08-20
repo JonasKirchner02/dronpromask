@@ -60,12 +60,12 @@
         background-color: #2626ff;
         color: #ffffff;
         border: none;
-        border-radius: 1vw;
+        border-radius: clamp(6px, 0.6vw, 12px); /* smaller rounded corners */
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.5vw 1vw;
-        font-size: clamp(12px, 1.2vw, 20px);
+        padding: clamp(4px, 0.4vw, 8px) clamp(6px, 0.6vw, 12px); /* less padding */
+        font-size: clamp(12px, 0.9vw, 16px); /* smaller max size */
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
