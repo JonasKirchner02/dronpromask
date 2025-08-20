@@ -146,6 +146,25 @@
         /* center the thumb on track */
       }
 
+      input:hover[type="range"] {
+        -webkit-appearance: none;
+
+        background: #f4ff26; /* track color */
+        border-radius: 6px;
+        outline: #ff0000;
+      }
+
+      input:hover[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #0b004e; /* thumb color */
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #ffe600;
+        /* center the thumb on track */
+      }
       canvas {
         position: absolute;
         top: 0;
