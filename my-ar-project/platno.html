@@ -47,11 +47,10 @@
       }
 
       .controls {
-        margin-bottom: 10px;
-        display: flex;
-        flex-wrap: nowrap; /* prevent wrapping */
-        justify-content: space-between; /* evenly spread if you want */
+        display: grid;
+        grid-template-columns: repeat(5, auto); /* adjust count */
         gap: 10px;
+        justify-content: center; /* keeps grid centered */
       }
 
       label,
