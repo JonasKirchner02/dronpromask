@@ -53,6 +53,15 @@
         padding-right: 1rem;
       }
 
+      @media only screen and (max-width: 768px) {
+        .controls {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2vw; /* a bit more spacing so buttons don't stick together */
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
+      }
+
       label,
       button,
       select,
