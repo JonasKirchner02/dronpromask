@@ -34,6 +34,8 @@
         font-style: normal;
         margin: 0;
         padding: 2vh;
+        padding-left: 6rem;
+        padding-right: 6rem;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -44,19 +46,13 @@
 
       .controls {
         display: grid;
-        grid-template-columns: repeat(10, auto);
+        grid-template-columns: repeat(10, center);
         gap: 1vw;
         justify-content: center;
-        padding: 0 2vw; /* more fluid padding */
+        padding-left: 1rem;
+        padding-right: 1rem;
       }
 
-      @media only screen and (max-width: 1366px) {
-        .controls {
-          grid-template-columns: repeat(3, auto);
-          gap: 2vw;
-          padding: 0 5vw; /* extra padding on mobile/tablet */
-        }
-      }
       label,
       button,
       select,
