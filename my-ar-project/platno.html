@@ -44,36 +44,26 @@
         background-color: #00ffff;
       }
 
-      #controls {
-        display: flex;
-        flex-wrap: wrap;
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(10, auto);
+        gap: 1vw;
         justify-content: center;
-        gap: 8px; /* spacing between items */
-        padding: 10px;
+        padding-left: 1rem;
+        padding-right: 1rem;
       }
 
-      /* Buttons, inputs, dropdowns */
-      #controls button,
-      #controls select,
-      #controls input {
-        flex: 1 1 auto; /* flexible sizing */
-        min-width: 120px; /* don’t shrink too small */
-        max-width: 200px;
-      }
-
-      /* Mobile tweaks */
-      @media (max-width: 768px) {
-        #controls {
-          flex-direction: row;
-          flex-wrap: wrap;
-          justify-content: space-around;
+      @media only screen and (max-width: 768px) {
+        body {
+          padding-left: 10rem;
+          padding-right: 10rem;
         }
 
-        #controls button,
-        #controls select,
-        #controls input {
-          flex: 2 1 45%; /* two per row */
-          max-width: none;
+        .controls {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2vw;
+          padding-left: 0;
+          padding-right: 0;
         }
       }
 
