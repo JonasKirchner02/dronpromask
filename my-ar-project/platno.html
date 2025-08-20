@@ -172,7 +172,13 @@
       <button onclick="downloadCanvas()">Download PNG</button>
     </div>
 
-    <button onclick="saveCanvasAndGo()" style="margin-top: 2vh">
+    <button
+      onclick="saveCanvasAndGo()"
+      style="
+        margin-top: 2vh;
+        padding: clamp 4px, 0.4vw, 8px clamp 6px, 0.6vw, 12px;
+      "
+    >
       <img
         src="./Apply2.svg"
         alt="Apply"
