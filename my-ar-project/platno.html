@@ -88,7 +88,19 @@
         font-weight: 500;
         font-style: normal;
       }
-
+      @media (max-width: 768px) {
+        label,
+        button,
+        select,
+        input,
+        input[type="text"],
+        input[type="color"],
+        input[type="range"],
+        #paintingList {
+          padding: clamp(6px, 2vw, 12px) clamp(10px, 3vw, 16px);
+          font-size: clamp(14px, 3vw, 18px);
+        }
+      }
       label:hover,
       button:hover,
       select:hover,
