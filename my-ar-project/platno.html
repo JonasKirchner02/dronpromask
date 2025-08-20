@@ -51,6 +51,7 @@
         justify-content: center;
         padding-left: 1rem;
         padding-right: 1rem;
+        white-space: nowrap; /* prevent text wrapping */
       }
 
       label,
@@ -73,13 +74,16 @@
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
-        flex-wrap: nowrap;
+        white-space: nowrap; /* prevent wrapping */
+        text-overflow: ellipsis; /* truncate if too long */
+        overflow: hidden; /* hide overflow text */
       }
+
       @media only screen and (max-width: 768px) {
         .controls {
-          grid-template-columns: repeat(1, auto); /* fewer columns */
+          grid-template-columns: repeat(1, auto);
           gap: 1rem;
-          padding: 1rem; /* reduce padding */
+          padding: 1rem;
         }
 
         label,
@@ -87,14 +91,15 @@
         select,
         input,
         #paintingList {
-          padding: 0.2rem 3rem; /* fixed padding instead of clamp() */
+          padding: 0.2rem 1rem;
           font-size: 0.8rem;
-          min-width: 0; /* allow shrinking in grid */
+          min-width: 0;
         }
         ::placeholder {
           font-size: 0.8rem;
         }
       }
+
       label:hover,
       button:hover,
       select:hover,
@@ -130,8 +135,7 @@
       input[type="range"] {
         -webkit-appearance: none;
         height: 1px;
-
-        background: #af32ff; /* track color */
+        background: #af32ff;
         border-radius: 6px;
         outline: #ffff00;
       }
@@ -141,18 +145,15 @@
         appearance: none;
         width: 12px;
         height: 12px;
-        background: #00ffff; /* thumb color */
+        background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
-
-        /* center the thumb on track */
       }
 
       input:hover[type="range"] {
         -webkit-appearance: none;
         height: 1px;
-
-        background: #262be8; /* track color */
+        background: #262be8;
         border-radius: 6px;
       }
 
@@ -161,12 +162,11 @@
         appearance: none;
         width: 12px;
         height: 12px;
-        background: #00ffff; /* thumb color */
+        background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
-
-        /* center the thumb on track */
       }
+
       canvas {
         position: absolute;
         top: 0;
