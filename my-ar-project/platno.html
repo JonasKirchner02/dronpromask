@@ -60,7 +60,7 @@
       button,
       select,
       input,
-      input[type="text"],
+      input:not([type="text"]),
       input[type="color"],
       input[type="range"],
       #paintingList {
@@ -87,6 +87,12 @@
         color: #ffffff;
         opacity: 1;
         text-align: center; /* Center placeholder too */
+      }
+
+      input[type="text"] {
+        display: block;
+        text-align: center;
+        padding: 0.2rem 0.4rem;
       }
 
       select {
