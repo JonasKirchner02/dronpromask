@@ -337,20 +337,36 @@
       function resizeCanvases() {
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
-
-        const oldPaint = document.createElement("canvas");
-        oldPaint.width = paintCanvas.width;
-        oldPaint.height = paintCanvas.height;
-        oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
+        const dpr = window.devicePixelRatio || 1;
 
         [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
-          c.width = rect.width;
-          c.height = rect.height;
-        });
+          // Save old image only for paintCanvas
+          let oldPaint;
+          if (c === paintCanvas) {
+            oldPaint = document.createElement("canvas");
+            oldPaint.width = c.width;
+            oldPaint.height = c.height;
+            oldPaint.getContext("2d").drawImage(c, 0, 0);
+          }
 
-        paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
-        bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
-        drawEffect();
+          // Set actual pixel size
+          c.width = rect.width * dpr;
+          c.height = rect.height * dpr;
+
+          // Scale drawing context for crisp rendering
+          const ctx = c.getContext("2d");
+          ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+          ctx.scale(dpr, dpr);
+
+          // Redraw content
+          if (c === paintCanvas && oldPaint) {
+            ctx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
+          } else if (c === bgCanvas) {
+            ctx.drawImage(bgImage, 0, 0, rect.width, rect.height);
+          } else if (c === effectCanvas) {
+            drawEffect();
+          }
+        });
       }
 
       function drawEffect() {
