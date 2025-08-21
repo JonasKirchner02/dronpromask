@@ -120,17 +120,29 @@
         select,
         input,
         #paintingList {
-          padding: 0.3rem 0.5rem;
-          font-size: 0.8rem;
-          min-width: 0;
-          text-align: center;
-          justify-content: center;
-        }
-        ::placeholder {
-          font-size: 0.8rem;
+          background-color: #2626ff;
+          color: #ffffff;
+          border: none;
+          border-radius: clamp(4px, 0.4vw, 8px);
+          display: flex;
           align-items: center;
           justify-content: center;
+          padding: 0.2rem 0.4rem;
+          font-size: 1rem;
+          font-family: "indivisible", sans-serif;
+          font-weight: 500;
+          font-style: normal;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+
+          /* Add these 👇 */
           text-align: center;
+        }
+
+        input::placeholder {
+          color: #ffffff;
+          opacity: 1;
+          text-align: center; /* Center placeholder too */
         }
       }
 
