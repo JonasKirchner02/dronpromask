@@ -89,6 +89,12 @@
         text-align: center; /* Center placeholder too */
       }
 
+      select {
+        -webkit-appearance: none; /* remove default arrow in Chrome/Safari */
+        -moz-appearance: none; /* Firefox */
+        appearance: none; /* standard */
+      }
+
       @media only screen and (max-width: 768px) {
         .controls {
           grid-template-columns: repeat(1, auto);
