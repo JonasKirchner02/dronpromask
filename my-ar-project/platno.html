@@ -48,11 +48,13 @@
 
       .controls {
         display: grid;
-        grid-template-columns: repeat(10, auto);
-        gap: 1vw;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(80px, 1fr)
+        ); /* flexible */
+        gap: 0.5rem;
         justify-content: center;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding: 1rem;
         white-space: nowrap; /* prevent text wrapping */
       }
 
