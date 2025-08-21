@@ -160,15 +160,13 @@
         >Color: <input type="color" id="colorPicker" value="#000000"
       /></label>
 
-      <label
-        >Brush type:
-        <select id="brushType">
-          <option value="classic">Classic</option>
-          <option value="soft">Softer</option>
-          <option value="image1">Image brush 1</option>
-          <option value="image2">Image brush 2</option>
-        </select>
-      </label>
+      <label id="brushTypeLabel">Brush type</label>
+      <select id="brushType">
+        <option value="classic">Classic</option>
+        <option value="soft">Softer</option>
+        <option value="image1">Image brush 1</option>
+        <option value="image2">Image brush 2</option>
+      </select>
 
       <label
         >Brush size:
@@ -361,6 +359,17 @@
       paintCanvas.addEventListener("touchend", stopPainting);
 
       resizeCanvases();
+
+      const brushTypeLabel = document.getElementById("brushTypeLabel");
+      const brushType = document.getElementById("brushType");
+
+      brushTypeLabel.addEventListener("click", () => {
+        if (brushType.style.display === "inline-block") {
+          brushType.style.display = "none";
+        } else {
+          brushType.style.display = "inline-block";
+        }
+      });
     </script>
   </body>
 </html>
