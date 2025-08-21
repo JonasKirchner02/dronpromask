@@ -217,7 +217,21 @@
       input[type="text"] {
         display: block; /* back to normal input */
         text-align: center; /* keep placeholder/text centered */
-        padding: 0.2rem 0.4rem; /* tighter padding */
+
+        background-color: #2626ff;
+        color: #ffffff;
+        border: none;
+        border-radius: clamp(4px, 0.4vw, 8px);
+
+        align-items: center;
+        justify-content: center;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.8rem;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       canvas#backgroundCanvas {
