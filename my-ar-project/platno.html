@@ -96,9 +96,31 @@
       }
 
       input[type="color"] {
-        -webkit-appearance: none; /* remove default arrow in Chrome/Safari */
+        -webkit-appearance: none; /* Chrome/Safari */
         -moz-appearance: none; /* Firefox */
-        appearance: none; /* standard */
+        appearance: none; /* Standard */
+        border: none;
+        width: 40px; /* your preferred size */
+        height: 40px;
+        background: none; /* remove default color background */
+        padding: 0;
+        cursor: pointer;
+      }
+
+      /* Remove the color swatch in Chrome/Safari */
+      input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+
+      input[type="color"]::-webkit-color-swatch {
+        border: none;
+        background: transparent;
+      }
+
+      /* Remove the color swatch in Firefox */
+      input[type="color"]::-moz-color-swatch {
+        border: none;
+        background: transparent;
       }
 
       @media only screen and (max-width: 768px) {
