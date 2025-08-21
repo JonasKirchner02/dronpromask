@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-    @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
+      @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
         body {
           overflow: hidden;
           height: 100vh;
@@ -41,6 +41,8 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        background: url("file3.png") no-repeat center center fixed;
+        background-size: cover;
         background-color: #262be8;
       }
 
@@ -51,29 +53,32 @@
         justify-content: center;
         padding-left: 1rem;
         padding-right: 1rem;
-        white-space: nowrap;
+        white-space: nowrap; /* prevent text wrapping */
       }
 
-      /* only style inputs, buttons, selects */
+      label,
       button,
       select,
       input,
+      input[type="text"],
+      input[type="color"],
+      input[type="range"],
       #paintingList {
         background-color: #2626ff;
         color: #ffffff;
         border: none;
         border-radius: clamp(6px, 0.6vw, 12px);
-        padding: 0.4rem 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem;
         font-size: 1rem;
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
-      }
-
-      label {
-        color: #ffffff;
-        font-size: 1rem;
-        margin-right: 0.3rem;
+        white-space: nowrap; /* prevent wrapping */
+        text-overflow: ellipsis; /* truncate if too long */
+        overflow: hidden; /* hide overflow text */
       }
 
       @media only screen and (max-width: 768px) {
@@ -82,21 +87,33 @@
           gap: 0.1rem;
           padding: 0.2rem;
         }
-        label {
-          display: block;
-          margin-bottom: 0.2rem;
-        }
+
+        label,
         button,
         select,
         input,
         #paintingList {
+          padding: 0.3rem 0.5rem;
+          font-size: 0.8rem;
+          min-width: 0;
           width: 90vw;
+
+          justify-content: center;
+        }
+        ::placeholder {
+          font-size: 0.8rem;
+          align-items: center;
+          justify-content: center;
         }
       }
 
+      label:hover,
       button:hover,
       select:hover,
       input:hover,
+      input[type="text"]:hover,
+      input[type="color"]:hover,
+      input[type="range"]:hover,
       #paintingList:hover {
         background-color: #000064;
         cursor: pointer;
@@ -121,15 +138,33 @@
         }
       }
 
+      /* Chrome, Safari, Opera */
       input[type="range"] {
         -webkit-appearance: none;
         height: 1px;
         background: #af32ff;
         border-radius: 6px;
-        outline: none;
+        outline: #ffff00;
       }
 
       input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      input:hover[type="range"] {
+        -webkit-appearance: none;
+        height: 1px;
+        background: #262be8;
+        border-radius: 6px;
+      }
+
+      input:hover[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
         width: 12px;
@@ -148,6 +183,11 @@
         touch-action: none;
       }
 
+      input::placeholder {
+        color: #ffffff;
+        opacity: 1;
+      }
+
       canvas#backgroundCanvas {
         z-index: 1;
       }
@@ -158,53 +198,12 @@
         z-index: 3;
         pointer-events: none;
       }
-    </style>
-  </head>
-  <body>
-    <div class="controls">
-      <label for="colorPicker">Color:</label>
-      <input type="color" id="colorPicker" value="#000000" />
 
-      <label for="brushType">Brush type:</label>
-      <select id="brushType">
-        <option value="classic">Classic</option>
-        <option value="soft">Softer</option>
-        <option value="image1">Image brush 1</option>
-        <option value="image2">Image brush 2</option>
-      </select>
-
-      <label for="brushSize">Brush size:</label>
-      <input type="range" id="brushSize" min="5" max="150" value="5" />
-
-      <label for="softSteps">Soft steps:</label>
-      <input type="range" id="softSteps" min="1" max="50" value="10" />
-
-      <button onclick="clearCanvas()">Clear</button>
-      <button onclick="undoLastStroke()">Undo</button>
-      <input type="text" id="paintingName" placeholder="Enter name:" />
-      <button onclick="savePainting()">Save painting</button>
-      <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">My paintings</option>
-      </select>
-      <button onclick="downloadCanvas()">Download PNG</button>
-    </div>
-
-    <div class="canvas-container">
-      <canvas id="backgroundCanvas"></canvas>
-      <canvas id="paintCanvas"></canvas>
-      <canvas id="effectCanvas"></canvas>
-    </div>
-
-    <button
-      onclick="saveCanvasAndGo()"
-      style="margin-top: 2vh; background: transparent; border: none; cursor: pointer;"
-    >
-      <img
-        src="./Apply2.svg"
-        alt="Apply"
-        style="width: clamp(100px, 15vw, 200px); height: auto; display: block;"
-      />
-    </button>
+      @font-face {
+        font-family: "Rapid";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
+          format("truetype");
+      }
     </style>
   </head>
   <body>
