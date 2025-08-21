@@ -78,26 +78,37 @@
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
-
-        /* Add these 👇 */
-        text-align: center;
+        text-align: center; /* center text */
       }
 
+      /* Input placeholder centered */
       input::placeholder {
         color: #ffffff;
         opacity: 1;
-        text-align: center; /* Center placeholder too */
+        text-align: center;
       }
 
-      /* Center text inside all selects and inputs */
-      input[type="text"],
+      /* All selects styled like buttons */
       select {
-        text-align: center; /* centers the text inside the box */
-        text-align-last: center; /* keeps the selected option centered */
+        appearance: none; /* remove default arrow */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #2626ff;
+        color: #ffffff;
+        border: none;
+        border-radius: clamp(4px, 0.4vw, 8px);
+        padding: 0.3rem 1.6rem 0.3rem 0.5rem; /* space for custom arrow */
+        font-size: 0.8rem;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        text-align: center;
+        text-align-last: center; /* center selected option */
+        cursor: pointer;
+        position: relative;
       }
 
-      /* Center placeholder text in input */
-      input::placeholder {
+      /* Dropdown options centered */
+      select option {
         text-align: center;
       }
 
