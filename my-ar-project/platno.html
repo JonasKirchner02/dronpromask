@@ -89,6 +89,18 @@
         text-align: center; /* Center placeholder too */
       }
 
+      /* Center text inside all selects and inputs */
+      input[type="text"],
+      select {
+        text-align: center; /* centers the text inside the box */
+        text-align-last: center; /* keeps the selected option centered */
+      }
+
+      /* Center placeholder text in input */
+      input::placeholder {
+        text-align: center;
+      }
+
       @media only screen and (max-width: 768px) {
         .controls {
           grid-template-columns: repeat(1, auto);
