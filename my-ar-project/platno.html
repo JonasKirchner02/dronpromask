@@ -67,18 +67,17 @@
         background-color: #2626ff;
         color: #ffffff;
         border: none;
-        border-radius: clamp(6px, 0.6vw, 12px);
+        border-radius: clamp(4px, 0.4vw, 8px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.2rem;
-        font-size: 1rem;
+        padding: 0.1rem 0.3rem; /* smaller padding */
+        font-size: 0.8rem; /* smaller text */
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
-        white-space: nowrap; /* prevent wrapping */
-        text-overflow: ellipsis; /* truncate if too long */
-        /* hide overflow text */
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       @media only screen and (max-width: 768px) {
