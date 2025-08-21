@@ -78,38 +78,15 @@
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
-        text-align: center; /* center text */
+
+        /* Add these 👇 */
+        text-align: center;
       }
 
-      /* Input placeholder centered */
       input::placeholder {
         color: #ffffff;
         opacity: 1;
-        text-align: center;
-      }
-
-      /* All selects styled like buttons */
-      select {
-        appearance: none; /* remove default arrow */
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-color: #2626ff;
-        color: #ffffff;
-        border: none;
-        border-radius: clamp(4px, 0.4vw, 8px);
-        padding: 0.3rem 1.6rem 0.3rem 0.5rem; /* space for custom arrow */
-        font-size: 0.8rem;
-        font-family: "indivisible", sans-serif;
-        font-weight: 500;
-        text-align: center;
-        text-align-last: center; /* center selected option */
-        cursor: pointer;
-        position: relative;
-      }
-
-      /* Dropdown options centered */
-      select option {
-        text-align: center;
+        text-align: center; /* Center placeholder too */
       }
 
       @media only screen and (max-width: 768px) {
