@@ -33,7 +33,9 @@
         font-weight: 500;
         font-style: normal;
         margin: 0;
-        padding: 2vh 6rem;
+        padding: 2vh;
+        padding-left: 6rem;
+        padding-right: 6rem;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -49,8 +51,9 @@
         grid-template-columns: repeat(10, auto);
         gap: 1vw;
         justify-content: center;
-        padding: 0 1rem;
-        white-space: nowrap;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        white-space: nowrap; /* prevent text wrapping */
       }
 
       label,
@@ -75,19 +78,51 @@
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        /* Add these 👇 */
         text-align: center;
       }
 
       input::placeholder {
         color: #ffffff;
         opacity: 1;
-        text-align: center;
+        text-align: center; /* Center placeholder too */
+      }
+
+      @media only screen and (max-width: 768px) {
+        .controls {
+          grid-template-columns: repeat(1, auto);
+          gap: 0.1rem;
+          padding: 0.2rem;
+        }
+
+        label,
+        button,
+        select,
+        input,
+        #paintingList {
+          padding: 0.3rem 0.5rem;
+          font-size: 0.8rem;
+          min-width: 0;
+          width: 90vw;
+
+          justify-content: center;
+        }
+        ::placeholder {
+          font-size: 0.8rem;
+          align-items: center;
+          justify-content: center;
+        }
       }
 
       label:hover,
       button:hover,
       select:hover,
-      input:hover {
+      input:hover,
+      input[type="text"]:hover,
+      input[type="color"]:hover,
+      input[type="range"]:hover,
+      #paintingList:hover {
         background-color: #000064;
         cursor: pointer;
       }
@@ -111,7 +146,7 @@
         }
       }
 
-      /* Range slider styling */
+      /* Chrome, Safari, Opera */
       input[type="range"] {
         -webkit-appearance: none;
         height: 1px;
@@ -119,8 +154,27 @@
         border-radius: 6px;
         outline: #ffff00;
       }
+
       input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      input:hover[type="range"] {
+        -webkit-appearance: none;
+        height: 1px;
+        background: #262be8;
+        border-radius: 6px;
+      }
+
+      input:hover[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
         width: 12px;
         height: 12px;
         background: #00ffff;
@@ -137,6 +191,11 @@
         touch-action: none;
       }
 
+      input::placeholder {
+        color: #ffffff;
+        opacity: 1;
+      }
+
       canvas#backgroundCanvas {
         z-index: 1;
       }
@@ -148,9 +207,10 @@
         pointer-events: none;
       }
 
-      /* Hide brushType dropdown initially */
-      #brushType {
-        display: none;
+      @font-face {
+        font-family: "Rapid";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
+          format("truetype");
       }
     </style>
   </head>
@@ -159,9 +219,8 @@
       <label
         >Color: <input type="color" id="colorPicker" value="#000000"
       /></label>
-
-      <label
-        >Brush type:
+      <label>
+        Brush type:
         <select id="brushType">
           <option value="classic">Classic</option>
           <option value="soft">Softer</option>
@@ -169,26 +228,21 @@
           <option value="image2">Image brush 2</option>
         </select>
       </label>
-
-      <label
-        >Brush size:
-        <input type="range" id="brushSize" min="5" max="150" value="5"
-      /></label>
-      <label
-        >Soft steps:
-        <input type="range" id="softSteps" min="1" max="50" value="10"
-      /></label>
-
+      <label>
+        Brush size:
+        <input type="range" id="brushSize" min="5" max="150" value="5" />
+      </label>
+      <label>
+        Soft steps:
+        <input type="range" id="softSteps" min="1" max="50" value="10" />
+      </label>
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
-
       <input type="text" id="paintingName" placeholder="Enter name:" />
       <button onclick="savePainting()">Save painting</button>
-
       <select id="paintingList" onchange="loadSelectedPainting()">
         <option value="">My paintings</option>
       </select>
-
       <button onclick="downloadCanvas()">Download PNG</button>
     </div>
 
@@ -198,7 +252,32 @@
       <canvas id="effectCanvas"></canvas>
     </div>
 
+    <button
+      onclick="saveCanvasAndGo()"
+      style="
+        margin-top: 2vh;
+        padding: clamp 4px, 0.4vw, 8px clamp 6px, 0.6vw, 12px;
+      "
+    >
+      <img
+        src="./Apply2.svg"
+        alt="Apply"
+        style="
+          width: 15vw;
+          height: auto;
+          max-width: 200px;
+          padding: clamp 8px, 0.8vw, 8px clamp 12px, 1.2vw, 12px;
+        "
+      />
+    </button>
+
     <script>
+      let historyStack = [];
+      const maxHistory = 50;
+      let lastX = 0,
+        lastY = 0;
+      let painting = false;
+
       const paintCanvas = document.getElementById("paintCanvas");
       const paintCtx = paintCanvas.getContext("2d");
       const bgCanvas = document.getElementById("backgroundCanvas");
@@ -210,21 +289,16 @@
       const brushSize = document.getElementById("brushSize");
       const softSteps = document.getElementById("softSteps");
       const brushType = document.getElementById("brushType");
-      const paintingList = document.getElementById("paintingList");
-
-      let historyStack = [];
-      const maxHistory = 50;
-      let painting = false,
-        lastX = 0,
-        lastY = 0;
 
       let brushImage1 = new Image();
       brushImage1.src = "/supina.png";
+
       let brushImage2 = new Image();
       brushImage2.src = "/supina2.png";
 
       const bgImage = new Image();
       bgImage.src = "/UVtransparent.png";
+
       const effectImage = new Image();
       effectImage.src = "/overlinky.png";
 
@@ -259,7 +333,7 @@
       }
 
       window.addEventListener("resize", resizeCanvases);
-      bgImage.onload = resizeCanvases;
+      bgImage.onload = () => resizeCanvases();
       effectImage.onload = drawEffect;
 
       function getCoordinates(e) {
@@ -299,68 +373,162 @@
           paintCtx.moveTo(lastX, lastY);
           paintCtx.lineTo(x, y);
           paintCtx.stroke();
-        } else {
-          const img = brushType.value === "image1" ? brushImage1 : brushImage2;
-          paintCtx.drawImage(
-            img,
-            x - img.width / 2,
-            y - img.height / 2,
-            brushSize.value,
-            brushSize.value
-          );
+
+          paintCtx.beginPath();
+          paintCtx.moveTo(paintCanvas.width - lastX, lastY);
+          paintCtx.lineTo(mirrorX, y);
+          paintCtx.stroke();
+        } else if (brushType.value === "soft") {
+          const steps = parseInt(softSteps.value);
+          for (let i = 0; i < steps; i++) {
+            const t = i / steps;
+            const ix = lastX + (x - lastX) * t;
+            const iy = lastY + (y - lastY) * t;
+            const mirrorIX = paintCanvas.width - ix;
+            const radius = brushSize.value * (1 - t * 0.8);
+
+            paintCtx.globalAlpha = 0.15;
+            paintCtx.beginPath();
+            paintCtx.arc(ix, iy, radius / 2, 0, Math.PI * 2);
+            paintCtx.fillStyle = colorPicker.value;
+            paintCtx.fill();
+
+            paintCtx.beginPath();
+            paintCtx.arc(mirrorIX, iy, radius / 2, 0, Math.PI * 2);
+            paintCtx.fillStyle = colorPicker.value;
+            paintCtx.fill();
+          }
+          paintCtx.globalAlpha = 1;
+        } else if (brushType.value === "image1") {
+          const w = brushSize.value;
+          const h = brushSize.value;
+          paintCtx.drawImage(brushImage1, x - w / 2, y - h / 2, w, h);
+          paintCtx.drawImage(brushImage1, mirrorX - w / 2, y - h / 2, w, h);
+        } else if (brushType.value === "image2") {
+          const w = brushSize.value;
+          const h = brushSize.value;
+          paintCtx.drawImage(brushImage2, x - w / 2, y - h / 2, w, h);
+          paintCtx.drawImage(brushImage2, mirrorX - w / 2, y - h / 2, w, h);
         }
 
         lastX = x;
         lastY = y;
       }
 
-      function stopPainting() {
+      function endPainting() {
         painting = false;
+        paintCtx.beginPath();
+        paintCtx.globalAlpha = 1;
+        localStorage.setItem("lastPainting", paintCanvas.toDataURL());
+      }
+
+      function undoLastStroke() {
+        if (historyStack.length > 0) {
+          const imgData = historyStack.pop();
+          paintCtx.putImageData(imgData, 0, 0);
+        }
       }
 
       function clearCanvas() {
+        saveToHistory();
         paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-      }
-      function undoLastStroke() {
-        if (historyStack.length)
-          paintCtx.putImageData(historyStack.pop(), 0, 0);
       }
 
       function savePainting() {
-        const name =
-          document.getElementById("paintingName").value || "Untitled";
-        const option = document.createElement("option");
-        option.value = paintCanvas.toDataURL();
-        option.text = name;
-        paintingList.add(option);
-        paintingList.style.display = "inline-block";
+        const name = document.getElementById("paintingName").value.trim();
+        if (!name) return alert("Enter a name!");
+        const dataURL = paintCanvas.toDataURL();
+        localStorage.setItem(`painting_${name}`, dataURL);
+
+        const paintingList = document.getElementById("paintingList");
+        if (![...paintingList.options].some((o) => o.value === name)) {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          paintingList.appendChild(option);
+        }
       }
 
       function loadSelectedPainting() {
-        const dataURL = paintingList.value;
+        const select = document.getElementById("paintingList");
+        const name = select.value;
+        if (!name) return;
+        const dataURL = localStorage.getItem(`painting_${name}`);
         if (!dataURL) return;
+
         const img = new Image();
-        img.onload = () =>
+        img.onload = () => {
+          paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
           paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
+        };
         img.src = dataURL;
       }
 
+      function saveCanvasAndGo() {
+        const finalImage = paintCanvas.toDataURL();
+        localStorage.setItem("customMaskTexture", finalImage);
+        window.location.href = "index.html";
+      }
+
       function downloadCanvas() {
-        const link = document.createElement("a");
-        link.download = "painting.png";
-        link.href = paintCanvas.toDataURL();
-        link.click();
+        const width = paintCanvas.width;
+        const height = paintCanvas.height;
+        if (width === 0 || height === 0) {
+          alert("Canvas has no size yet — try painting first.");
+          return;
+        }
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(bgCanvas, 0, 0);
+        tempCtx.drawImage(paintCanvas, 0, 0);
+
+        tempCanvas.toBlob(function (blob) {
+          const link = document.createElement("a");
+          link.download =
+            (document.getElementById("paintingName").value.trim() || "") +
+            ".png";
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+        });
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
       paintCanvas.addEventListener("touchstart", startPainting);
       paintCanvas.addEventListener("mousemove", draw);
       paintCanvas.addEventListener("touchmove", draw);
-      paintCanvas.addEventListener("mouseup", stopPainting);
-      paintCanvas.addEventListener("mouseleave", stopPainting);
-      paintCanvas.addEventListener("touchend", stopPainting);
+      paintCanvas.addEventListener("mouseup", endPainting);
+      paintCanvas.addEventListener("mouseleave", endPainting);
+      paintCanvas.addEventListener("touchend", endPainting);
 
-      resizeCanvases();
+      window.addEventListener("load", () => {
+        resizeCanvases();
+        const lastPainting = localStorage.getItem("lastPainting");
+        if (lastPainting) {
+          const img = new Image();
+          img.onload = () =>
+            paintCtx.drawImage(
+              img,
+              0,
+              0,
+              paintCanvas.width,
+              paintCanvas.height
+            );
+          img.src = lastPainting;
+        }
+        const paintingList = document.getElementById("paintingList");
+        for (let key in localStorage) {
+          if (key.startsWith("painting_")) {
+            const name = key.replace("painting_", "");
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = name;
+            paintingList.appendChild(option);
+          }
+        }
+      });
     </script>
   </body>
 </html>
