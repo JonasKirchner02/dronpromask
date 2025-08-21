@@ -33,7 +33,9 @@
         font-weight: 500;
         font-style: normal;
         margin: 0;
-        padding: 2vh 6rem;
+        padding: 2vh;
+        padding-left: 6rem;
+        padding-right: 6rem;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -49,12 +51,14 @@
         grid-template-columns: repeat(10, auto);
         gap: 1vw;
         justify-content: center;
-        padding: 0 1rem;
-        white-space: nowrap;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        white-space: nowrap; /* prevent text wrapping */
       }
 
       label,
       button,
+      select,
       input,
       input[type="text"],
       input[type="color"],
@@ -64,20 +68,16 @@
         color: #ffffff;
         border: none;
         border-radius: clamp(4px, 0.4vw, 8px);
-        padding: 0.1rem 0.3rem;
-        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.1rem 0.3rem; /* smaller padding */
+        font-size: 0.8rem; /* smaller text */
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
-      }
-
-      /* Fix select dropdown issue */
-      select,
-      #paintingList {
-        display: inline-block; /* reset flex */
-        cursor: pointer;
       }
 
       @media only screen and (max-width: 768px) {
@@ -96,9 +96,13 @@
           font-size: 0.8rem;
           min-width: 0;
           width: 90vw;
+
+          justify-content: center;
         }
         ::placeholder {
           font-size: 0.8rem;
+          align-items: center;
+          justify-content: center;
         }
       }
 
@@ -153,11 +157,20 @@
       }
 
       input:hover[type="range"] {
+        -webkit-appearance: none;
+        height: 1px;
         background: #262be8;
+        border-radius: 6px;
       }
 
       input:hover[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
         background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
       }
 
       canvas {
@@ -206,14 +219,14 @@
           <option value="image2">Image brush 2</option>
         </select>
       </label>
-      <label
-        >Brush size:
-        <input type="range" id="brushSize" min="5" max="150" value="5"
-      /></label>
-      <label
-        >Soft steps:
-        <input type="range" id="softSteps" min="1" max="50" value="10"
-      /></label>
+      <label>
+        Brush size:
+        <input type="range" id="brushSize" min="5" max="150" value="5" />
+      </label>
+      <label>
+        Soft steps:
+        <input type="range" id="softSteps" min="1" max="50" value="10" />
+      </label>
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
       <input type="text" id="paintingName" placeholder="Enter name:" />
@@ -232,12 +245,20 @@
 
     <button
       onclick="saveCanvasAndGo()"
-      style="margin-top: 2vh; padding: 0.4rem 0.6rem"
+      style="
+        margin-top: 2vh;
+        padding: clamp 4px, 0.4vw, 8px clamp 6px, 0.6vw, 12px;
+      "
     >
       <img
         src="./Apply2.svg"
         alt="Apply"
-        style="width: 15vw; height: auto; max-width: 200px"
+        style="
+          width: 15vw;
+          height: auto;
+          max-width: 200px;
+          padding: clamp 8px, 0.8vw, 8px clamp 12px, 1.2vw, 12px;
+        "
       />
     </button>
 
