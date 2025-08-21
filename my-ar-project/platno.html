@@ -54,7 +54,6 @@
         padding-left: 1rem;
         padding-right: 1rem;
         white-space: nowrap; /* prevent text wrapping */
-        width: 2vw;
       }
 
       label,
@@ -68,7 +67,7 @@
         background-color: #2626ff;
         color: #ffffff;
         border: none;
-        border-radius: 6px;
+        border-radius: clamp(6px, 0.6vw, 12px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -78,6 +77,8 @@
         font-weight: 500;
         font-style: normal;
         white-space: nowrap; /* prevent wrapping */
+        /* truncate if too long */
+        overflow: hidden; /* hide overflow text */
       }
 
       @media only screen and (max-width: 768px) {
