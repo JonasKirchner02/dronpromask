@@ -194,6 +194,13 @@
         }
       }
 
+      @media only screen and (max-width: 1366px) {
+        .apply-button img {
+          width: 30vw; /* Increase size */
+          max-width: 300px; /* Optional: allow bigger image */
+        }
+      }
+
       /* ✅ Range slider styles */
       input[type="range"] {
         -webkit-appearance: none;
@@ -292,6 +299,7 @@
 
     <button
       onclick="saveCanvasAndGo()"
+      class="apply-button"
       style="margin-top: 2vh; border: none; cursor: pointer"
     >
       <img
