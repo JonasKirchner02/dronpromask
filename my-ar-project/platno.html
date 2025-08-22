@@ -5,29 +5,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
-        body {
-          overflow: hidden;
-          height: 100vh;
-        }
-        body::before {
-          content: "Please rotate your device";
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          color: #00ffff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: clamp(18px, 3.5vw, 40px);
-          text-align: center;
-          z-index: 999999;
-          background: #000064;
-        }
-      }
-
       body {
         font-family: "indivisible", sans-serif;
         font-weight: 500;
@@ -53,16 +30,12 @@
         justify-content: center;
         padding-left: 1rem;
         padding-right: 1rem;
-        white-space: nowrap;
       }
 
       label,
       button,
       select,
       input,
-      input[type="text"],
-      input[type="color"],
-      input[type="range"],
       #paintingList {
         background-color: #2626ff;
         color: #ffffff;
@@ -75,109 +48,26 @@
         font-size: 1rem;
         font-family: "indivisible", sans-serif;
         font-weight: 500;
-        font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
         text-align: center;
-      }
-
-      input::placeholder {
-        color: #ffffff;
-        opacity: 1;
-        text-align: center;
-      }
-
-      select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
-
-      input[type="color"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        width: 0;
-        height: 0;
-        padding: 0;
-        border: none;
-        background: none;
-        overflow: hidden;
-      }
-
-      @media only screen and (max-width: 1366px) {
-        .controls {
-          grid-template-columns: repeat(1, auto);
-          gap: 0.1rem;
-          padding: 0.2rem;
-          width: 60vw;
-        }
-
-        label,
-        button,
-        select,
-        input,
-        #paintingList {
-          background-color: #2626ff;
-          color: #ffffff;
-          border: none;
-          border-radius: clamp(4px, 0.4vw, 8px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0.2rem 0.4rem;
-          font-size: 1rem;
-          font-family: "indivisible", sans-serif;
-          font-weight: 500;
-          font-style: normal;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          text-align: center;
-        }
-
-        input::placeholder {
-          color: #ffffff;
-          opacity: 1;
-          text-align: center;
-        }
-      }
-
-      label:hover,
-      button:hover,
-      select:hover,
-      input:hover,
-      input[type="text"]:hover,
-      input[type="color"]:hover,
-      input[type="range"]:hover,
-      #paintingList:hover {
-        background-color: #000064;
-        cursor: pointer;
       }
 
       .canvas-container {
         position: relative;
         width: 35vw;
         aspect-ratio: 1 / 1;
-        transform: translateY(2%);
         padding: 2%;
         display: flex;
         justify-content: center;
         align-items: center;
       }
 
-      @media only screen and (max-width: 1366px) {
-        .canvas-container {
-          width: 80vw;
-          aspect-ratio: 1 / 1;
-          transform: translateY(0%);
-        }
-      }
-
       canvas {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%; /* 🔑 Display size scales with container */
+        width: 100%; /* 🔑 only scale visually */
         height: 100%;
         touch-action: none;
       }
@@ -232,6 +122,18 @@
       <canvas id="effectCanvas"></canvas>
     </div>
 
+    <!-- 🔑 Apply button restored -->
+    <button
+      onclick="saveCanvasAndGo()"
+      style="margin-top: 2vh; border: none; background: none; cursor: pointer"
+    >
+      <img
+        src="./Apply2.svg"
+        alt="Apply"
+        style="width: 15vw; height: auto; max-width: 200px"
+      />
+    </button>
+
     <script>
       let historyStack = [];
       const maxHistory = 50;
@@ -263,15 +165,14 @@
       const effectImage = new Image();
       effectImage.src = "/overlinky3.png";
 
-      // 🔑 Paint canvas fixed high-res buffer
-      paintCanvas.width = 1024;
-      paintCanvas.height = 1024;
+      // fixed high-res paint buffer
+      paintCanvas.width = 2048;
+      paintCanvas.height = 2048;
 
       function resizeCanvases() {
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
-        // Only resize background + effect, NOT paintCanvas
         bgCanvas.width = rect.width;
         bgCanvas.height = rect.height;
         effectCanvas.width = rect.width;
@@ -301,7 +202,6 @@
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        // 🔑 Scale input coordinates into paintCanvas resolution
         const scaleX = paintCanvas.width / rect.width;
         const scaleY = paintCanvas.height / rect.height;
 
@@ -430,6 +330,12 @@
           paintCtx.drawImage(img, 0, 0, paintCanvas.width, paintCanvas.height);
         };
         img.src = dataURL;
+      }
+
+      function saveCanvasAndGo() {
+        const finalImage = paintCanvas.toDataURL();
+        localStorage.setItem("customMaskTexture", finalImage);
+        window.location.href = "index.html";
       }
 
       function downloadCanvas() {
