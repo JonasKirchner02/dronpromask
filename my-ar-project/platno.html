@@ -53,7 +53,7 @@
         justify-content: center;
         padding-left: 1rem;
         padding-right: 1rem;
-        white-space: nowrap; /* prevent text wrapping */
+        white-space: nowrap;
       }
 
       label,
@@ -78,21 +78,19 @@
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
-
-        /* Add these 👇 */
         text-align: center;
       }
 
       input::placeholder {
         color: #ffffff;
         opacity: 1;
-        text-align: center; /* Center placeholder too */
+        text-align: center;
       }
 
       select {
-        -webkit-appearance: none; /* remove default arrow in Chrome/Safari */
-        -moz-appearance: none; /* Firefox */
-        appearance: none; /* standard */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
       }
 
       input[type="color"] {
@@ -134,15 +132,13 @@
           font-style: normal;
           white-space: nowrap;
           text-overflow: ellipsis;
-
-          /* Add these 👇 */
           text-align: center;
         }
 
         input::placeholder {
           color: #ffffff;
           opacity: 1;
-          text-align: center; /* Center placeholder too */
+          text-align: center;
         }
       }
 
@@ -177,54 +173,13 @@
         }
       }
 
-      /* Chrome, Safari, Opera */
-      input[type="range"] {
-        -webkit-appearance: none;
-        height: 1px;
-        background: #af32ff;
-        border-radius: 6px;
-        outline: #ffff00;
-      }
-
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      input:hover[type="range"] {
-        -webkit-appearance: none;
-        height: 1px;
-        background: #262be8;
-        border-radius: 6px;
-      }
-
-      input:hover[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
       canvas {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        width: 100%; /* 🔑 Display size scales with container */
         height: 100%;
         touch-action: none;
-      }
-
-      input::placeholder {
-        color: #ffffff;
-        opacity: 1;
       }
 
       canvas#backgroundCanvas {
@@ -236,12 +191,6 @@
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
-      }
-
-      @font-face {
-        font-family: "Rapid";
-        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
-          format("truetype");
       }
     </style>
   </head>
@@ -283,25 +232,6 @@
       <canvas id="effectCanvas"></canvas>
     </div>
 
-    <button
-      onclick="saveCanvasAndGo()"
-      style="
-        margin-top: 2vh;
-        padding: clamp 4px, 0.4vw, 8px clamp 6px, 0.6vw, 12px;
-      "
-    >
-      <img
-        src="./Apply2.svg"
-        alt="Apply"
-        style="
-          width: 15vw;
-          height: auto;
-          max-width: 200px;
-          padding: clamp 8px, 0.8vw, 8px clamp 12px, 1.2vw, 12px;
-        "
-      />
-    </button>
-
     <script>
       let historyStack = [];
       const maxHistory = 50;
@@ -333,21 +263,20 @@
       const effectImage = new Image();
       effectImage.src = "/overlinky3.png";
 
+      // 🔑 Paint canvas fixed high-res buffer
+      paintCanvas.width = 2048;
+      paintCanvas.height = 2048;
+
       function resizeCanvases() {
         const container = document.querySelector(".canvas-container");
         const rect = container.getBoundingClientRect();
 
-        const oldPaint = document.createElement("canvas");
-        oldPaint.width = paintCanvas.width;
-        oldPaint.height = paintCanvas.height;
-        oldPaint.getContext("2d").drawImage(paintCanvas, 0, 0);
+        // Only resize background + effect, NOT paintCanvas
+        bgCanvas.width = rect.width;
+        bgCanvas.height = rect.height;
+        effectCanvas.width = rect.width;
+        effectCanvas.height = rect.height;
 
-        [paintCanvas, bgCanvas, effectCanvas].forEach((c) => {
-          c.width = rect.width;
-          c.height = rect.height;
-        });
-
-        paintCtx.drawImage(oldPaint, 0, 0, rect.width, rect.height);
         bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
         drawEffect();
       }
@@ -371,7 +300,15 @@
         const rect = paintCanvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
+
+        // 🔑 Scale input coordinates into paintCanvas resolution
+        const scaleX = paintCanvas.width / rect.width;
+        const scaleY = paintCanvas.height / rect.height;
+
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY,
+        };
       }
 
       function saveToHistory() {
@@ -495,24 +432,12 @@
         img.src = dataURL;
       }
 
-      function saveCanvasAndGo() {
-        const finalImage = paintCanvas.toDataURL();
-        localStorage.setItem("customMaskTexture", finalImage);
-        window.location.href = "index.html";
-      }
-
       function downloadCanvas() {
-        const width = paintCanvas.width;
-        const height = paintCanvas.height;
-        if (width === 0 || height === 0) {
-          alert("Canvas has no size yet — try painting first.");
-          return;
-        }
         const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = width;
-        tempCanvas.height = height;
+        tempCanvas.width = paintCanvas.width;
+        tempCanvas.height = paintCanvas.height;
         const tempCtx = tempCanvas.getContext("2d");
-        tempCtx.drawImage(bgCanvas, 0, 0);
+        tempCtx.drawImage(bgCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
         tempCtx.drawImage(paintCanvas, 0, 0);
 
         tempCanvas.toBlob(function (blob) {
