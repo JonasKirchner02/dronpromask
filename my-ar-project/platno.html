@@ -107,19 +107,24 @@
 
       @media only screen and (max-width: 1366px) {
         .controls {
-          grid-template-columns: repeat(1, auto);
-          gap: 0.1rem;
-          padding: 0.2rem;
-          width: 60vw;
+          grid-template-columns: 1fr; /* make them all same width */
+          width: 80vw; /* take more width */
+          margin: 0 auto; /* center the grid */
+          justify-items: center; /* center items horizontally */
         }
+
+        select,
+          input[type="text"] {
+          width: 100%;       /* make them full width of container */
+          text-align: center;
+          box-sizing: border-box;
+          }
+      }
 
         label,
         button,
         select,
         input,
-        input[type="text"],
-        input[type="color"],
-        input[type="range"],
         #paintingList {
           background-color: #2626ff;
           color: #ffffff;
