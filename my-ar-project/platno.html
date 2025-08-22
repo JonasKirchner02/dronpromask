@@ -194,6 +194,18 @@
         }
       }
 
+      .apply-button {
+        margin-top: 2vh;
+        border: none;
+        cursor: pointer;
+      }
+
+      .apply-button img {
+        width: 15vw;
+        height: auto;
+        max-width: 200px;
+      }
+
       @media only screen and (max-width: 1366px) {
         .apply-button img {
           width: 30vw; /* Increase size */
@@ -297,17 +309,8 @@
       <canvas id="effectCanvas"></canvas>
     </div>
 
-    <button
-      onclick="saveCanvasAndGo()"
-      class="apply-button"
-      style="margin-top: 2vh; border: none; cursor: pointer"
-    >
-      <img
-        class="apply-button"
-        src="./Apply2.svg"
-        alt="Apply"
-        style="width: 15vw; height: auto; max-width: 200px"
-      />
+    <button onclick="saveCanvasAndGo()" class="apply-button">
+      <img src="./Apply2.svg" />
     </button>
 
     <script>
