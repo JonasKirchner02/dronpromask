@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="https://use.typekit.net/dfq5tse.css" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painter</title>
     <style>
       @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
         body {
@@ -13,10 +14,7 @@
         body::before {
           content: "Please rotate your device";
           position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
+          inset: 0;
           color: #00ffff;
           display: flex;
           align-items: center;
@@ -44,25 +42,27 @@
         background-color: #262be8;
       }
 
+      /* ── Top controls bar ───────────────────────────────────────────── */
       .controls {
         display: grid;
-        grid-template-columns: repeat(10, auto);
+        grid-auto-flow: column;
+        grid-auto-columns: max-content;
         gap: 1vw;
         justify-content: center;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding: 0 1rem;
+        width: 100%;
         white-space: nowrap;
-        width: 5vw;
       }
 
-      label,
-      button,
-      select,
-      input,
-      input[type="text"],
-      input[type="color"],
-      input[type="range"],
-      #paintingList {
+      /* scope the blue pill style ONLY to items inside .controls */
+      .controls label,
+      .controls button,
+      .controls select,
+      .controls input,
+      .controls input[type="text"],
+      .controls input[type="color"],
+      .controls input[type="range"],
+      .controls #paintingList {
         background-color: #2626ff;
         color: #ffffff;
         border: none;
@@ -80,19 +80,19 @@
         text-align: center;
       }
 
-      input::placeholder {
+      .controls input::placeholder {
         color: #ffffff;
         opacity: 1;
         text-align: center;
       }
 
-      select {
+      .controls select {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
       }
 
-      input[type="color"] {
+      .controls input[type="color"] {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
@@ -104,52 +104,44 @@
         overflow: hidden;
       }
 
+      .controls label:hover,
+      .controls button:hover,
+      .controls select:hover,
+      .controls input:hover,
+      .controls input[type="text"]:hover,
+      .controls input[type="color"]:hover,
+      .controls input[type="range"]:hover,
+      .controls #paintingList:hover {
+        background-color: #000064;
+        cursor: pointer;
+      }
+
       @media only screen and (max-width: 768px) {
         .controls {
-          grid-template-columns: repeat(1, auto);
+          grid-auto-flow: row;
+          grid-template-columns: 1fr;
           gap: 0.1rem;
           padding: 0.2rem;
-          width: 60vw;
+          width: 100%;
+          justify-items: center;
         }
-
-        label,
-        button,
-        select,
-        input,
-        input[type="text"],
-        input[type="color"],
-        input[type="range"],
-        #paintingList {
-          background-color: #2626ff;
-          color: #ffffff;
-          border: none;
+        .controls label,
+        .controls button,
+        .controls select,
+        .controls input,
+        .controls input[type="text"],
+        .controls input[type="color"],
+        .controls input[type="range"],
+        .controls #paintingList {
           border-radius: clamp(4px, 0.4vw, 8px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
           padding: 0.2rem 0.4rem;
-          font-size: 1rem;
-          font-family: "indivisible", sans-serif;
-          font-weight: 500;
-          font-style: normal;
-          white-space: nowrap;
-          text-overflow: ellipsis;
+        }
+        .controls select,
+        .controls input[type="text"] {
           text-align: center;
+          text-align-last: center;
         }
-
-        input::placeholder {
-          color: #ffffff;
-          opacity: 1;
-          text-align: center;
-        }
-
-        select,
-        input[type="text"] {
-          text-align: center; /* center text */
-          text-align-last: center; /* center selected option in select */
-        }
-
-        input[type="color"] {
+        .controls input[type="color"] {
           position: absolute;
           width: 1px;
           height: 1px;
@@ -161,18 +153,7 @@
         }
       }
 
-      label:hover,
-      button:hover,
-      select:hover,
-      input:hover,
-      input[type="text"]:hover,
-      input[type="color"]:hover,
-      input[type="range"]:hover,
-      #paintingList:hover {
-        background-color: #000064;
-        cursor: pointer;
-      }
-
+      /* ── Canvas area ───────────────────────────────────────────────── */
       .canvas-container {
         position: relative;
         width: 35vw;
@@ -183,7 +164,6 @@
         justify-content: center;
         align-items: center;
       }
-
       @media only screen and (max-width: 768px) {
         .canvas-container {
           width: 80vw;
@@ -192,68 +172,13 @@
         }
       }
 
-      .apply-button {
-        margin-top: 2vh;
-        border: none;
-        cursor: pointer;
-        border-radius: clamp(8px, 0.8vw, 12px);
-        padding: 1.2rem 0.8rem;
-      }
-
-      .apply-button img {
-        width: 8vw;
-        height: auto;
-        max-width: 200px;
-      }
-
-      @media only screen and (max-width: 768px) {
-        .apply-button img {
-          width: 15vw; /* Increase size */
-          max-width: 300px; /* Optional: allow bigger image */
-          padding: none;
-        }
-      }
-
-      /* ✅ Range slider styles */
-      input[type="range"] {
-        -webkit-appearance: none;
-        height: 1px;
-        background: #af32ff;
-        border-radius: 6px;
-        outline: #ffff00;
-      }
-
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      input:hover[type="range"] {
-        background: #262be8;
-      }
-
-      input:hover[type="range"]::-webkit-slider-thumb {
-        background: #00ffff;
-      }
-
-      input[type="text"] {
-        text-align: center;
-      }
-
       canvas {
         position: absolute;
-        top: 0;
-        left: 0;
+        inset: 0;
         width: 100%;
         height: 100%;
         touch-action: none;
       }
-
       canvas#backgroundCanvas {
         z-index: 1;
       }
@@ -263,6 +188,54 @@
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
+      }
+
+      /* ── Apply button (image-only) ─────────────────────────────────── */
+      .apply-button {
+        margin-top: 2vh;
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        border-radius: clamp(8px, 0.8vw, 12px);
+        display: inline-block;
+      }
+      .apply-button img {
+        width: clamp(120px, 8vw, 200px);
+        height: auto;
+        display: block;
+      }
+      @media only screen and (max-width: 768px) {
+        .apply-button img {
+          width: clamp(140px, 15vw, 300px);
+        }
+      }
+
+      /* Range slider chrome */
+      input[type="range"] {
+        -webkit-appearance: none;
+        height: 1px;
+        background: #af32ff;
+        border-radius: 6px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      input:hover[type="range"] {
+        background: #262be8;
+      }
+      input:hover[type="range"]::-webkit-slider-thumb {
+        background: #00ffff;
+      }
+
+      input[type="text"] {
+        text-align: center;
       }
 
       @font-face {
@@ -286,21 +259,24 @@
         <option value="image2">Image 2</option>
       </select>
 
-      <label>
-        Brush size
-        <input type="range" id="brushSize" min="5" max="150" value="5" />
-      </label>
-      <label>
-        Soft steps
-        <input type="range" id="softSteps" min="1" max="50" value="10" />
-      </label>
+      <label
+        >Brush size
+        <input type="range" id="brushSize" min="5" max="150" value="5"
+      /></label>
+      <label
+        >Soft steps
+        <input type="range" id="softSteps" min="1" max="50" value="10"
+      /></label>
+
       <button onclick="clearCanvas()">Clear</button>
       <button onclick="undoLastStroke()">Undo</button>
       <input type="text" id="paintingName" placeholder="Enter name" />
       <button onclick="savePainting()">Save painting</button>
+
       <select id="paintingList" onchange="loadSelectedPainting()">
         <option value="">My paintings</option>
       </select>
+
       <button onclick="downloadCanvas()">Download PNG</button>
     </div>
 
@@ -310,8 +286,8 @@
       <canvas id="effectCanvas"></canvas>
     </div>
 
-    <button onclick="saveCanvasAndGo()" class="apply-button">
-      <img src="./Apply4.svg" />
+    <button onclick="saveCanvasAndGo()" class="apply-button" type="button">
+      <img src="./Apply4.svg" alt="Apply" draggable="false" />
     </button>
 
     <script>
@@ -333,15 +309,12 @@
       const softSteps = document.getElementById("softSteps");
       const brushType = document.getElementById("brushType");
 
-      let brushImage1 = new Image();
+      const brushImage1 = new Image();
       brushImage1.src = "/supina.png";
-
-      let brushImage2 = new Image();
+      const brushImage2 = new Image();
       brushImage2.src = "/supina2.png";
-
       const bgImage = new Image();
       bgImage.src = "/uvmapka.png";
-
       const effectImage = new Image();
       effectImage.src = "/overlinky7.png";
 
@@ -350,14 +323,14 @@
       paintCanvas.height = 1024;
 
       function resizeCanvases() {
-        const container = document.querySelector(".canvas-container");
-        const rect = container.getBoundingClientRect();
-
+        const rect = document
+          .querySelector(".canvas-container")
+          .getBoundingClientRect();
         bgCanvas.width = rect.width;
         bgCanvas.height = rect.height;
         effectCanvas.width = rect.width;
         effectCanvas.height = rect.height;
-
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
         bgCtx.drawImage(bgImage, 0, 0, rect.width, rect.height);
         drawEffect();
       }
@@ -374,17 +347,15 @@
       }
 
       window.addEventListener("resize", resizeCanvases);
-      bgImage.onload = () => resizeCanvases();
+      bgImage.onload = resizeCanvases;
       effectImage.onload = drawEffect;
 
       function getCoordinates(e) {
         const rect = paintCanvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
         const scaleX = paintCanvas.width / rect.width;
         const scaleY = paintCanvas.height / rect.height;
-
         return {
           x: (clientX - rect.left) * scaleX,
           y: (clientY - rect.top) * scaleY,
@@ -421,13 +392,12 @@
           paintCtx.moveTo(lastX, lastY);
           paintCtx.lineTo(x, y);
           paintCtx.stroke();
-
           paintCtx.beginPath();
           paintCtx.moveTo(paintCanvas.width - lastX, lastY);
           paintCtx.lineTo(mirrorX, y);
           paintCtx.stroke();
         } else if (brushType.value === "soft") {
-          const steps = parseInt(softSteps.value);
+          const steps = parseInt(softSteps.value, 10);
           for (let i = 0; i < steps; i++) {
             const t = i / steps;
             const ix = lastX + (x - lastX) * t;
@@ -448,13 +418,13 @@
           }
           paintCtx.globalAlpha = 1;
         } else if (brushType.value === "image1") {
-          const w = brushSize.value;
-          const h = brushSize.value;
+          const w = brushSize.value,
+            h = brushSize.value;
           paintCtx.drawImage(brushImage1, x - w / 2, y - h / 2, w, h);
           paintCtx.drawImage(brushImage1, mirrorX - w / 2, y - h / 2, w, h);
         } else if (brushType.value === "image2") {
-          const w = brushSize.value;
-          const h = brushSize.value;
+          const w = brushSize.value,
+            h = brushSize.value;
           paintCtx.drawImage(brushImage2, x - w / 2, y - h / 2, w, h);
           paintCtx.drawImage(brushImage2, mirrorX - w / 2, y - h / 2, w, h);
         }
@@ -538,9 +508,11 @@
       }
 
       paintCanvas.addEventListener("mousedown", startPainting);
-      paintCanvas.addEventListener("touchstart", startPainting);
+      paintCanvas.addEventListener("touchstart", startPainting, {
+        passive: false,
+      });
       paintCanvas.addEventListener("mousemove", draw);
-      paintCanvas.addEventListener("touchmove", draw);
+      paintCanvas.addEventListener("touchmove", draw, { passive: false });
       paintCanvas.addEventListener("mouseup", endPainting);
       paintCanvas.addEventListener("mouseleave", endPainting);
       paintCanvas.addEventListener("touchend", endPainting);
@@ -561,8 +533,9 @@
           img.src = lastPainting;
         }
         const paintingList = document.getElementById("paintingList");
-        for (let key in localStorage) {
-          if (key.startsWith("painting_")) {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith("painting_")) {
             const name = key.replace("painting_", "");
             const option = document.createElement("option");
             option.value = name;
