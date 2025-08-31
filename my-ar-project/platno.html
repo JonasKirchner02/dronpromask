@@ -145,8 +145,8 @@
 
         select,
         input[type="text"] {
-          text-align: center; /* center text */
-          text-align-last: center; /* center selected option in select */
+          text-align: center;
+          text-align-last: center;
         }
 
         input[type="color"] {
@@ -192,25 +192,28 @@
         }
       }
 
+      /* ✅ Fix for Apply button */
       .apply-button {
         margin-top: 2vh;
         border: none;
         cursor: pointer;
         border-radius: clamp(8px, 0.8vw, 12px);
-        padding: 1.2rem 0.8rem;
+        padding: 0; /* remove generic padding */
+        background: none; /* no blue background */
+        display: inline-block; /* don’t flex this */
       }
 
       .apply-button img {
         width: 8vw;
         height: auto;
         max-width: 200px;
+        display: block;
       }
 
       @media only screen and (max-width: 768px) {
         .apply-button img {
-          width: 15vw; /* Increase size */
-          max-width: 300px; /* Optional: allow bigger image */
-          padding: none;
+          width: 15vw;
+          max-width: 300px;
         }
       }
 
