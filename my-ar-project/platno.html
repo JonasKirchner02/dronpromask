@@ -50,10 +50,10 @@
         grid-template-columns: repeat(10, auto);
         gap: 1vw;
         justify-content: center;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding: 0 1rem;
         white-space: nowrap;
-        width: 5vw;
+        width: auto; /* let content define width */
+        max-width: 90vw; /* optional: prevent overflow */
       }
 
       label,
