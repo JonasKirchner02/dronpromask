@@ -33,11 +33,12 @@
         font-weight: 500;
         font-style: normal;
         margin: 0;
-        padding: 2vh 3vw;
+        height: 100vh; /* full viewport height */
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: center; /* vertical centering */
+        gap: 2vh; /* spacing between items */
         overflow: hidden;
         background: url("file3.png") no-repeat center center fixed;
         background-size: cover;
@@ -175,8 +176,8 @@
 
       .canvas-container {
         position: relative;
-        width: 35vw;
-        aspect-ratio: 1 / 1;
+        width: min(80vw, 80vh); /* responsive size */
+        aspect-ratio: 1 / 1; /* keeps it square */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -191,17 +192,15 @@
       }
 
       .apply-button {
-        margin-top: 2vh;
         border: none;
         cursor: pointer;
         border-radius: clamp(8px, 0.8vw, 12px);
-        padding: 1.2rem 0.8rem;
+        padding: 1rem;
       }
 
       .apply-button img {
-        width: 8vw;
+        width: clamp(80px, 12vw, 200px); /* scales responsively */
         height: auto;
-        max-width: 200px;
       }
 
       @media only screen and (max-width: 768px) {
