@@ -46,14 +46,14 @@
       }
 
       .controls {
-        display: flex; /* use flex for easy centering */
-        flex-wrap: wrap; /* allow wrapping when needed */
-        gap: 1vw; /* spacing between items */
-        justify-content: center; /* keep items centered */
-        padding: 0 1rem;
-        width: auto; /* content defines width */
-        max-width: 90vw; /* don’t let it overflow */
-        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: repeat(10, auto);
+        gap: 1vw;
+        justify-content: center;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        white-space: nowrap;
+        width: 90vw;
       }
 
       label,
@@ -107,60 +107,59 @@
 
       @media only screen and (max-width: 768px) {
         .controls {
-          grid-template-columns: 1fr; /* stack items vertically */
-          gap: 0.4rem;
-          padding: 0.4rem;
-          width: 60vw; /* fill most of the screen */
-          max-width: 100%;
+          grid-template-columns: repeat(1, auto);
+          gap: 0.1rem;
+          padding: 0.2rem;
+          width: 60vw;
         }
-      }
 
-      label,
-      button,
-      select,
-      input,
-      input[type="text"],
-      input[type="color"],
-      input[type="range"],
-      #paintingList {
-        background-color: #2626ff;
-        color: #ffffff;
-        border: none;
-        border-radius: clamp(4px, 0.4vw, 8px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.2rem 0.4rem;
-        font-size: 1rem;
-        font-family: "indivisible", sans-serif;
-        font-weight: 500;
-        font-style: normal;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        text-align: center;
-      }
+        label,
+        button,
+        select,
+        input,
+        input[type="text"],
+        input[type="color"],
+        input[type="range"],
+        #paintingList {
+          background-color: #2626ff;
+          color: #ffffff;
+          border: none;
+          border-radius: clamp(4px, 0.4vw, 8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.2rem 0.4rem;
+          font-size: 1rem;
+          font-family: "indivisible", sans-serif;
+          font-weight: 500;
+          font-style: normal;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          text-align: center;
+        }
 
-      input::placeholder {
-        color: #ffffff;
-        opacity: 1;
-        text-align: center;
-      }
+        input::placeholder {
+          color: #ffffff;
+          opacity: 1;
+          text-align: center;
+        }
 
-      select,
-      input[type="text"] {
-        text-align: center; /* center text */
-        text-align-last: center; /* center selected option in select */
-      }
+        select,
+        input[type="text"] {
+          text-align: center; /* center text */
+          text-align-last: center; /* center selected option in select */
+        }
 
-      input[type="color"] {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: 0;
-        border: none;
-        opacity: 0;
-        pointer-events: none;
+        input[type="color"] {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: 0;
+          border: none;
+          opacity: 0;
+          pointer-events: none;
+        }
       }
 
       label:hover,
