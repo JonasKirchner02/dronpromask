@@ -107,11 +107,10 @@
 
       @media only screen and (max-width: 768px) {
         .controls {
-          flex-direction: column; /* stack items vertically */
-          align-items: center; /* center stacked items */
+          grid-template-columns: 1fr; /* stack items vertically */
           gap: 0.4rem;
           padding: 0.4rem;
-          width: 90vw;
+          width: 60vw; /* fill most of the screen */
           max-width: 100%;
         }
       }
