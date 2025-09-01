@@ -5,270 +5,269 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-            @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
-              body {
-                overflow: hidden;
-                height: 100vh;
-              }
-              body::before {
-                content: "Please rotate your device";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                color: #00ffff;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: clamp(18px, 3.5vw, 40px);
-                text-align: center;
-                z-index: 999999;
-                background: #000064;
-              }
-            }
+      @media only screen and (orientation: landscape) and (max-width: 1366px) and (pointer: coarse) {
+        body {
+          overflow: hidden;
+          height: 100vh;
+        }
+        body::before {
+          content: "Please rotate your device";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          color: #00ffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(18px, 3.5vw, 40px);
+          text-align: center;
+          z-index: 999999;
+          background: #000064;
+        }
+      }
 
-            body {
-              font-family: "indivisible", sans-serif;
-              font-weight: 500;
-              font-style: normal;
-              margin: 0;
-              height: 100vh; /* full viewport height */
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center; /* vertical centering */
-              gap: 2vh; /* spacing between items */
-              overflow: hidden;
-              background: url("file3.png") no-repeat center center fixed;
-              background-size: cover;
-              background-color: #262be8;
-            }
+      body {
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+        margin: 0;
+        height: 100vh; /* full viewport height */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; /* vertical centering */
+        gap: 2vh; /* spacing between items */
+        overflow: hidden;
+        background: url("file3.png") no-repeat center center fixed;
+        background-size: cover;
+        background-color: #262be8;
+      }
 
-            .controls {
-        display: grid;
-        grid-template-columns: repeat(10, auto);
-        gap: 1vw;
-        justify-content: center;
+      .controls {
+        display: flex; /* use flex for easy centering */
+        flex-wrap: wrap; /* allow wrapping when needed */
+        gap: 1vw; /* spacing between items */
+        justify-content: center; /* keep items centered */
         padding: 0 1rem;
-        white-space: nowrap;
-        width: auto;          /* content defines width */
-        max-width: 90vw;      /* prevent overflow */
+        width: auto; /* content defines width */
+        max-width: 90vw; /* don’t let it overflow */
         box-sizing: border-box;
       }
 
-            label,
-            button,
-            select,
-            input,
-            input[type="text"],
-            input[type="color"],
-            input[type="range"],
-            #paintingList {
-              background-color: #2626ff;
-              color: #ffffff;
-              border: none;
-              border-radius: clamp(6px, 0.6vw, 10px);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              padding: 0.5rem 0.5rem;
-              font-size: 1rem;
-              font-family: "indivisible", sans-serif;
-              font-weight: 500;
-              font-style: normal;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              text-align: center;
-            }
+      label,
+      button,
+      select,
+      input,
+      input[type="text"],
+      input[type="color"],
+      input[type="range"],
+      #paintingList {
+        background-color: #2626ff;
+        color: #ffffff;
+        border: none;
+        border-radius: clamp(6px, 0.6vw, 10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 0.5rem;
+        font-size: 1rem;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: center;
+      }
 
-            input::placeholder {
-              color: #ffffff;
-              opacity: 1;
-              text-align: center;
-            }
+      input::placeholder {
+        color: #ffffff;
+        opacity: 1;
+        text-align: center;
+      }
 
-            select {
-              -webkit-appearance: none;
-              -moz-appearance: none;
-              appearance: none;
-            }
+      select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
 
-            input[type="color"] {
-              -webkit-appearance: none;
-              -moz-appearance: none;
-              appearance: none;
-              width: 0;
-              height: 0;
-              padding: 0;
-              border: none;
-              background: none;
-              overflow: hidden;
-            }
+      input[type="color"] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 0;
+        height: 0;
+        padding: 0;
+        border: none;
+        background: none;
+        overflow: hidden;
+      }
 
-            @media only screen and (max-width: 768px) {
+      @media only screen and (max-width: 768px) {
         .controls {
-          grid-template-columns: 1fr;  /* stack items vertically */
+          flex-direction: column; /* stack items vertically */
+          align-items: center; /* center stacked items */
           gap: 0.4rem;
           padding: 0.4rem;
-          width: 60vw;                 /* fill most of the screen */
+          width: 90vw;
           max-width: 100%;
         }
       }
 
-              label,
-              button,
-              select,
-              input,
-              input[type="text"],
-              input[type="color"],
-              input[type="range"],
-              #paintingList {
-                background-color: #2626ff;
-                color: #ffffff;
-                border: none;
-                border-radius: clamp(4px, 0.4vw, 8px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0.2rem 0.4rem;
-                font-size: 1rem;
-                font-family: "indivisible", sans-serif;
-                font-weight: 500;
-                font-style: normal;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                text-align: center;
-              }
+      label,
+      button,
+      select,
+      input,
+      input[type="text"],
+      input[type="color"],
+      input[type="range"],
+      #paintingList {
+        background-color: #2626ff;
+        color: #ffffff;
+        border: none;
+        border-radius: clamp(4px, 0.4vw, 8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem 0.4rem;
+        font-size: 1rem;
+        font-family: "indivisible", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: center;
+      }
 
-              input::placeholder {
-                color: #ffffff;
-                opacity: 1;
-                text-align: center;
-              }
+      input::placeholder {
+        color: #ffffff;
+        opacity: 1;
+        text-align: center;
+      }
 
-              select,
-              input[type="text"] {
-                text-align: center; /* center text */
-                text-align-last: center; /* center selected option in select */
-              }
+      select,
+      input[type="text"] {
+        text-align: center; /* center text */
+        text-align-last: center; /* center selected option in select */
+      }
 
-              input[type="color"] {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                padding: 0;
-                margin: 0;
-                border: none;
-                opacity: 0;
-                pointer-events: none;
-              }
-            }
+      input[type="color"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        opacity: 0;
+        pointer-events: none;
+      }
 
-            label:hover,
-            button:hover,
-            select:hover,
-            input:hover,
-            input[type="text"]:hover,
-            input[type="color"]:hover,
-            input[type="range"]:hover,
-            #paintingList:hover {
-              background-color: #000064;
-              cursor: pointer;
-            }
+      label:hover,
+      button:hover,
+      select:hover,
+      input:hover,
+      input[type="text"]:hover,
+      input[type="color"]:hover,
+      input[type="range"]:hover,
+      #paintingList:hover {
+        background-color: #000064;
+        cursor: pointer;
+      }
 
-            .canvas-container {
-              position: relative;
-              width: min(80vw, 80vh); /* responsive size */
-              aspect-ratio: 1 / 1; /* keeps it square */
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            }
+      .canvas-container {
+        position: relative;
+        width: min(80vw, 80vh); /* responsive size */
+        aspect-ratio: 1 / 1; /* keeps it square */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-            @media only screen and (max-width: 768px) {
-              .canvas-container {
-                width: 80vw;
-                aspect-ratio: 1 / 1;
-                transform: translateY(0%);
-              }
-            }
+      @media only screen and (max-width: 768px) {
+        .canvas-container {
+          width: 80vw;
+          aspect-ratio: 1 / 1;
+          transform: translateY(0%);
+        }
+      }
 
-            .apply-button {
-              border: none;
-              cursor: pointer;
-              border-radius: clamp(4px, 0.4vw, 6px);
-              padding: 1rem;
-            }
+      .apply-button {
+        border: none;
+        cursor: pointer;
+        border-radius: clamp(4px, 0.4vw, 6px);
+        padding: 1rem;
+      }
 
-            .apply-button img {
-              width: clamp(40px, 6vw, 100px); /* scales responsively */
-              height: auto;
-            }
+      .apply-button img {
+        width: clamp(40px, 6vw, 100px); /* scales responsively */
+        height: auto;
+      }
 
-            @media only screen and (max-width: 768px) {
-              .apply-button img {
-                width: 15vw; /* Increase size */
-                max-width: 300px; /* Optional: allow bigger image */
-                padding: none;
-              }
-            }
+      @media only screen and (max-width: 768px) {
+        .apply-button img {
+          width: 15vw; /* Increase size */
+          max-width: 300px; /* Optional: allow bigger image */
+          padding: none;
+        }
+      }
 
-            /* ✅ Range slider styles */
-            input[type="range"] {
-              -webkit-appearance: none;
-              height: 1px;
-              background: #af32ff;
-              border-radius: 6px;
-              outline: #ffff00;
-            }
+      /* ✅ Range slider styles */
+      input[type="range"] {
+        -webkit-appearance: none;
+        height: 1px;
+        background: #af32ff;
+        border-radius: 6px;
+        outline: #ffff00;
+      }
 
-            input[type="range"]::-webkit-slider-thumb {
-              -webkit-appearance: none;
-              appearance: none;
-              width: 12px;
-              height: 12px;
-              background: #00ffff;
-              border-radius: 50%;
-              cursor: pointer;
-            }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
 
-            input:hover[type="range"] {
-              background: #262be8;
-            }
+      input:hover[type="range"] {
+        background: #262be8;
+      }
 
-            input:hover[type="range"]::-webkit-slider-thumb {
-              background: #00ffff;
-            }
+      input:hover[type="range"]::-webkit-slider-thumb {
+        background: #00ffff;
+      }
 
-            input[type="text"] {
-              text-align: center;
-            }
+      input[type="text"] {
+        text-align: center;
+      }
 
-            canvas {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%; /* visually stretch */
-              height: 100%; /* visually stretch */
-            }
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%; /* visually stretch */
+        height: 100%; /* visually stretch */
+      }
 
-            canvas#backgroundCanvas {
-              z-index: 1;
-            }
-            canvas#paintCanvas {
-              z-index: 2;
-            }
-            canvas#effectCanvas {
-              z-index: 3;
-              pointer-events: none;
-            }
+      canvas#backgroundCanvas {
+        z-index: 1;
+      }
+      canvas#paintCanvas {
+        z-index: 2;
+      }
+      canvas#effectCanvas {
+        z-index: 3;
+        pointer-events: none;
+      }
 
-            @font-face {
-              font-family: "Rapid";
-              src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
-                format("truetype");
-            }
+      @font-face {
+        font-family: "Rapid";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
+          format("truetype");
+      }
     </style>
   </head>
   <body>
