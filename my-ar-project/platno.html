@@ -46,43 +46,31 @@
         overflow: hidden;
       }
 
-      /* Controls wrapper */
+      /* Controls wrapper adds left/right padding and handles scrolling */
       .controls-wrapper {
         width: 100%;
-        overflow: visible; /* no scroll */
-        padding: 0;
+        overflow-x: auto; /* allow horizontal scroll if needed */
+        padding: 0 1rem; /* left and right padding */
         box-sizing: border-box;
       }
 
-      /* Controls row */
+      /* Controls row (no wrapping) */
       .controls {
         display: flex;
-        flex-wrap: nowrap; /* no wrapping */
-        gap: 0.5vw;
-        justify-content: space-between;
-        align-items: center;
-        transform-origin: left center; /* scale from left */
+        flex-wrap: nowrap; /* prevent wrapping */
+        gap: 1vw; /* space between controls */
+        justify-content: flex-start;
       }
 
-      /* Scale controls to fit container */
+      /* hide scrollbar */
+      .controls-wrapper::-webkit-scrollbar {
+        display: none;
+      }
       .controls-wrapper {
-        display: flex;
-        justify-content: center;
-        overflow: hidden;
-      }
-      .controls-wrapper > .controls {
-        max-width: 100%;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
       }
 
-      /* Controls shrink proportionally */
-      .controls > * {
-        flex: 1 1 auto;
-        min-width: 80px; /* minimum readable size */
-        white-space: nowrap;
-        text-align: center;
-      }
-
-      /* Buttons, labels, selects, inputs */
       label,
       button,
       select,
@@ -100,12 +88,21 @@
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         text-align: center;
         box-sizing: border-box;
         cursor: pointer;
       }
 
-      /* Color input styling */
+      label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: auto; /* natural sizing */
+      }
+
+      /* Hidden color input, visible via label */
       label.color-label {
         justify-content: center;
         position: relative;
@@ -117,7 +114,7 @@
         pointer-events: none;
       }
 
-      /* Range inputs */
+      /* Range inputs styling */
       label input[type="range"] {
         flex: 1;
         min-width: 0;
@@ -146,22 +143,22 @@
       label input[type="range"]:hover {
         background: #262be8;
       }
+      label input[type="range"]:hover::-webkit-slider-thumb {
+        background: #00ffff;
+      }
 
-      /* Placeholder text */
       input::placeholder {
         color: #ffffff;
         opacity: 1;
         text-align: center;
       }
 
-      /* Remove default select arrows */
       select {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
       }
 
-      /* Hover effect */
       label:hover,
       button:hover,
       select:hover,
@@ -171,7 +168,33 @@
         background-color: #000064;
       }
 
-      /* Canvas container */
+      @media only screen and (max-width: 768px) {
+        .controls-wrapper {
+          padding: 0 0.5rem;
+        }
+
+        label,
+        button,
+        select,
+        input[type="text"],
+        #paintingList {
+          font-size: clamp(0.7rem, 2vw, 0.9rem);
+          padding: clamp(0.2rem, 1.5vw, 0.4rem);
+          border-radius: clamp(4px, 1.5vw, 8px);
+        }
+
+        label input[type="range"] {
+          margin-left: 0.3rem;
+          height: 4px;
+        }
+
+        select,
+        input[type="text"] {
+          text-align: center;
+          text-align-last: center;
+        }
+      }
+
       .canvas-container {
         position: relative;
         width: min(80vw, 80vh);
@@ -179,6 +202,37 @@
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .canvas-container {
+          width: 80vw;
+          aspect-ratio: 1 / 1;
+          transform: translateY(0%);
+        }
+      }
+
+      .apply-button {
+        border: none;
+        cursor: pointer;
+        border-radius: clamp(4px, 0.4vw, 6px);
+        padding: 1rem;
+      }
+
+      .apply-button img {
+        width: clamp(40px, 6vw, 100px);
+        height: auto;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .apply-button img {
+          width: 15vw;
+          max-width: 300px;
+        }
+      }
+
+      input[type="text"] {
+        text-align: center;
       }
 
       canvas {
@@ -200,22 +254,26 @@
         pointer-events: none;
       }
 
-      /* Apply button */
-      .apply-button {
-        border: none;
-        cursor: pointer;
-        border-radius: clamp(4px, 0.4vw, 6px);
-        padding: 1rem;
-      }
-      .apply-button img {
-        width: clamp(40px, 6vw, 100px);
-        height: auto;
+      @font-face {
+        font-family: "Rapid";
+        src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
+          format("truetype");
       }
 
-      /* Mobile adjustments */
       @media only screen and (max-width: 768px) {
+        .controls-wrapper {
+          padding: 0.5rem;
+        }
+
+        .controls {
+          flex-direction: column; /* stack vertically */
+          align-items: center; /* full width */
+          gap: 0.2rem;
+        }
+
         .controls > * {
-          min-width: 60px;
+          width: 30%;
+          flex: none; /* prevent shrinking */
         }
 
         label,
@@ -223,14 +281,20 @@
         select,
         input[type="text"],
         #paintingList {
-          font-size: clamp(0.6rem, 2vw, 0.9rem);
-          padding: clamp(0.2rem, 1vw, 0.4rem);
+          font-size: clamp(0.7rem, 2vw, 0.9rem);
+          padding: clamp(0.3rem, 1.2vw, 0.5rem);
           border-radius: clamp(4px, 1.5vw, 8px);
         }
 
         label input[type="range"] {
           margin-left: 0.3rem;
           height: 4px;
+        }
+
+        select,
+        input[type="text"] {
+          text-align: center;
+          text-align-last: center;
         }
 
         .canvas-container {
