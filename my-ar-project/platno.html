@@ -46,27 +46,27 @@
         overflow: hidden;
       }
 
-      /* Controls wrapper */
+      /* Controls wrapper (no horizontal scroll) */
       .controls-wrapper {
         width: 100%;
         padding: 0 1rem;
+        box-sizing: border-box;
         overflow: hidden; /* hide horizontal scroll */
       }
 
       /* Controls row */
       .controls {
         display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
+        flex-wrap: nowrap; /* allow wrapping */
+        justify-content: center; /* center controls */
         gap: 1vw;
       }
 
       /* All control elements scale */
       .controls > * {
-        flex: 1 1 auto;
-        width: clamp(15vw, 20%, 25vw); /* scales with viewport */
-        min-width: 10vw;
-        max-width: 30vw;
+        flex: 1 1 auto; /* allow shrinking */
+        min-width: 100px;
+        max-width: 200px;
       }
 
       /* Hide scrollbar */
@@ -78,7 +78,6 @@
         scrollbar-width: none;
       }
 
-      /* Buttons, labels, inputs, selects */
       label,
       button,
       select,
@@ -87,18 +86,19 @@
         background-color: #2626ff;
         color: #ffffff;
         border: none;
-        border-radius: clamp(4px, 0.8vw, 8px);
+        border-radius: clamp(6px, 0.6vw, 10px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: clamp(0.3rem, 1vw, 0.5rem);
-        font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+        padding: clamp(0.3rem, 0.8vw, 0.5rem);
+        font-size: clamp(0.8rem, 1.2vw, 1rem);
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
         text-align: center;
+        box-sizing: border-box;
         cursor: pointer;
       }
 
@@ -127,22 +127,22 @@
         min-width: 0;
         max-width: 100%;
         margin-left: 0.5rem;
-        height: clamp(4px, 0.5vw, 6px);
+        height: 4px;
         background: #af32ff;
         border-radius: 6px;
         -webkit-appearance: none;
       }
       label input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
-        width: clamp(10px, 1vw, 15px);
-        height: clamp(10px, 1vw, 15px);
+        width: 12px;
+        height: 12px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
       }
       label input[type="range"]::-moz-range-thumb {
-        width: clamp(10px, 1vw, 15px);
-        height: clamp(10px, 1vw, 15px);
+        width: 12px;
+        height: 12px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
@@ -180,35 +180,44 @@
         .controls-wrapper {
           padding: 0.5rem;
         }
-        .controls {
-          flex-direction: column;
-          align-items: center;
-          gap: 0.5rem;
+
+        @media only screen and (max-width: 768px) {
+          .controls {
+            flex-direction: column; /* stack vertically */
+            align-items: center; /* make buttons take full width */
+            gap: 0.2rem; /* space between rows */
+          }
+
+          .controls > * {
+            flex: 1 1 auto; /* allow them to grow to full width */
+            min-width: 0; /* remove min-width that prevents shrinking */
+            width: 30%; /* full width per button/element */
+          }
         }
-        .controls > * {
-          width: 80%;
-        }
+
         label input[type="range"] {
           margin-left: 0.3rem;
           height: 4px;
         }
+
         select,
         input[type="text"] {
           text-align: center;
           text-align-last: center;
         }
+
         .canvas-container {
           width: 80vw;
           aspect-ratio: 1 / 1;
           transform: translateY(0%);
         }
+
         .apply-button img {
-          width: 20vw;
+          width: 15vw;
           max-width: 300px;
         }
       }
 
-      /* Canvas container */
       .canvas-container {
         position: relative;
         width: min(80vw, 80vh);
@@ -253,7 +262,6 @@
         pointer-events: none;
       }
 
-      /* Font face */
       @font-face {
         font-family: "Rapid";
         src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
