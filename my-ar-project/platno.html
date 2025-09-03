@@ -33,35 +33,33 @@
         font-weight: 500;
         font-style: normal;
         margin: 0;
+        padding: 0;
         height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 2vh;
-        overflow: hidden;
         background: url("file3.png") no-repeat center center fixed;
         background-size: cover;
         background-color: #262be8;
+        overflow: hidden;
       }
 
       .controls {
         display: grid;
-        grid-template-columns: repeat(10, auto);
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 1vw;
         justify-content: center;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        white-space: nowrap;
+        padding: 0.5rem;
         width: 100%;
+        box-sizing: border-box;
       }
 
       label,
       button,
       select,
-      input,
       input[type="text"],
-      input[type="range"],
       #paintingList {
         background-color: #2626ff;
         color: #ffffff;
@@ -70,23 +68,61 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.5rem;
-        font-size: 1rem;
+        padding: clamp(0.3rem, 0.8vw, 0.5rem);
+        font-size: clamp(0.8rem, 1.2vw, 1rem);
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
         text-align: center;
+        box-sizing: border-box;
+        cursor: pointer;
       }
 
       label {
         display: flex;
         align-items: center;
-        justify-content: center; /* center label text */
+        justify-content: space-between;
         gap: 0.5rem;
         width: 100%;
-        cursor: pointer; /* entire label clickable */
+      }
+
+      label input[type="range"] {
+        flex: 1;
+        min-width: 0;
+        max-width: 100%;
+        margin-left: 0.5rem;
+        height: 4px;
+        background: #af32ff;
+        border-radius: 6px;
+        -webkit-appearance: none;
+      }
+
+      label input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      label input[type="range"]:hover {
+        background: #262be8;
+      }
+
+      label input[type="range"]:hover::-webkit-slider-thumb {
+        background: #00ffff;
+      }
+
+      label input[type="range"]::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
       }
 
       input::placeholder {
@@ -102,14 +138,26 @@
       }
 
       input[type="color"] {
-        position: absolute; /* hide without removing from DOM */
-        width: 1px;
-        height: 1px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
         padding: 0;
-        margin: 0;
         border: none;
-        opacity: 0;
-        pointer-events: none;
+        background: none;
+        cursor: pointer;
+      }
+
+      label.color-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      label.color-label input[type="color"] {
+        width: clamp(30px, 5vw, 40px);
+        height: clamp(30px, 5vw, 40px);
       }
 
       label:hover,
@@ -117,10 +165,43 @@
       select:hover,
       input:hover,
       input[type="text"]:hover,
-      input[type="range"]:hover,
       #paintingList:hover {
         background-color: #000064;
-        cursor: pointer;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .controls {
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+          gap: 0.3rem;
+          padding: 0.2rem;
+          width: 100%;
+        }
+
+        label,
+        button,
+        select,
+        input[type="text"],
+        #paintingList {
+          font-size: clamp(0.7rem, 2vw, 0.9rem);
+          padding: clamp(0.2rem, 1.5vw, 0.4rem);
+          border-radius: clamp(4px, 1.5vw, 8px);
+        }
+
+        label input[type="range"] {
+          margin-left: 0.3rem;
+          height: 4px;
+        }
+
+        select,
+        input[type="text"] {
+          text-align: center;
+          text-align-last: center;
+        }
+
+        label.color-label input[type="color"] {
+          width: clamp(25px, 10vw, 40px);
+          height: clamp(25px, 10vw, 40px);
+        }
       }
 
       .canvas-container {
@@ -130,6 +211,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .canvas-container {
+          width: 80vw;
+          aspect-ratio: 1 / 1;
+          transform: translateY(0%);
+        }
       }
 
       .apply-button {
@@ -145,29 +234,11 @@
         height: auto;
       }
 
-      input[type="range"] {
-        -webkit-appearance: none;
-        height: 4px;
-        background: #af32ff;
-        border-radius: 6px;
-      }
-
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      input[type="range"]::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
+      @media only screen and (max-width: 768px) {
+        .apply-button img {
+          width: 15vw;
+          max-width: 300px;
+        }
       }
 
       input[type="text"] {
@@ -193,55 +264,6 @@
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
-      }
-
-      @media only screen and (max-width: 768px) {
-        .controls {
-          grid-template-columns: repeat(1, auto);
-          gap: 0.1rem;
-          padding: 0.2rem;
-          width: 60vw;
-        }
-
-        label,
-        button,
-        select,
-        input,
-        input[type="text"],
-        input[type="range"],
-        #paintingList {
-          border-radius: clamp(4px, 0.4vw, 8px);
-          padding: 0.2rem 0.4rem;
-          font-size: 1rem;
-        }
-
-        select,
-        input[type="text"] {
-          text-align: center;
-          text-align-last: center;
-        }
-
-        input[type="color"] {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: 0;
-          border: none;
-          opacity: 0;
-          pointer-events: none;
-        }
-
-        .canvas-container {
-          width: 80vw;
-          aspect-ratio: 1 / 1;
-          transform: translateY(0%);
-        }
-
-        .apply-button img {
-          width: 15vw;
-          max-width: 300px;
-        }
       }
 
       @font-face {
