@@ -45,7 +45,7 @@
         background-color: #262be8;
       }
 
-      /* Controls row - always one line, scale to fit */
+      /* Controls row - always one line, scale to fit, with left/right padding */
       .controls {
         display: flex;
         flex-wrap: nowrap; /* stay in one line */
@@ -54,11 +54,11 @@
         gap: 0.5vw;
         width: 100%;
         margin: 1rem auto;
-        padding: 0 1rem;
+        padding: 0 1rem; /* left and right padding */
         box-sizing: border-box;
       }
 
-      /* Each control element scales to fit */
+      /* Each control element scales */
       .controls > * {
         flex: 1 1 0; /* shrink to fit, grow if space */
         min-width: 0; /* allow shrinking below original size */
