@@ -45,22 +45,22 @@
         background-color: #262be8;
       }
 
-      /* Controls row */
+      /* Controls container */
       .controls {
         display: flex;
-        flex-wrap: wrap; /* allow wrapping */
-        justify-content: center;
+        flex-wrap: wrap; /* allow wrapping to new lines */
+        justify-content: center; /* center horizontally */
         align-items: center;
         gap: 1vw;
         width: 95%;
         margin: 1rem auto;
       }
 
-      /* Each control */
+      /* Each control element */
       .controls > * {
-        flex: 1 1 auto;
-        min-width: 120px;
+        flex: 1 1 150px; /* allow shrinking and growing */
         max-width: 200px;
+        min-width: 120px;
       }
 
       /* Labels, buttons, inputs, select */
@@ -78,9 +78,6 @@
         justify-content: center;
         padding: clamp(0.3rem, 0.8vw, 0.5rem);
         font-size: clamp(0.8rem, 1.2vw, 1rem);
-        font-family: "indivisible", sans-serif;
-        font-weight: 500;
-        font-style: normal;
         white-space: nowrap;
         text-overflow: ellipsis;
         text-align: center;
@@ -88,6 +85,7 @@
         cursor: pointer;
       }
 
+      /* Labels */
       label {
         display: flex;
         align-items: center;
@@ -164,26 +162,6 @@
         background-color: #000064;
       }
 
-      /* Responsive controls for small screens */
-      @media only screen and (max-width: 768px) {
-        .controls {
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        .controls > * {
-          width: 90%;
-          min-width: 0;
-        }
-        label input[type="range"] {
-          margin-left: 0.3rem;
-        }
-        select,
-        input[type="text"] {
-          text-align: center;
-          text-align-last: center;
-        }
-      }
-
       /* Canvas container */
       .canvas-container {
         position: relative;
@@ -231,6 +209,13 @@
         font-family: "Rapid";
         src: url("C:/Users/kirch/OneDrive - VUT/Plocha/DronPro/my-ar-project/fonts/RapidVariableSt.ttf")
           format("truetype");
+      }
+
+      /* Optional: always wrap on smaller widths for very narrow screens */
+      @media (max-width: 500px) {
+        .controls > * {
+          flex: 1 1 90%; /* stack vertically on tiny screens */
+        }
       }
     </style>
   </head>
