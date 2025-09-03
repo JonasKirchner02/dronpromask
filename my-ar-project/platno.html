@@ -47,16 +47,13 @@
       }
 
       .controls {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap; /* prevent wrapping */
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 1vw;
         justify-content: center;
-        align-items: center;
         padding: 0.5rem;
         width: 100%;
         box-sizing: border-box;
-        overflow-x: auto; /* allow horizontal scrolling if needed */
       }
 
       label,
@@ -87,17 +84,18 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        width: auto; /* allow shrink/grow in flex row */
+        width: 100%;
       }
 
       /* Hidden color input, visible via label */
       label.color-label {
-        justify-content: center;
+        justify-content: center; /* center the "Color" text */
         position: relative;
       }
 
       label.color-label input[type="color"] {
         position: absolute;
+
         border: none;
         opacity: 0;
         pointer-events: none;
@@ -164,8 +162,10 @@
 
       @media only screen and (max-width: 768px) {
         .controls {
-          gap: 0.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+          gap: 0.3rem;
           padding: 0.2rem;
+          width: 100%;
         }
 
         label,
