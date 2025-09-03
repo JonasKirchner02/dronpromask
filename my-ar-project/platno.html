@@ -82,22 +82,17 @@
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         text-align: center;
         box-sizing: border-box;
       }
 
-      /* Labels stack text + slider */
-      label {
-        flex-direction: column;
-        gap: 0.4rem;
-        min-width: 120px;
-      }
-
-      /* Sliders inside labels */
+      /* ✅ Inline sliders inside label boxes */
       label input[type="range"] {
-        width: 100%;
-        margin: 0;
-        background: none;
+        flex: 1; /* take available space */
+        max-width: 70%; /* keep inside the box */
+        margin-left: 0.5rem;
       }
 
       input::placeholder {
@@ -152,9 +147,9 @@
           text-align: center;
         }
 
-        label {
-          flex-direction: column;
-          gap: 0.3rem;
+        label input[type="range"] {
+          max-width: 65%; /* tighter fit on mobile */
+          margin-left: 0.3rem;
         }
 
         input::placeholder {
