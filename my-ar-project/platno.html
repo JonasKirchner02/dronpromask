@@ -45,16 +45,16 @@
         background-color: #262be8;
       }
 
-      /* Controls row - always one line, scale to fit, with left/right padding */
+      /* Controls row - one line, scale to fit, with padding */
       .controls {
         display: flex;
-        flex-wrap: nowrap; /* stay in one line */
+        flex-wrap: nowrap; /* always one line */
         justify-content: center;
         align-items: center;
         gap: 0.5vw;
         width: 100%;
         margin: 1rem auto;
-        padding: 0 1rem; /* left and right padding */
+        padding: 0 1rem; /* left/right padding */
         box-sizing: border-box;
       }
 
@@ -63,14 +63,21 @@
         flex: 1 1 0; /* shrink to fit, grow if space */
         min-width: 0; /* allow shrinking below original size */
         max-width: 100%; /* never exceed container width */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
       }
 
-      /* Labels, buttons, inputs, select */
+      /* Labels, buttons, inputs, select - responsive */
       label,
       button,
       select,
       input[type="text"],
       #paintingList {
+        flex: 1 1 auto; /* shrink and grow with container */
+        min-width: 0; /* allow shrinking */
+        max-width: 100%;
         background-color: #2626ff;
         color: #ffffff;
         border: none;
@@ -79,8 +86,8 @@
         align-items: center;
         justify-content: center;
         padding: clamp(0.3rem, 0.8vw, 0.5rem);
-        font-size: clamp(0.6rem, 1vw, 1rem);
-        white-space: nowrap;
+        font-size: clamp(0.6rem, 1vw, 1rem); /* responsive font */
+        white-space: nowrap; /* prevent breaking text */
         text-overflow: ellipsis;
         text-align: center;
         box-sizing: border-box;
@@ -88,11 +95,11 @@
         overflow: hidden;
       }
 
-      /* Labels */
+      /* Labels with inner elements */
       label {
-        display: flex;
-        align-items: center;
         gap: 0.3rem;
+        width: auto;
+        flex: 1 1 auto;
       }
 
       /* Hidden color input */
@@ -109,7 +116,7 @@
 
       /* Range styling */
       label input[type="range"] {
-        flex: 1;
+        flex: 1 1 auto;
         min-width: 0;
         max-width: 100%;
         margin-left: 0.3rem;
