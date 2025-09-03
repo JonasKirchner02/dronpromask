@@ -149,16 +149,15 @@
 
       label.color-label {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3rem;
+        align-items: center; /* vertically center text and color box */
+        justify-content: center; /* horizontally center label content */
+        gap: 0.5rem;
         width: 100%;
       }
 
       label.color-label input[type="color"] {
-        width: clamp(40px, 6vw, 60px);
-        height: clamp(30px, 5vw, 50px);
+        width: clamp(30px, 5vw, 40px);
+        height: clamp(30px, 5vw, 40px);
       }
 
       label:hover,
@@ -199,9 +198,9 @@
           text-align-last: center;
         }
 
-        input[type="color"] {
-          width: clamp(30px, 10vw, 50px);
-          height: clamp(25px, 10vw, 45px);
+        label.color-label input[type="color"] {
+          width: clamp(25px, 10vw, 40px);
+          height: clamp(25px, 10vw, 40px);
         }
       }
 
@@ -227,6 +226,7 @@
         cursor: pointer;
         border-radius: clamp(4px, 0.4vw, 6px);
         padding: 1rem;
+        background: none;
       }
 
       .apply-button img {
