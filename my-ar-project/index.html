@@ -77,7 +77,6 @@
         ></a-camera>
 
         <a-light
-          id="globalLight"
           type="directional"
           intensity="3"
           position="0 0.8 10"
@@ -142,18 +141,8 @@
             scale="1 1 1"
             rotation="0 0 0"
             material="color: #c2c2c2;"
-            shadow="cast: true; receive: true"
+            shadow="cast: false; receive: false"
           ></a-gltf-model>
-
-          <!-- Extra light just for maskaown -->
-          <a-light
-            id="ownLight"
-            type="directional"
-            intensity="0.1"
-            position="0 0.8 -10"
-            castShadow="true"
-          >
-          </a-light>
         </a-entity>
       </a-scene>
     </div>
@@ -179,8 +168,6 @@
             visibles[i] = visible;
             allEntities[i].forEach((entity) => {
               entity.setAttribute("visible", visible);
-
-              // Toggle animation
               if (visible) {
                 entity.removeAttribute("animation-mixer");
 
@@ -201,25 +188,8 @@
                   clampWhenFinished: true,
                 });
               }
-
-              // 🔦 Special case for maskaown
-              if (list[i] === "maskaown") {
-                const specialLight = entity.querySelector("#ownLight");
-                const globalLight = document.querySelector("#globalLight");
-
-                if (specialLight && globalLight) {
-                  if (visible) {
-                    specialLight.setAttribute("visible", true); // turn ON local light
-                    globalLight.setAttribute("visible", false); // turn OFF global
-                  } else {
-                    specialLight.setAttribute("visible", false); // turn OFF local light
-                    globalLight.setAttribute("visible", true); // turn ON global
-                  }
-                }
-              }
             });
           });
-
           currentIndex = index;
           localStorage.setItem("returnIndex", `${index}`);
         }
