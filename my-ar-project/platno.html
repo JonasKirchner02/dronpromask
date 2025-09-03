@@ -47,13 +47,23 @@
       }
 
       .controls {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 1vw;
-        justify-content: center;
-        padding: 0.5rem;
+        display: flex; /* flex layout */
+        flex-wrap: nowrap; /* no wrapping */
+        gap: 1vw; /* spacing between controls */
+        padding: 0 1rem; /* left and right padding */
         width: 100%;
         box-sizing: border-box;
+        overflow-x: auto; /* horizontal scroll if needed */
+        justify-content: flex-start; /* align left */
+      }
+
+      /* hide scrollbar */
+      .controls::-webkit-scrollbar {
+        display: none;
+      }
+      .controls {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
       }
 
       label,
@@ -84,18 +94,16 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        width: 100%;
+        width: auto; /* let label size naturally */
       }
 
       /* Hidden color input, visible via label */
       label.color-label {
-        justify-content: center; /* center the "Color" text */
+        justify-content: center;
         position: relative;
       }
-
       label.color-label input[type="color"] {
         position: absolute;
-
         border: none;
         opacity: 0;
         pointer-events: none;
@@ -112,31 +120,26 @@
         border-radius: 6px;
         -webkit-appearance: none;
       }
-
       label input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
-        appearance: none;
         width: 12px;
         height: 12px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
       }
-
-      label input[type="range"]:hover {
-        background: #262be8;
-      }
-
-      label input[type="range"]:hover::-webkit-slider-thumb {
-        background: #00ffff;
-      }
-
       label input[type="range"]::-moz-range-thumb {
         width: 12px;
         height: 12px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
+      }
+      label input[type="range"]:hover {
+        background: #262be8;
+      }
+      label input[type="range"]:hover::-webkit-slider-thumb {
+        background: #00ffff;
       }
 
       input::placeholder {
@@ -162,10 +165,8 @@
 
       @media only screen and (max-width: 768px) {
         .controls {
-          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
           gap: 0.3rem;
-          padding: 0.2rem;
-          width: 100%;
+          padding: 0 0.5rem;
         }
 
         label,
@@ -241,11 +242,9 @@
       canvas#backgroundCanvas {
         z-index: 1;
       }
-
       canvas#paintCanvas {
         z-index: 2;
       }
-
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
