@@ -143,6 +143,15 @@
             material="color: #c2c2c2;"
             shadow="cast: false; receive: false"
           ></a-gltf-model>
+
+          <!-- Extra light just for maskaown -->
+          <a-light
+            type="directional"
+            intensity="1"
+            position="0 0.8 10"
+            castShadow="true"
+          >
+          </a-light>
         </a-entity>
       </a-scene>
     </div>
@@ -168,6 +177,8 @@
             visibles[i] = visible;
             allEntities[i].forEach((entity) => {
               entity.setAttribute("visible", visible);
+
+              // Toggle animation
               if (visible) {
                 entity.removeAttribute("animation-mixer");
 
@@ -188,8 +199,17 @@
                   clampWhenFinished: true,
                 });
               }
+
+              // 🔦 Special case for maskaown → toggle its child light
+              if (list[i] === "maskaown") {
+                const specialLight = entity.querySelector(".maskaown-light");
+                if (specialLight) {
+                  specialLight.setAttribute("visible", visible);
+                }
+              }
             });
           });
+
           currentIndex = index;
           localStorage.setItem("returnIndex", `${index}`);
         }
