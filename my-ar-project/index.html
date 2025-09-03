@@ -133,16 +133,6 @@
         </a-entity>
 
         <a-entity mindar-face-target="anchorIndex: 9">
-          <a-light
-            type="point"
-            intensity="0.2"
-            distance="2"
-            decay="2"
-            position="0 0.5 10"
-            target=".maskaown-entity"
-          >
-          </a-light>
-
           <a-gltf-model
             class="maskaown-entity"
             src="#maskaown"
@@ -150,7 +140,7 @@
             position="0 0.5 0"
             scale="1 1 1"
             rotation="0 0 0"
-            material="color: #c2c2c2;"
+            material="emissive: #ffffff; emissiveIntensity: 0.2; color: #c2c2c2;"
             shadow="cast: false; receive: false"
           ></a-gltf-model>
         </a-entity>
