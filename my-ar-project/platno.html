@@ -83,9 +83,25 @@
       label {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         gap: 0.5rem;
         width: 100%;
+      }
+
+      /* Hidden color input, visible via label */
+      label.color-label {
+        justify-content: center; /* center the "Color" text */
+        position: relative;
+      }
+
+      label.color-label input[type="color"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        opacity: 0;
+        pointer-events: none;
       }
 
       /* Range inputs styling */
@@ -124,27 +140,6 @@
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
-      }
-
-      /* Hidden color input, visible via label */
-      input[type="color"] {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: 0;
-        border: none;
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      /* Place color input inside a label for styling */
-      label.color-label {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
       }
 
       input::placeholder {
