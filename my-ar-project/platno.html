@@ -88,24 +88,23 @@
         box-sizing: border-box;
       }
 
-      /* Responsive sliders inside label boxes */
+      /* Range sliders inside label, original thin style preserved */
       label input[type="range"] {
-        flex: 1; /* take remaining space in label */
-        max-width: 80%; /* don’t overflow label */
-        height: 60%; /* occupy most of label height */
-        min-height: 20px; /* never too small */
-        margin-left: 0.5rem;
-        border-radius: 6px;
+        flex: 1; /* take available space in label */
+        max-width: 60%; /* stay inside label box */
+        margin-left: 0.5rem; /* spacing from label text */
+        height: 4px; /* original thin line */
         background: #af32ff;
+        border-radius: 6px;
         -webkit-appearance: none;
       }
 
-      /* Slider thumbs */
+      /* Slider thumb, small circle */
       label input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: clamp(12px, 2vw, 20px);
-        height: clamp(12px, 2vw, 20px);
+        width: 12px;
+        height: 12px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
@@ -121,8 +120,8 @@
 
       /* Firefox thumb */
       label input[type="range"]::-moz-range-thumb {
-        width: clamp(12px, 2vw, 20px);
-        height: clamp(12px, 2vw, 20px);
+        width: 12px;
+        height: 12px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
@@ -171,9 +170,9 @@
         }
 
         label input[type="range"] {
-          max-width: 75%;
-          height: 55%;
+          max-width: 55%; /* tighter fit on mobile */
           margin-left: 0.3rem;
+          height: 4px; /* keep thin line */
         }
 
         select,
