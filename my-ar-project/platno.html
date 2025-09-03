@@ -54,18 +54,64 @@
         padding: 0.5rem;
         max-width: 100%;
         box-sizing: border-box;
-      }
-
-      .controls {
         border: none;
         cursor: pointer;
         border-radius: clamp(4px, 0.4vw, 6px);
-        padding: clamp(0.5rem, 1vw, 1rem);
         background: none;
       }
 
-      /* General control boxes with responsive font and padding */
-      label,
+      /* Label boxes with sliders fully inside */
+      label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.5rem 0.7rem;
+        background-color: #2626ff;
+        border-radius: clamp(6px, 0.6vw, 10px);
+        color: #fff;
+        font-family: "indivisible", sans-serif;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      /* Range sliders inside labels, original look */
+      label input[type="range"] {
+        flex: 1;
+        height: 4px;
+        background: #af32ff;
+        border-radius: 6px;
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      label input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      label input[type="range"]:hover {
+        background: #262be8;
+      }
+
+      label input[type="range"]:hover::-webkit-slider-thumb {
+        background: #00ffff;
+      }
+
+      label input[type="range"]::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      /* Other controls */
       button,
       select,
       input[type="text"],
@@ -86,45 +132,6 @@
         text-overflow: ellipsis;
         text-align: center;
         box-sizing: border-box;
-      }
-
-      /* Range sliders inside label, original thin style preserved */
-      label input[type="range"] {
-        flex: 1; /* take available space in label */
-        max-width: 60%; /* stay inside label box */
-        margin-left: 0.5rem; /* spacing from label text */
-        height: 4px; /* original thin line */
-        background: #af32ff;
-        border-radius: 6px;
-        -webkit-appearance: none;
-      }
-
-      /* Slider thumb, small circle */
-      label input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      label input[type="range"]:hover {
-        background: #262be8;
-      }
-
-      label input[type="range"]:hover::-webkit-slider-thumb {
-        background: #00ffff;
-      }
-
-      /* Firefox thumb */
-      label input[type="range"]::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
       }
 
       input::placeholder {
@@ -159,7 +166,16 @@
           width: 100%;
         }
 
-        label,
+        label {
+          font-size: clamp(0.7rem, 2vw, 0.9rem);
+          padding: clamp(0.2rem, 1.5vw, 0.4rem);
+          border-radius: clamp(4px, 1.5vw, 8px);
+        }
+
+        label input[type="range"] {
+          max-width: 100%;
+        }
+
         button,
         select,
         input[type="text"],
@@ -167,12 +183,6 @@
           font-size: clamp(0.7rem, 2vw, 0.9rem);
           padding: clamp(0.2rem, 1.5vw, 0.4rem);
           border-radius: clamp(4px, 1.5vw, 8px);
-        }
-
-        label input[type="range"] {
-          max-width: 55%; /* tighter fit on mobile */
-          margin-left: 0.3rem;
-          height: 4px; /* keep thin line */
         }
 
         select,
