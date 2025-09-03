@@ -147,6 +147,7 @@
 
           <!-- Extra light just for maskaown -->
           <a-light
+            id="ownLight"
             type="directional"
             intensity="1"
             position="0 0.8 10"
@@ -203,7 +204,7 @@
 
               // 🔦 Special case for maskaown
               if (list[i] === "maskaown") {
-                const specialLight = entity.querySelector(".maskaown-light");
+                const specialLight = entity.querySelector("#ownLight");
                 const globalLight = document.querySelector("#globalLight");
 
                 if (specialLight && globalLight) {
