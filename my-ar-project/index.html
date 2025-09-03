@@ -78,7 +78,7 @@
 
         <a-light
           type="directional"
-          intensity="1"
+          intensity="3"
           position="0 0.8 10"
           castShadow="true"
         ></a-light>
@@ -133,6 +133,16 @@
         </a-entity>
 
         <a-entity mindar-face-target="anchorIndex: 9">
+          <a-light
+            type="point"
+            intensity="1.5"
+            distance="2"
+            decay="2"
+            position="0 0.5 0.5"
+            target=".maskaown-entity"
+          >
+          </a-light>
+
           <a-gltf-model
             class="maskaown-entity"
             src="#maskaown"
