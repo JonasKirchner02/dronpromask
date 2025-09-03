@@ -33,7 +33,7 @@
         font-weight: 500;
         font-style: normal;
         margin: 0;
-        padding: 0; /* removed 5vw padding */
+        padding: 0;
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -52,8 +52,7 @@
         gap: 1vw;
         justify-content: center;
         padding: 0.5rem;
-        white-space: nowrap;
-        max-width: 100%; /* prevent overflow */
+        max-width: 100%;
         box-sizing: border-box;
       }
 
@@ -65,13 +64,11 @@
         background: none;
       }
 
+      /* General control boxes */
       label,
       button,
       select,
-      input,
       input[type="text"],
-      input[type="color"],
-      input[type="range"],
       #paintingList {
         background-color: #2626ff;
         color: #ffffff;
@@ -80,14 +77,27 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.5rem 0.5rem;
+        padding: 0.5rem;
         font-size: 1rem;
         font-family: "indivisible", sans-serif;
         font-weight: 500;
         font-style: normal;
-        white-space: nowrap;
-        text-overflow: ellipsis;
         text-align: center;
+        box-sizing: border-box;
+      }
+
+      /* Labels stack text + slider */
+      label {
+        flex-direction: column;
+        gap: 0.4rem;
+        min-width: 120px;
+      }
+
+      /* Sliders inside labels */
+      label input[type="range"] {
+        width: 100%;
+        margin: 0;
+        background: none;
       }
 
       input::placeholder {
@@ -125,10 +135,7 @@
         label,
         button,
         select,
-        input,
         input[type="text"],
-        input[type="color"],
-        input[type="range"],
         #paintingList {
           background-color: #2626ff;
           color: #ffffff;
@@ -142,9 +149,12 @@
           font-family: "indivisible", sans-serif;
           font-weight: 500;
           font-style: normal;
-          white-space: nowrap;
-          text-overflow: ellipsis;
           text-align: center;
+        }
+
+        label {
+          flex-direction: column;
+          gap: 0.3rem;
         }
 
         input::placeholder {
@@ -176,8 +186,6 @@
       select:hover,
       input:hover,
       input[type="text"]:hover,
-      input[type="color"]:hover,
-      input[type="range"]:hover,
       #paintingList:hover {
         background-color: #000064;
         cursor: pointer;
@@ -223,27 +231,27 @@
       /* Range slider styles */
       input[type="range"] {
         -webkit-appearance: none;
-        height: 1px;
+        height: 4px;
         background: #af32ff;
         border-radius: 6px;
-        outline: #ffff00;
+        outline: none;
       }
 
       input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
         background: #00ffff;
         border-radius: 50%;
         cursor: pointer;
       }
 
-      input:hover[type="range"] {
+      input[type="range"]:hover {
         background: #262be8;
       }
 
-      input:hover[type="range"]::-webkit-slider-thumb {
+      input[type="range"]:hover::-webkit-slider-thumb {
         background: #00ffff;
       }
 
