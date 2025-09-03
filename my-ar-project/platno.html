@@ -48,23 +48,14 @@
 
       .controls {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, auto));
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 1vw;
         justify-content: center;
         padding: 0.5rem;
-        max-width: 100%;
+        width: 100%;
         box-sizing: border-box;
       }
 
-      .controls {
-        border: none;
-        cursor: pointer;
-        border-radius: clamp(4px, 0.4vw, 6px);
-        padding: clamp(0.5rem, 1vw, 1rem);
-        background: none;
-      }
-
-      /* General control boxes with responsive font and padding */
       label,
       button,
       select,
@@ -86,20 +77,28 @@
         text-overflow: ellipsis;
         text-align: center;
         box-sizing: border-box;
+        cursor: pointer;
       }
 
-      /* Range sliders inside label, original thin style preserved */
+      label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
       label input[type="range"] {
-        flex: 1; /* take available space in label */
-        max-width: 60%; /* stay inside label box */
-        margin-left: 0.5rem; /* spacing from label text */
-        height: 4px; /* original thin line */
+        flex: 1;
+        min-width: 0;
+        max-width: 100%;
+        margin-left: 0.5rem;
+        height: 4px;
         background: #af32ff;
         border-radius: 6px;
         -webkit-appearance: none;
       }
 
-      /* Slider thumb, small circle */
       label input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
@@ -118,7 +117,6 @@
         background: #00ffff;
       }
 
-      /* Firefox thumb */
       label input[type="range"]::-moz-range-thumb {
         width: 12px;
         height: 12px;
@@ -151,6 +149,15 @@
         overflow: hidden;
       }
 
+      label:hover,
+      button:hover,
+      select:hover,
+      input:hover,
+      input[type="text"]:hover,
+      #paintingList:hover {
+        background-color: #000064;
+      }
+
       @media only screen and (max-width: 768px) {
         .controls {
           grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -170,9 +177,8 @@
         }
 
         label input[type="range"] {
-          max-width: 55%; /* tighter fit on mobile */
           margin-left: 0.3rem;
-          height: 4px; /* keep thin line */
+          height: 4px;
         }
 
         select,
@@ -191,16 +197,6 @@
           opacity: 0;
           pointer-events: none;
         }
-      }
-
-      label:hover,
-      button:hover,
-      select:hover,
-      input:hover,
-      input[type="text"]:hover,
-      #paintingList:hover {
-        background-color: #000064;
-        cursor: pointer;
       }
 
       .canvas-container {
@@ -225,6 +221,7 @@
         cursor: pointer;
         border-radius: clamp(4px, 0.4vw, 6px);
         padding: 1rem;
+        background: none;
       }
 
       .apply-button img {
@@ -254,9 +251,11 @@
       canvas#backgroundCanvas {
         z-index: 1;
       }
+
       canvas#paintCanvas {
         z-index: 2;
       }
+
       canvas#effectCanvas {
         z-index: 3;
         pointer-events: none;
