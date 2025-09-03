@@ -49,17 +49,16 @@
       .controls {
         display: flex;
         flex-wrap: nowrap; /* no wrapping */
-        gap: 1vw; /* space between controls */
+        gap: 1vw; /* spacing between controls */
         padding: 0 2vw; /* left and right padding */
-        width: 100%;
+        justify-content: center; /* center the row */
         box-sizing: border-box;
-        justify-content: center; /* center controls */
       }
 
+      /* Controls shrink if needed but do not grow to fill */
       .controls > * {
-        flex: 0 1 auto; /* do not grow, shrink if needed */
-        min-width: 80px; /* minimum size */
-        max-width: 200px; /* optional max size */
+        flex: 0 1 auto; /* flex-grow:0, flex-shrink:1, base auto width */
+        min-width: 60px; /* do not shrink below this */
       }
 
       label,
