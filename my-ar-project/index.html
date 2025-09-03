@@ -347,6 +347,20 @@
 
               node.parent.add(overlayMesh);
             }
+
+            function showOnly(index) {
+              list.forEach((_, i) => {
+                const visible = i === index;
+                visibles[i] = visible;
+                allEntities[i].forEach((entity) => {
+                  entity.setAttribute("visible", visible);
+
+                  // Also toggle its child light
+                  const light = entity.querySelector("a-light");
+                  if (light) light.setAttribute("visible", visible);
+                });
+              });
+            }
           });
         });
       }
