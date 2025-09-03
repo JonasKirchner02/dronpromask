@@ -181,17 +181,18 @@
           padding: 0.5rem;
         }
 
-        .controls {
-          flex-direction: row;
-          justify-content: center;
-          gap: 0.5rem;
-        }
+        @media only screen and (max-width: 768px) {
+          .controls {
+            flex-direction: column; /* stack vertically */
+            align-items: center; /* make buttons take full width */
+            gap: 0.2rem; /* space between rows */
+          }
 
-        .controls > * {
-          flex: 1 1 45%;
-          min-width: 90px;
-          font-size: clamp(0.6rem, 2vw, 0.9rem);
-          padding: clamp(0.2rem, 1.5vw, 0.4rem);
+          .controls > * {
+            flex: 1 1 auto; /* allow them to grow to full width */
+            min-width: 0; /* remove min-width that prevents shrinking */
+            width: 30%; /* full width per button/element */
+          }
         }
 
         label input[type="range"] {
