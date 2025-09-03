@@ -46,26 +46,21 @@
         overflow: hidden;
       }
 
+      /* Controls container */
       .controls {
         display: flex;
-        flex-wrap: nowrap; /* allow wrapping if needed */
-        gap: 1vw;
-        padding: 0 2vw; /* left/right padding */
-        justify-content: space-between; /* space evenly across */
-        max-width: 1200px; /* optional max width for large screens */
-        box-sizing: border-box;
-      }
-
-      /* Controls shrink if needed but do not grow to fill */
-      .controls > * {
-        flex: 0 1 auto; /* flex-grow:0, flex-shrink:1, base auto width */
-        min-width: 60px; /* do not shrink below this */
-      }
-
-      .controls-wrapper {
+        flex-wrap: nowrap; /* no wrapping */
+        gap: 1vw; /* spacing between controls */
+        padding: 0 2vw; /* left and right padding */
         width: 100%;
-        display: flex;
-        justify-content: center;
+        box-sizing: border-box;
+        justify-content: center; /* center controls */
+      }
+
+      /* Controls resize proportionally */
+      .controls > * {
+        flex: 1 1 120px; /* grow/shrink with base width 120px */
+        min-width: 60px; /* don't shrink too small */
       }
 
       label,
