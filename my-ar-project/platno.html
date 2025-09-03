@@ -270,35 +270,37 @@
     </style>
   </head>
   <body>
-    <div class="controls">
-      <label class="color-label"
-        >Color<input type="color" id="colorPicker" value="#000000"
-      /></label>
+    <div class="controls-wrapper">
+      <div class="controls">
+        <label class="color-label"
+          >Color<input type="color" id="colorPicker" value="#000000"
+        /></label>
 
-      <select id="brushType">
-        <option value="classic">Brush Type</option>
-        <option value="classic">Classic</option>
-        <option value="soft">Softer</option>
-        <option value="image1">Image 1</option>
-        <option value="image2">Image 2</option>
-      </select>
+        <select id="brushType">
+          <option value="classic">Brush Type</option>
+          <option value="classic">Classic</option>
+          <option value="soft">Softer</option>
+          <option value="image1">Image 1</option>
+          <option value="image2">Image 2</option>
+        </select>
 
-      <label>
-        Brush size
-        <input type="range" id="brushSize" min="5" max="150" value="5" />
-      </label>
-      <label>
-        Soft steps
-        <input type="range" id="softSteps" min="1" max="50" value="10" />
-      </label>
-      <button onclick="clearCanvas()">Clear</button>
-      <button onclick="undoLastStroke()">Undo</button>
-      <input type="text" id="paintingName" placeholder="Enter name" />
-      <button onclick="savePainting()">Save painting</button>
-      <select id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">My paintings</option>
-      </select>
-      <button onclick="downloadCanvas()">Download PNG</button>
+        <label>
+          Brush size
+          <input type="range" id="brushSize" min="5" max="150" value="5" />
+        </label>
+        <label>
+          Soft steps
+          <input type="range" id="softSteps" min="1" max="50" value="10" />
+        </label>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="undoLastStroke()">Undo</button>
+        <input type="text" id="paintingName" placeholder="Enter name" />
+        <button onclick="savePainting()">Save painting</button>
+        <select id="paintingList" onchange="loadSelectedPainting()">
+          <option value="">My paintings</option>
+        </select>
+        <button onclick="downloadCanvas()">Download PNG</button>
+      </div>
     </div>
 
     <div class="canvas-container">
