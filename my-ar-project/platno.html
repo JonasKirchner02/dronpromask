@@ -58,25 +58,28 @@
       .controls {
         display: flex;
         flex-wrap: nowrap; /* no wrapping */
-        gap: 0.5vw; /* spacing between controls */
-        justify-content: space-between; /* spread controls */
+        gap: 0.5vw;
+        justify-content: space-between;
         align-items: center;
+        transform-origin: left center; /* scale from left */
       }
 
-      /* Controls shrink proportionally to fit */
-      .controls > * {
-        flex: 1 1 auto; /* allow shrinking/growing */
-        min-width: 0; /* allows shrinking below content width */
-        white-space: nowrap; /* prevent internal wrapping */
-      }
-
-      /* Hide scrollbar if any */
-      .controls-wrapper::-webkit-scrollbar {
-        display: none;
-      }
+      /* Scale controls to fit container */
       .controls-wrapper {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .controls-wrapper > .controls {
+        max-width: 100%;
+      }
+
+      /* Controls shrink proportionally */
+      .controls > * {
+        flex: 1 1 auto;
+        min-width: 80px; /* minimum readable size */
+        white-space: nowrap;
+        text-align: center;
       }
 
       /* Buttons, labels, selects, inputs */
@@ -211,6 +214,10 @@
 
       /* Mobile adjustments */
       @media only screen and (max-width: 768px) {
+        .controls > * {
+          min-width: 60px;
+        }
+
         label,
         button,
         select,
@@ -220,15 +227,18 @@
           padding: clamp(0.2rem, 1vw, 0.4rem);
           border-radius: clamp(4px, 1.5vw, 8px);
         }
+
         label input[type="range"] {
           margin-left: 0.3rem;
           height: 4px;
         }
+
         .canvas-container {
           width: 80vw;
           aspect-ratio: 1 / 1;
           transform: translateY(0%);
         }
+
         .apply-button img {
           width: 15vw;
           max-width: 300px;
