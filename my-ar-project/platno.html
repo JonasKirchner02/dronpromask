@@ -45,7 +45,7 @@
         background-color: #262be8;
       }
 
-      /* Controls row - always one line, scale to fit, with left/right padding */
+      /* Controls row - desktop: one line */
       .controls {
         display: flex;
         flex-wrap: nowrap; /* stay in one line */
@@ -200,6 +200,33 @@
 
       ::placeholder {
         color: #ffffff;
+      }
+
+      /* Mobile: stack controls vertically */
+      @media (max-width: 768px) {
+        .controls {
+          flex-direction: column; /* stack items */
+          flex-wrap: wrap; /* allow wrapping */
+          gap: 1rem; /* more spacing */
+          padding: 0.5rem; /* smaller padding */
+        }
+
+        .controls > * {
+          flex: 1 1 100%; /* each control full width */
+          min-width: 0;
+        }
+
+        label,
+        button,
+        select,
+        input[type="text"],
+        #paintingList {
+          font-size: clamp(0.8rem, 3vw, 1rem); /* mobile friendly */
+        }
+
+        label input[type="range"] {
+          margin-left: 0.5rem; /* more space for slider */
+        }
       }
     </style>
   </head>
