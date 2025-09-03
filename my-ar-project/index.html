@@ -76,13 +76,14 @@
           raycaster="objects: .clickable"
         ></a-camera>
 
+        <a-light
+          type="directional"
+          intensity="3"
+          position="0 0.8 10"
+          castShadow="true"
+        ></a-light>
+
         <a-entity mindar-face-target="anchorIndex: 1">
-          <a-light
-            type="directional"
-            intensity="3"
-            position="0 0.8 10"
-            castShadow="true"
-          ></a-light>
           <a-gltf-model
             id="headModelEntity"
             class="clickable"
@@ -96,12 +97,6 @@
         </a-entity>
 
         <a-entity mindar-face-target="anchorIndex: 9">
-          <a-light
-            type="directional"
-            intensity="3"
-            position="0 0.8 10"
-            castShadow="true"
-          ></a-light>
           <a-gltf-model
             class="maska1-entity"
             src="#maska1"
@@ -114,12 +109,6 @@
         </a-entity>
 
         <a-entity mindar-face-target="anchorIndex: 9">
-          <a-light
-            type="directional"
-            intensity="3"
-            position="0 0.8 10"
-            castShadow="true"
-          ></a-light>
           <a-gltf-model
             class="maska2-entity"
             src="#maska2"
@@ -132,12 +121,6 @@
         </a-entity>
 
         <a-entity mindar-face-target="anchorIndex: 9">
-          <a-light
-            type="directional"
-            intensity="3"
-            position="0 0.8 10"
-            castShadow="true"
-          ></a-light>
           <a-gltf-model
             class="maska3-entity"
             src="#maska3"
@@ -160,12 +143,6 @@
             material="color: #c2c2c2;"
             shadow="cast: false; receive: false"
           ></a-gltf-model>
-          <a-light
-            type="directional"
-            intensity="1"
-            position="0 0.8 10"
-            castShadow="true"
-          ></a-light>
         </a-entity>
       </a-scene>
     </div>
@@ -346,20 +323,6 @@
               overlayMesh.scale.copy(node.scale);
 
               node.parent.add(overlayMesh);
-            }
-
-            function showOnly(index) {
-              list.forEach((_, i) => {
-                const visible = i === index;
-                visibles[i] = visible;
-                allEntities[i].forEach((entity) => {
-                  entity.setAttribute("visible", visible);
-
-                  // Also toggle its child light
-                  const light = entity.querySelector("a-light");
-                  if (light) light.setAttribute("visible", visible);
-                });
-              });
             }
           });
         });
