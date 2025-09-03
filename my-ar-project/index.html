@@ -82,6 +82,7 @@
           intensity="3"
           position="0 0.8 10"
           castShadow="true"
+          light-layer="layer: 0"
         ></a-light>
 
         <a-entity mindar-face-target="anchorIndex: 1">
@@ -106,6 +107,7 @@
             scale="1 1 1"
             rotation="0 0 0"
             shadow="cast: true; receive: true"
+            light-layer="layer: 0"
           ></a-gltf-model>
         </a-entity>
 
@@ -118,6 +120,7 @@
             scale="1 1 1"
             rotation="0 0 0"
             shadow="cast: true; receive: true"
+            light-layer="layer: 0"
           ></a-gltf-model>
         </a-entity>
 
@@ -130,6 +133,7 @@
             scale="1 1 1"
             rotation="0 0 0"
             shadow="cast: true; receive: true"
+            light-layer="layer: 0"
           ></a-gltf-model>
         </a-entity>
 
@@ -143,6 +147,7 @@
             rotation="0 0 0"
             material="color: #c2c2c2;"
             shadow="cast: true; receive: true"
+            light-layer="layer: 1"
           ></a-gltf-model>
 
           <!-- Extra light just for maskaown -->
@@ -152,6 +157,7 @@
             intensity="0.1"
             position="0 0.8 -10"
             castShadow="true"
+            light-layer="layer: 1"
           >
           </a-light>
         </a-entity>
@@ -159,6 +165,31 @@
     </div>
 
     <script>
+      // 🔦 Assign light to a specific layer
+      AFRAME.registerComponent("light-layer", {
+        schema: { layer: { type: "int", default: 0 } },
+        init: function () {
+          this.el.addEventListener("loaded", () => {
+            const light = this.el.getObject3D("light");
+            if (light) {
+              light.layers.set(this.data.layer);
+            }
+          });
+        },
+      });
+
+      // 🎭 Assign model's meshes to a specific layer
+      AFRAME.registerComponent("mesh-layer", {
+        schema: { layer: { type: "int", default: 0 } },
+        init: function () {
+          this.el.addEventListener("model-loaded", () => {
+            this.el.getObject3D("mesh").traverse((node) => {
+              if (node.isMesh) node.layers.set(this.data.layer);
+            });
+          });
+        },
+      });
+
       document.addEventListener("DOMContentLoaded", function () {
         const list = ["maska1", "maska3", "maska2", "maskaown"];
         const visibles = [false, false, false, false];
