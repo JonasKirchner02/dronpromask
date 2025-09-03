@@ -88,11 +88,44 @@
         box-sizing: border-box;
       }
 
-      /* Inline sliders inside label boxes */
+      /* Responsive sliders inside label boxes */
       label input[type="range"] {
-        flex: 1;
-        max-width: 70%;
+        flex: 1; /* take remaining space in label */
+        max-width: 80%; /* don’t overflow label */
+        height: 60%; /* occupy most of label height */
+        min-height: 20px; /* never too small */
         margin-left: 0.5rem;
+        border-radius: 6px;
+        background: #af32ff;
+        -webkit-appearance: none;
+      }
+
+      /* Slider thumbs */
+      label input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: clamp(12px, 2vw, 20px);
+        height: clamp(12px, 2vw, 20px);
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      label input[type="range"]:hover {
+        background: #262be8;
+      }
+
+      label input[type="range"]:hover::-webkit-slider-thumb {
+        background: #00ffff;
+      }
+
+      /* Firefox thumb */
+      label input[type="range"]::-moz-range-thumb {
+        width: clamp(12px, 2vw, 20px);
+        height: clamp(12px, 2vw, 20px);
+        background: #00ffff;
+        border-radius: 50%;
+        cursor: pointer;
       }
 
       input::placeholder {
@@ -138,7 +171,8 @@
         }
 
         label input[type="range"] {
-          max-width: 65%;
+          max-width: 75%;
+          height: 55%;
           margin-left: 0.3rem;
         }
 
@@ -204,34 +238,6 @@
           width: 15vw;
           max-width: 300px;
         }
-      }
-
-      /* Range slider styles */
-      input[type="range"] {
-        -webkit-appearance: none;
-        height: 4px;
-        width: 70px;
-        background: #af32ff;
-        border-radius: 6px;
-        outline: none;
-      }
-
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 14px;
-        height: 14px;
-        background: #00ffff;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      input[type="range"]:hover {
-        background: #262be8;
-      }
-
-      input[type="range"]:hover::-webkit-slider-thumb {
-        background: #00ffff;
       }
 
       input[type="text"] {
