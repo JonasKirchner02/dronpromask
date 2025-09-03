@@ -48,13 +48,14 @@
 
       .controls {
         display: grid;
-        grid-template-columns: repeat(10, auto);
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(clamp(60px, 8vw, 120px), 1fr)
+        );
         gap: 1vw;
         justify-content: center;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        white-space: nowrap;
-        width: 90vw;
+        padding: 0.5rem;
+        max-width: 90vw; /* prevents overflowing */
       }
 
       label,
