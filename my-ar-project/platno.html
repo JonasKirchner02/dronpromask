@@ -46,29 +46,22 @@
         overflow: hidden;
       }
 
-      /* Controls wrapper adds left/right padding and handles scrolling */
-      .controls-wrapper {
-        width: 100%;
-        overflow-x: auto; /* allow horizontal scroll if needed */
-        padding: 0 1rem; /* left and right padding */
-        box-sizing: border-box;
-      }
-
-      /* Controls row (no wrapping) */
+      /* Controls container with padding on both sides */
       .controls {
         display: flex;
-        flex-wrap: nowrap; /* prevent wrapping */
+        flex-wrap: nowrap; /* no wrapping */
         gap: 1vw; /* space between controls */
-        justify-content: flex-start;
+        padding: 0 2vw; /* left and right padding */
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: center; /* center controls */
       }
 
-      /* hide scrollbar */
-      .controls-wrapper::-webkit-scrollbar {
-        display: none;
-      }
-      .controls-wrapper {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+      /* Each control resizes proportionally */
+      .controls > * {
+        flex: 1 1 auto; /* allow shrinking and growing */
+        min-width: 80px; /* minimum width to avoid too small */
+        max-width: 200px; /* optional maximum width */
       }
 
       label,
@@ -99,7 +92,6 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        width: auto; /* natural sizing */
       }
 
       /* Hidden color input, visible via label */
@@ -140,12 +132,6 @@
         border-radius: 50%;
         cursor: pointer;
       }
-      label input[type="range"]:hover {
-        background: #262be8;
-      }
-      label input[type="range"]:hover::-webkit-slider-thumb {
-        background: #00ffff;
-      }
 
       input::placeholder {
         color: #ffffff;
@@ -169,8 +155,14 @@
       }
 
       @media only screen and (max-width: 768px) {
-        .controls-wrapper {
-          padding: 0 0.5rem;
+        .controls {
+          gap: 0.5vw;
+          padding: 0 4vw; /* slightly bigger padding on small screens */
+        }
+
+        .controls > * {
+          min-width: 60px;
+          max-width: none;
         }
 
         label,
@@ -186,12 +178,6 @@
         label input[type="range"] {
           margin-left: 0.3rem;
           height: 4px;
-        }
-
-        select,
-        input[type="text"] {
-          text-align: center;
-          text-align-last: center;
         }
       }
 
