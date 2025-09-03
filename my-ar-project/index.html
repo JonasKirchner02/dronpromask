@@ -173,27 +173,26 @@
     </div>
 
     <script>
-      // 🔦 Assign light to a specific layer
-      AFRAME.registerComponent("mesh-layer", {
+      AFRAME.registerComponent("light-layer", {
         schema: { layer: { type: "int", default: 0 } },
         init: function () {
-          this.el.addEventListener("model-loaded", () => {
-            this.el.object3D.traverse((obj) => {
-              if (obj.isMesh) {
-                obj.layers.set(this.data.layer);
-              }
-            });
+          this.el.addEventListener("loaded", () => {
+            const light = this.el.getObject3D("light");
+            if (light) {
+              light.layers.set(this.data.layer);
+            }
           });
         },
       });
 
-      // 🎭 Assign model's meshes to a specific layer
       AFRAME.registerComponent("mesh-layer", {
         schema: { layer: { type: "int", default: 0 } },
         init: function () {
           this.el.addEventListener("model-loaded", () => {
-            this.el.getObject3D("mesh").traverse((node) => {
-              if (node.isMesh) node.layers.set(this.data.layer);
+            this.el.object3D.traverse((node) => {
+              if (node.isMesh) {
+                node.layers.set(this.data.layer);
+              }
             });
           });
         },
