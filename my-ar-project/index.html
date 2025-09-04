@@ -303,9 +303,12 @@
         textureLoader.load(dataURL, (texture) => {
           texture.flipY = false;
 
+          // ✅ make sure texture is read as sRGB
+          texture.encoding = THREE.sRGBEncoding;
+          texture.needsUpdate = true;
+
           model.getObject3D("mesh").traverse((node) => {
             if (node.isMesh) {
-              const originalMaterial = node.material;
               const overlayMaterial = new THREE.MeshStandardMaterial({
                 map: texture,
                 transparent: true,
@@ -313,20 +316,15 @@
                 depthWrite: false,
                 roughness: 1, // fully matte
                 metalness: 0, // no metallic shine
-                emissive: new THREE.Color(0x000000), // prevent glow
-                emissiveIntensity: 0,
-                toneMapped: true, // make sure renderer tone mapping applies
+                color: new THREE.Color(0xaaaaaa), // darken a bit if still too bright
+                toneMapped: true,
               });
 
               const overlayMesh = new THREE.Mesh(
                 node.geometry.clone(),
                 overlayMaterial
               );
-              overlayMesh.position.set(
-                node.position.x,
-                node.position.y,
-                node.position.z + 0.001
-              );
+              overlayMesh.position.copy(node.position);
               overlayMesh.rotation.copy(node.rotation);
               overlayMesh.scale.copy(node.scale);
 
