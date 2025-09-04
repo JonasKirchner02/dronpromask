@@ -311,6 +311,8 @@
                 transparent: true,
                 opacity: 1,
                 depthWrite: false,
+                roughness: 1, // maximum roughness (0 = shiny, 1 = matte/rough)
+                metalness: 0,
               });
 
               const overlayMesh = new THREE.Mesh(
