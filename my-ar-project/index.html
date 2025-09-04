@@ -311,8 +311,11 @@
                 transparent: true,
                 opacity: 1,
                 depthWrite: false,
-                roughness: 1, // maximum roughness (0 = shiny, 1 = matte/rough)
-                metalness: 0,
+                roughness: 1, // fully matte
+                metalness: 0, // no metallic shine
+                emissive: new THREE.Color(0x000000), // prevent glow
+                emissiveIntensity: 0,
+                toneMapped: true, // make sure renderer tone mapping applies
               });
 
               const overlayMesh = new THREE.Mesh(
