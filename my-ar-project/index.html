@@ -314,10 +314,12 @@
                 transparent: true,
                 opacity: 1,
                 depthWrite: false,
-                roughness: 1, // fully matte
-                metalness: 0, // no metallic shine
-                color: new THREE.Color(0xaaaaaa), // darken a bit if still too bright
-                toneMapped: true,
+                roughness: 1,
+                metalness: 0,
+                color: new THREE.Color(0xaaaaaa),
+                polygonOffset: true,
+                polygonOffsetFactor: -1, // push forward
+                polygonOffsetUnits: -1,
               });
 
               const overlayMesh = new THREE.Mesh(
