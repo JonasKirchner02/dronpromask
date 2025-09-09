@@ -176,12 +176,6 @@
         margin: -2rem 0 1rem 0;
       }
 
-      #paintingName {
-        font-size: clamp(0.6rem, 1vw, 1rem); /* prevents zoom */
-        transform: scale(0.8); /* looks smaller (≈12.8px) */
-        transform-origin: center; /* keeps it centered */
-      }
-
       @media (max-width: 768px) {
         .canvas-container {
           position: relative;
@@ -204,6 +198,12 @@
         .apply-button img {
           width: clamp(60px, 8vw, 100px);
           height: auto;
+        }
+
+        #paintingName {
+          font-size: 16px; /* prevents zoom */
+          transform: scale(0.8); /* looks smaller (≈12.8px) */
+          transform-origin: center; /* keeps it centered */
         }
       }
 
