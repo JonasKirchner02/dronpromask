@@ -153,6 +153,10 @@
         background-color: #000064;
       }
 
+      .saves {
+        background-color: #9dff00;
+      }
+
       /* Canvas container */
       .canvas-container {
         position: relative;
@@ -260,14 +264,19 @@
         Soft steps
         <input type="range" id="softSteps" min="1" max="50" value="10" />
       </label>
-      <button onclick="clearCanvas()">Clear</button>
-      <button onclick="undoLastStroke()">Undo</button>
-      <input type="text" id="paintingName" placeholder="Enter name" />
-      <button onclick="savePainting()">Save painting</button>
-      <select id="paintingList" onchange="loadSelectedPainting()">
+      <button class="saves" onclick="clearCanvas()">Clear</button>
+      <button class="saves" onclick="undoLastStroke()">Undo</button>
+      <input
+        class="saves"
+        type="text"
+        id="paintingName"
+        placeholder="Enter name"
+      />
+      <button class="saves" onclick="savePainting()">Save painting</button>
+      <select class="saves" id="paintingList" onchange="loadSelectedPainting()">
         <option value="">My paintings</option>
       </select>
-      <button onclick="downloadCanvas()">Download PNG</button>
+      <button class="saves" onclick="downloadCanvas()">Download PNG</button>
     </div>
 
     <div class="canvas-container">
