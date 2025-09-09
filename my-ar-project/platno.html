@@ -188,12 +188,12 @@
         }
 
         .apply-button {
-          border: none;
-          cursor: pointer;
-          border-radius: clamp(4px, 0.4vw, 6px);
-          padding: 1rem;
-          margin: 0;
-          bottom: 2em;
+          position: fixed;
+          bottom: 2rem; /* distance from bottom */
+          left: 50%;
+          transform: translateX(-50%);
+          margin: 0; /* reset old margins */
+          z-index: 1000; /* stays above other stuff */
         }
         .apply-button img {
           width: clamp(60px, 8vw, 100px);
