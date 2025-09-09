@@ -153,7 +153,8 @@
         background-color: #000064;
       }
 
-      .saves {
+      .saves,
+      #paintingName {
         background-color: #9dff00;
       }
 
@@ -208,7 +209,7 @@
       }
 
       ::placeholder {
-        color: #9dff00;
+        color: #ffffff;
       }
 
       /* Mobile: stack controls vertically */
@@ -274,7 +275,7 @@
       />
       <button class="saves" onclick="savePainting()">Save painting</button>
       <select class="saves" id="paintingList" onchange="loadSelectedPainting()">
-        <option value="">My paintings</option>
+        <option class="saves" value="">My paintings</option>
       </select>
       <button class="saves" onclick="downloadCanvas()">Download PNG</button>
     </div>
