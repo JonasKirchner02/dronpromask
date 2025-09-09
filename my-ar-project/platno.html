@@ -222,11 +222,13 @@
       /* Mobile: stack controls vertically */
       @media (max-width: 768px) {
         .controls {
+          display: flex;
           flex-direction: column; /* stack items */
           flex-wrap: wrap; /* allow wrapping */
           gap: 0.2rem; /* more spacing */
           text-align: center;
           text-align-last: center;
+          justify-content: center;
         }
 
         .controls > * {
