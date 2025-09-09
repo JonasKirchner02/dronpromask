@@ -176,18 +176,6 @@
         margin: -2rem 0 1rem 0;
       }
 
-      @media (max-width: 768px) {
-        .canvas-container {
-          position: relative;
-          width: min(90vw, 90vh);
-          aspect-ratio: 1 / 1;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin: -2rem 0 1rem 0;
-        }
-      }
-
       /* Apply button */
       .apply-button {
         border: none;
@@ -234,32 +222,32 @@
       /* Mobile: stack controls vertically */
       @media (max-width: 768px) {
         .controls {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.2rem; /* space between columns */
-          justify-content: center;
+          flex-direction: column; /* stack items */
+          flex-wrap: wrap; /* allow wrapping */
+          gap: 0.2rem; /* more spacing */
+          text-align: center;
+          text-align-last: center;
         }
 
         .controls > * {
-          flex: 1 1 calc(50% - 0.5rem); /* two columns */
-          max-width: calc(50% - 0.5rem);
-          box-sizing: border-box;
+          flex: 1 2 auto; /* each control full width */
+          width: 60%;
         }
-      }
 
-      label,
-      button,
-      select,
-      input[type="text"],
-      #paintingList {
-        font-size: clamp(0.8rem, 3vw, 1rem); /* mobile friendly */
+        label,
+        button,
+        select,
+        input[type="text"],
+        #paintingList {
+          font-size: clamp(0.8rem, 3vw, 1rem); /* mobile friendly */
 
-        text-align: center;
-        text-align-last: center;
-      }
+          text-align: center;
+          text-align-last: center;
+        }
 
-      label input[type="range"] {
-        margin-left: 0.5rem; /* more space for slider */
+        label input[type="range"] {
+          margin-left: 0.5rem; /* more space for slider */
+        }
       }
     </style>
   </head>
