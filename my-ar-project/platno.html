@@ -257,11 +257,11 @@
         >Color<input type="color" id="colorPicker" value="#000000"
       /></label>
       <label>
-        Brush size
+        Brush
         <input type="range" id="brushSize" min="5" max="150" value="5" />
       </label>
       <select id="brushType">
-        <option value="classic">Brush Type</option>
+        <option value="classic">Brush</option>
         <option value="classic">Classic</option>
         <option value="soft">Softer</option>
         <option value="image1">Image 1</option>
@@ -269,7 +269,7 @@
       </select>
 
       <label>
-        Soft steps
+        Brush steps
         <input type="range" id="softSteps" min="1" max="50" value="10" />
       </label>
       <button onclick="clearCanvas()">Clear</button>
@@ -280,11 +280,11 @@
         id="paintingName"
         placeholder="Enter name"
       />
-      <button class="saves" onclick="savePainting()">Save painting</button>
+      <button class="saves" onclick="savePainting()">Save skin</button>
       <select class="saves" id="paintingList" onchange="loadSelectedPainting()">
-        <option class="saves" value="">My paintings</option>
+        <option class="saves" value="">My skins</option>
       </select>
-      <button class="saves" onclick="downloadCanvas()">Download PNG</button>
+      <button class="saves" onclick="downloadCanvas()">Download skin</button>
     </div>
 
     <div class="canvas-container">
