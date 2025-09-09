@@ -222,32 +222,32 @@
       /* Mobile: stack controls vertically */
       @media (max-width: 768px) {
         .controls {
-          flex-direction: column; /* stack items */
-          flex-wrap: wrap; /* allow wrapping */
-          gap: 0.2rem; /* more spacing */
-          text-align: center;
-          text-align-last: center;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.2rem; /* space between columns */
+          justify-content: center;
         }
 
         .controls > * {
-          flex: 1 2 auto; /* each control full width */
-          width: 60%;
+          flex: 1 1 calc(50% - 0.5rem); /* two columns */
+          max-width: calc(50% - 0.5rem);
+          box-sizing: border-box;
         }
+      }
 
-        label,
-        button,
-        select,
-        input[type="text"],
-        #paintingList {
-          font-size: clamp(0.8rem, 3vw, 1rem); /* mobile friendly */
+      label,
+      button,
+      select,
+      input[type="text"],
+      #paintingList {
+        font-size: clamp(0.8rem, 3vw, 1rem); /* mobile friendly */
 
-          text-align: center;
-          text-align-last: center;
-        }
+        text-align: center;
+        text-align-last: center;
+      }
 
-        label input[type="range"] {
-          margin-left: 0.5rem; /* more space for slider */
-        }
+      label input[type="range"] {
+        margin-left: 0.5rem; /* more space for slider */
       }
     </style>
   </head>
