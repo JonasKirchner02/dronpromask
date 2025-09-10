@@ -10,6 +10,7 @@
     <style></style>
     <script src="https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="icon" type="image/png" href="/faviconadron.png" />
     <!-- Apple (iOS / iPadOS) home screen icon -->
     <link
@@ -168,41 +169,22 @@
 
     <script>
       document.getElementById("screenshotBtn").addEventListener("click", () => {
-        const container = document.querySelector(".example-container");
+        // Hide carousel before taking screenshot
+        const carousel = document.querySelector(".carousel-wrapper");
+        const oldDisplay = carousel.style.display;
+        carousel.style.display = "none";
 
-        // The camera feed video (MindAR inserts it here)
-        const videoEl = container.querySelector("video");
-        // The WebGL render (A-Frame / Three.js)
-        const rendererCanvas = container.querySelector("canvas");
+        // Take screenshot of the whole page
+        html2canvas(document.body, { useCORS: true }).then((canvas) => {
+          // Restore carousel
+          carousel.style.display = oldDisplay;
 
-        if (!videoEl || !rendererCanvas) {
-          alert("Could not find video or canvas inside .example-container");
-          return;
-        }
-
-        // Create a new canvas the same size as the renderer
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = rendererCanvas.width;
-        finalCanvas.height = rendererCanvas.height;
-        const ctx = finalCanvas.getContext("2d");
-
-        // Draw the video background first
-        ctx.drawImage(videoEl, 0, 0, finalCanvas.width, finalCanvas.height);
-
-        // Then draw the AR objects on top
-        ctx.drawImage(
-          rendererCanvas,
-          0,
-          0,
-          finalCanvas.width,
-          finalCanvas.height
-        );
-
-        // Save the result
-        const link = document.createElement("a");
-        link.download = "ar-screenshot.png";
-        link.href = finalCanvas.toDataURL("image/png");
-        link.click();
+          // Save image
+          const link = document.createElement("a");
+          link.download = "page-screenshot.png";
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
       });
 
       document.addEventListener("DOMContentLoaded", function () {
