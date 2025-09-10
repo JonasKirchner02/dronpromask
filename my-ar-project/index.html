@@ -151,10 +151,10 @@
       document.getElementById("screenshotBtn").addEventListener("click", () => {
         const container = document.querySelector(".example-container");
         const videoEl = container.querySelector("video");
-        const rendererCanvas = container.querySelector("canvas");
+        const sceneEl = container.querySelector("a-scene");
 
-        if (!videoEl || !rendererCanvas) {
-          alert("Could not find video or canvas inside .example-container");
+        if (!videoEl || !sceneEl) {
+          alert("Could not find video or a-scene inside .example-container");
           return;
         }
 
@@ -163,40 +163,41 @@
         const width = rect.width;
         const height = rect.height;
 
-        // Create final canvas same size as container
+        // Final canvas sized like container
         const finalCanvas = document.createElement("canvas");
         finalCanvas.width = width;
         finalCanvas.height = height;
         const ctx = finalCanvas.getContext("2d");
 
-        // Scale factors (video/canvas might be bigger than container)
-        const scaleX = width / rendererCanvas.clientWidth;
-        const scaleY = height / rendererCanvas.clientHeight;
-
-        // Draw video
+        // Draw video background
         ctx.drawImage(
           videoEl,
           0,
           0,
           videoEl.videoWidth,
-          videoEl.videoHeight, // full video
+          videoEl.videoHeight,
           0,
           0,
           width,
-          height // scaled to container
+          height
         );
 
-        // Draw AR scene
+        // Force A-Frame to render one frame to its WebGL canvas
+        const renderer = sceneEl.renderer;
+        renderer.render(sceneEl.object3D, sceneEl.camera);
+
+        // Now copy pixels from the WebGL canvas into our final canvas
+        const glCanvas = renderer.domElement;
         ctx.drawImage(
-          rendererCanvas,
+          glCanvas,
           0,
           0,
-          rendererCanvas.width,
-          rendererCanvas.height, // full AR canvas
+          glCanvas.width,
+          glCanvas.height,
           0,
           0,
           width,
-          height // scaled to container
+          height
         );
 
         // Save result
