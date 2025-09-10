@@ -135,3 +135,14 @@ body {
   transform: scale(1.1);
   opacity: 1;
 }
+
+@media only screen and (max-width: 480px) {
+  .ikony {
+    gap: 5px; /* smaller gap between icons */
+  }
+
+  .obrazky,
+  .edit-button {
+    height: 6vh; /* smaller icons */
+  }
+}
