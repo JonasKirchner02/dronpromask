@@ -169,15 +169,30 @@
     <script>
       document.getElementById("screenshotBtn").addEventListener("click", () => {
         const sceneEl = document.querySelector("a-scene");
+        const rendererCanvas = sceneEl.renderer.domElement;
+        const videoEl = document.querySelector("video"); // MindAR inserts the camera feed here
 
-        // ask aframe to take a screenshot
-        sceneEl.components.screenshot.capture("perspective");
+        // Create a new canvas big enough
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = rendererCanvas.width;
+        finalCanvas.height = rendererCanvas.height;
+        const ctx = finalCanvas.getContext("2d");
 
-        // get the last captured image
-        const canvas = sceneEl.components.screenshot.getCanvas("perspective");
+        // Draw camera video first
+        ctx.drawImage(videoEl, 0, 0, finalCanvas.width, finalCanvas.height);
+        // Then draw 3D render on top
+        ctx.drawImage(
+          rendererCanvas,
+          0,
+          0,
+          finalCanvas.width,
+          finalCanvas.height
+        );
+
+        // Save result
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
-        link.href = canvas.toDataURL("image/png");
+        link.href = finalCanvas.toDataURL("image/png");
         link.click();
       });
 
