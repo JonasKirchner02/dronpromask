@@ -434,29 +434,29 @@
         const { x, y } = getCoordinates(e);
         const mirrorX = paintCanvas.width - x;
 
-        paintCtx.lineCap = "round";
-        paintCtx.strokeStyle = colorPicker.value;
+        const steps = parseInt(softSteps.value);
+        for (let i = 0; i < steps; i++) {
+          const t = i / steps;
+          const ix = lastX + (x - lastX) * t;
+          const iy = lastY + (y - lastY) * t;
+          const mirrorIX = paintCanvas.width - ix;
 
-        if (brushType.value === "classic") {
-          paintCtx.lineWidth = brushSize.value;
-          paintCtx.beginPath();
-          paintCtx.moveTo(lastX, lastY);
-          paintCtx.lineTo(x, y);
-          paintCtx.stroke();
+          paintCtx.lineCap = "round";
+          paintCtx.strokeStyle = colorPicker.value;
 
-          paintCtx.beginPath();
-          paintCtx.moveTo(paintCanvas.width - lastX, lastY);
-          paintCtx.lineTo(mirrorX, y);
-          paintCtx.stroke();
-        } else if (brushType.value === "soft") {
-          const steps = parseInt(softSteps.value);
-          for (let i = 0; i < steps; i++) {
-            const t = i / steps;
-            const ix = lastX + (x - lastX) * t;
-            const iy = lastY + (y - lastY) * t;
-            const mirrorIX = paintCanvas.width - ix;
+          if (brushType.value === "classic") {
+            paintCtx.lineWidth = brushSize.value;
+            paintCtx.beginPath();
+            paintCtx.moveTo(lastX, lastY);
+            paintCtx.lineTo(ix, iy);
+            paintCtx.stroke();
+
+            paintCtx.beginPath();
+            paintCtx.moveTo(paintCanvas.width - lastX, lastY);
+            paintCtx.lineTo(mirrorIX, iy);
+            paintCtx.stroke();
+          } else if (brushType.value === "soft") {
             const radius = brushSize.value * (1 - t * 0.8);
-
             paintCtx.globalAlpha = 0.15;
             paintCtx.beginPath();
             paintCtx.arc(ix, iy, radius / 2, 0, Math.PI * 2);
@@ -467,18 +467,18 @@
             paintCtx.arc(mirrorIX, iy, radius / 2, 0, Math.PI * 2);
             paintCtx.fillStyle = colorPicker.value;
             paintCtx.fill();
+            paintCtx.globalAlpha = 1;
+          } else if (brushType.value === "image1") {
+            const w = brushSize.value;
+            const h = brushSize.value;
+            paintCtx.drawImage(brushImage1, ix - w / 2, iy - h / 2, w, h);
+            paintCtx.drawImage(brushImage1, mirrorIX - w / 2, iy - h / 2, w, h);
+          } else if (brushType.value === "image2") {
+            const w = brushSize.value;
+            const h = brushSize.value;
+            paintCtx.drawImage(brushImage2, ix - w / 2, iy - h / 2, w, h);
+            paintCtx.drawImage(brushImage2, mirrorIX - w / 2, iy - h / 2, w, h);
           }
-          paintCtx.globalAlpha = 1;
-        } else if (brushType.value === "image1") {
-          const w = brushSize.value;
-          const h = brushSize.value;
-          paintCtx.drawImage(brushImage1, x - w / 2, y - h / 2, w, h);
-          paintCtx.drawImage(brushImage1, mirrorX - w / 2, y - h / 2, w, h);
-        } else if (brushType.value === "image2") {
-          const w = brushSize.value;
-          const h = brushSize.value;
-          paintCtx.drawImage(brushImage2, x - w / 2, y - h / 2, w, h);
-          paintCtx.drawImage(brushImage2, mirrorX - w / 2, y - h / 2, w, h);
         }
 
         lastX = x;
