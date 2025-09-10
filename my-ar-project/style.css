@@ -136,7 +136,7 @@ body {
   opacity: 1;
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 768px) {
   .ikony {
     gap: 5px; /* smaller gap between icons */
   }
