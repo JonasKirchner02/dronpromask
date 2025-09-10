@@ -149,22 +149,41 @@
 
     <script>
       document.getElementById("screenshotBtn").addEventListener("click", () => {
-        // Hide carousel before taking screenshot
-        const carousel = document.querySelector(".carousel-wrapper");
-        const oldDisplay = carousel.style.display;
-        carousel.style.display = "none";
+        const container = document.querySelector(".example-container");
 
-        // Take screenshot of the whole page
-        html2canvas(document.body, { useCORS: true }).then((canvas) => {
-          // Restore carousel
-          carousel.style.display = oldDisplay;
+        // MindAR inserts a <video> for the camera feed
+        const videoEl = container.querySelector("video");
+        // A-Frame renders into a <canvas>
+        const rendererCanvas = container.querySelector("canvas");
 
-          // Save image
-          const link = document.createElement("a");
-          link.download = "page-screenshot.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-        });
+        if (!videoEl || !rendererCanvas) {
+          alert("Could not find video or canvas inside .example-container");
+          return;
+        }
+
+        // Create final canvas same size as renderer
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = rendererCanvas.width;
+        finalCanvas.height = rendererCanvas.height;
+        const ctx = finalCanvas.getContext("2d");
+
+        // Draw camera feed
+        ctx.drawImage(videoEl, 0, 0, finalCanvas.width, finalCanvas.height);
+
+        // Draw AR scene on top
+        ctx.drawImage(
+          rendererCanvas,
+          0,
+          0,
+          finalCanvas.width,
+          finalCanvas.height
+        );
+
+        // Export screenshot
+        const link = document.createElement("a");
+        link.download = "ar-screenshot.png";
+        link.href = finalCanvas.toDataURL("image/png");
+        link.click();
       });
 
       document.addEventListener("DOMContentLoaded", function () {
