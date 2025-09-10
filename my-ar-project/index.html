@@ -150,10 +150,7 @@
     <script>
       document.getElementById("screenshotBtn").addEventListener("click", () => {
         const container = document.querySelector(".example-container");
-
-        // MindAR inserts a <video> for the camera feed
         const videoEl = container.querySelector("video");
-        // A-Frame renders into a <canvas>
         const rendererCanvas = container.querySelector("canvas");
 
         if (!videoEl || !rendererCanvas) {
@@ -161,25 +158,48 @@
           return;
         }
 
-        // Create final canvas same size as renderer
+        // Get container dimensions on screen
+        const rect = container.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+
+        // Create final canvas same size as container
         const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = rendererCanvas.width;
-        finalCanvas.height = rendererCanvas.height;
+        finalCanvas.width = width;
+        finalCanvas.height = height;
         const ctx = finalCanvas.getContext("2d");
 
-        // Draw camera feed
-        ctx.drawImage(videoEl, 0, 0, finalCanvas.width, finalCanvas.height);
+        // Scale factors (video/canvas might be bigger than container)
+        const scaleX = width / rendererCanvas.clientWidth;
+        const scaleY = height / rendererCanvas.clientHeight;
 
-        // Draw AR scene on top
+        // Draw video
+        ctx.drawImage(
+          videoEl,
+          0,
+          0,
+          videoEl.videoWidth,
+          videoEl.videoHeight, // full video
+          0,
+          0,
+          width,
+          height // scaled to container
+        );
+
+        // Draw AR scene
         ctx.drawImage(
           rendererCanvas,
           0,
           0,
-          finalCanvas.width,
-          finalCanvas.height
+          rendererCanvas.width,
+          rendererCanvas.height, // full AR canvas
+          0,
+          0,
+          width,
+          height // scaled to container
         );
 
-        // Export screenshot
+        // Save result
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
         link.href = finalCanvas.toDataURL("image/png");
