@@ -163,31 +163,33 @@
           return;
         }
 
-        // Get container dimensions on screen
+        // Get container dimensions
         const rect = container.getBoundingClientRect();
         const width = rect.width;
         const height = rect.height;
 
-        // Prepare final canvas matching container size
         const finalCanvas = document.createElement("canvas");
         finalCanvas.width = width;
         finalCanvas.height = height;
         const ctx = finalCanvas.getContext("2d");
 
-        // Draw camera video scaled to container
+        // --- Draw mirrored camera video ---
+        ctx.save();
+        ctx.scale(-1, 1); // flip horizontally
         ctx.drawImage(
           videoEl,
           0,
           0,
           videoEl.videoWidth,
           videoEl.videoHeight,
-          0,
+          -width,
           0,
           width,
-          height
+          height // shift left after flip
         );
+        ctx.restore();
 
-        // Draw AR mask layer scaled to container
+        // --- Draw AR mask layer on top (not mirrored) ---
         ctx.drawImage(
           screenshotCanvas,
           0,
