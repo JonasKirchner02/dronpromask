@@ -168,19 +168,28 @@
 
     <script>
       document.getElementById("screenshotBtn").addEventListener("click", () => {
-        const sceneEl = document.querySelector("a-scene");
-        const rendererCanvas = sceneEl.renderer.domElement;
-        const videoEl = document.querySelector("video"); // MindAR inserts the camera feed here
+        const container = document.querySelector(".example-container");
 
-        // Create a new canvas big enough
+        // The camera feed video (MindAR inserts it here)
+        const videoEl = container.querySelector("video");
+        // The WebGL render (A-Frame / Three.js)
+        const rendererCanvas = container.querySelector("canvas");
+
+        if (!videoEl || !rendererCanvas) {
+          alert("Could not find video or canvas inside .example-container");
+          return;
+        }
+
+        // Create a new canvas the same size as the renderer
         const finalCanvas = document.createElement("canvas");
         finalCanvas.width = rendererCanvas.width;
         finalCanvas.height = rendererCanvas.height;
         const ctx = finalCanvas.getContext("2d");
 
-        // Draw camera video first
+        // Draw the video background first
         ctx.drawImage(videoEl, 0, 0, finalCanvas.width, finalCanvas.height);
-        // Then draw 3D render on top
+
+        // Then draw the AR objects on top
         ctx.drawImage(
           rendererCanvas,
           0,
@@ -189,7 +198,7 @@
           finalCanvas.height
         );
 
-        // Save result
+        // Save the result
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
         link.href = finalCanvas.toDataURL("image/png");
