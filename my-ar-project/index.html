@@ -155,15 +155,36 @@
         const scene = document.querySelector("a-scene");
         const screenshotCanvas =
           scene.components.screenshot.getCanvas("perspective");
+        const videoEl = document.querySelector(".example-container video"); // MindAR inserts this
 
-        // Match screenshot to actual <a-scene> size on screen
-        const rect = scene.getBoundingClientRect();
+        if (!screenshotCanvas || !videoEl) {
+          alert("Could not find scene screenshot or video");
+          return;
+        }
+
+        // Match to full window size (what the user sees)
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
         const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = rect.width;
-        finalCanvas.height = rect.height;
+        finalCanvas.width = width;
+        finalCanvas.height = height;
         const ctx = finalCanvas.getContext("2d");
 
-        // Draw the screenshot scaled correctly
+        // Draw camera feed first
+        ctx.drawImage(
+          videoEl,
+          0,
+          0,
+          videoEl.videoWidth,
+          videoEl.videoHeight,
+          0,
+          0,
+          width,
+          height
+        );
+
+        // Then draw masks on top
         ctx.drawImage(
           screenshotCanvas,
           0,
@@ -172,11 +193,11 @@
           screenshotCanvas.height,
           0,
           0,
-          finalCanvas.width,
-          finalCanvas.height
+          width,
+          height
         );
 
-        // Save image
+        // Save result
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
         link.href = finalCanvas.toDataURL("image/png");
