@@ -57,6 +57,12 @@
           onclick="{localStorage.setItem('returnIndex', 3); window.location.href = 'platno.html'}"
         />
       </div>
+      <button
+        id="screenshotBtn"
+        style="position: fixed; bottom: 20px; right: 20px; z-index: 9999"
+      >
+        📸 Screenshot
+      </button>
     </div>
 
     <div class="example-container">
@@ -161,6 +167,19 @@
     </div>
 
     <script>
+      document.getElementById("screenshotBtn").addEventListener("click", () => {
+        const sceneEl = document.querySelector("a-scene");
+
+        // make sure the renderer has the latest frame
+        sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
+
+        const canvas = sceneEl.renderer.domElement;
+        const link = document.createElement("a");
+        link.download = "ar-screenshot.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+
       document.addEventListener("DOMContentLoaded", function () {
         const list = ["maska1", "maska3", "maska2", "maskaown"];
         const visibles = [false, false, false, false];
