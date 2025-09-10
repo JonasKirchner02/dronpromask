@@ -151,13 +151,35 @@
     </div>
 
     <script>
-      const scene = document.querySelector("a-scene");
-
       document.getElementById("screenshotBtn").addEventListener("click", () => {
-        const screenshot = scene.components.screenshot.getCanvas("perspective");
+        const scene = document.querySelector("a-scene");
+        const screenshotCanvas =
+          scene.components.screenshot.getCanvas("perspective");
+
+        // Match screenshot to actual <a-scene> size on screen
+        const rect = scene.getBoundingClientRect();
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = rect.width;
+        finalCanvas.height = rect.height;
+        const ctx = finalCanvas.getContext("2d");
+
+        // Draw the screenshot scaled correctly
+        ctx.drawImage(
+          screenshotCanvas,
+          0,
+          0,
+          screenshotCanvas.width,
+          screenshotCanvas.height,
+          0,
+          0,
+          finalCanvas.width,
+          finalCanvas.height
+        );
+
+        // Save image
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
-        link.href = screenshot.toDataURL("image/png");
+        link.href = finalCanvas.toDataURL("image/png");
         link.click();
       });
 
