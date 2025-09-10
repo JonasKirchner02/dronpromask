@@ -54,13 +54,19 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  width: calc(100% - 40px); /* 20px space on each side */
-  max-width: 75vw; /* optional */
+
+  /* Add horizontal padding */
+  padding: 0 20px;
+
+  /* Limit max width */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* ensure padding doesn't break layout */
 }
 
 .carousel-container {
   overflow: hidden;
-  width: 80%;
+  width: 100%;
 }
 
 .ikony {
