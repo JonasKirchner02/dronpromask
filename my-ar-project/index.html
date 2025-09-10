@@ -54,6 +54,9 @@
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false"
+        screenshot
+        arjs="..."
+        mindar="..."
       >
         <a-assets>
           <a-asset-item
@@ -148,62 +151,13 @@
     </div>
 
     <script>
+      const scene = document.querySelector("a-scene");
+
       document.getElementById("screenshotBtn").addEventListener("click", () => {
-        const container = document.querySelector(".example-container");
-        const videoEl = container.querySelector("video");
-        const sceneEl = container.querySelector("a-scene");
-
-        if (!videoEl || !sceneEl) {
-          alert("Could not find video or a-scene inside .example-container");
-          return;
-        }
-
-        // Get container dimensions on screen
-        const rect = container.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-
-        // Final canvas sized like container
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = width;
-        finalCanvas.height = height;
-        const ctx = finalCanvas.getContext("2d");
-
-        // Draw video background
-        ctx.drawImage(
-          videoEl,
-          0,
-          0,
-          videoEl.videoWidth,
-          videoEl.videoHeight,
-          0,
-          0,
-          width,
-          height
-        );
-
-        // Force A-Frame to render one frame to its WebGL canvas
-        const renderer = sceneEl.renderer;
-        renderer.render(sceneEl.object3D, sceneEl.camera);
-
-        // Now copy pixels from the WebGL canvas into our final canvas
-        const glCanvas = renderer.domElement;
-        ctx.drawImage(
-          glCanvas,
-          0,
-          0,
-          glCanvas.width,
-          glCanvas.height,
-          0,
-          0,
-          width,
-          height
-        );
-
-        // Save result
+        const screenshot = scene.components.screenshot.getCanvas("perspective");
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
-        link.href = finalCanvas.toDataURL("image/png");
+        link.href = screenshot.toDataURL("image/png");
         link.click();
       });
 
