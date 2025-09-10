@@ -173,23 +173,43 @@
         finalCanvas.height = height;
         const ctx = finalCanvas.getContext("2d");
 
-        // --- Draw mirrored camera video ---
+        // --- Draw mirrored video with "cover" effect (no stretch) ---
         ctx.save();
-        ctx.scale(-1, 1); // flip horizontally
+        ctx.scale(-1, 1); // mirror horizontally
+
+        const videoAspect = videoEl.videoWidth / videoEl.videoHeight;
+        const containerAspect = width / height;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (videoAspect > containerAspect) {
+          // Video is wider → crop horizontally
+          drawHeight = height;
+          drawWidth = height * videoAspect;
+          offsetX = (drawWidth - width) / 2;
+          offsetY = 0;
+        } else {
+          // Video is taller → crop vertically
+          drawWidth = width;
+          drawHeight = width / videoAspect;
+          offsetX = 0;
+          offsetY = (drawHeight - height) / 2;
+        }
+
         ctx.drawImage(
           videoEl,
           0,
           0,
           videoEl.videoWidth,
-          videoEl.videoHeight,
-          -width,
-          0,
-          width,
-          height // shift left after flip
+          videoEl.videoHeight, // source
+          -drawWidth + offsetX + width,
+          -offsetY,
+          drawWidth,
+          drawHeight // destination mirrored
         );
         ctx.restore();
 
-        // --- Draw AR mask layer on top (not mirrored) ---
+        // --- Draw AR mask layer (not mirrored) ---
         ctx.drawImage(
           screenshotCanvas,
           0,
@@ -202,7 +222,7 @@
           height
         );
 
-        // Save image
+        // Save result
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
         link.href = finalCanvas.toDataURL("image/png");
