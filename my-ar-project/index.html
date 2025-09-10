@@ -170,10 +170,11 @@
       document.getElementById("screenshotBtn").addEventListener("click", () => {
         const sceneEl = document.querySelector("a-scene");
 
-        // make sure the renderer has the latest frame
-        sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
+        // ask aframe to take a screenshot
+        sceneEl.components.screenshot.capture("perspective");
 
-        const canvas = sceneEl.renderer.domElement;
+        // get the last captured image
+        const canvas = sceneEl.components.screenshot.getCanvas("perspective");
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
         link.href = canvas.toDataURL("image/png");
