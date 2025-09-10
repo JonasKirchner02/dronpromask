@@ -213,12 +213,14 @@
 
       /* Apply button */
       .apply-button {
-        border: none;
-        cursor: pointer;
-        border-radius: clamp(4px, 0.4vw, 6px);
-        padding: 1rem;
-        margin: -2rem 0 1rem 0;
+        position: fixed;
+        bottom: 1rem; /* distance from bottom */
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0; /* reset old margins */
+        z-index: 1000; /* stays above other stuff */
       }
+
       .apply-button img {
         width: clamp(40px, 6vw, 100px);
         height: auto;
