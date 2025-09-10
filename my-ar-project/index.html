@@ -156,13 +156,14 @@
         const screenshotCanvas =
           scene.components.screenshot.getCanvas("perspective");
 
-        // Match full window size
+        // Match screenshot to actual <a-scene> size on screen
+        const rect = scene.getBoundingClientRect();
         const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = window.innerWidth;
-        finalCanvas.height = window.innerHeight;
+        finalCanvas.width = rect.width;
+        finalCanvas.height = rect.height;
         const ctx = finalCanvas.getContext("2d");
 
-        // Draw the screenshot scaled to window size
+        // Draw the screenshot scaled correctly
         ctx.drawImage(
           screenshotCanvas,
           0,
