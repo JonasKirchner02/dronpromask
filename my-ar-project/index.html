@@ -151,26 +151,19 @@
     </div>
 
     <script>
-      const videoEl = document.querySelector("video");
-
-      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-        videoEl.srcObject = stream;
-        videoEl.play();
-      });
-
       document.getElementById("screenshotBtn").addEventListener("click", () => {
-        if (videoEl.readyState < 2) return alert("Video not ready yet");
-
         const scene = document.querySelector("a-scene");
         const screenshotCanvas =
           scene.components.screenshot.getCanvas("perspective");
         const container = document.querySelector(".example-container");
+        const videoEl = container.querySelector("video");
 
         if (!screenshotCanvas || !videoEl || !container) {
           alert("Could not find scene screenshot, video, or container");
           return;
         }
 
+        // Get container dimensions
         const rect = container.getBoundingClientRect();
         const width = rect.width;
         const height = rect.height;
@@ -180,39 +173,43 @@
         finalCanvas.height = height;
         const ctx = finalCanvas.getContext("2d");
 
-        // --- Mirror video with cover ---
+        // --- Draw mirrored video with "cover" effect (no stretch) ---
+        ctx.save();
+        ctx.scale(-1, 1); // mirror horizontally
+
         const videoAspect = videoEl.videoWidth / videoEl.videoHeight;
         const containerAspect = width / height;
 
         let drawWidth, drawHeight, offsetX, offsetY;
+
         if (videoAspect > containerAspect) {
+          // Video is wider → crop horizontally
           drawHeight = height;
           drawWidth = height * videoAspect;
           offsetX = (drawWidth - width) / 2;
           offsetY = 0;
         } else {
+          // Video is taller → crop vertically
           drawWidth = width;
           drawHeight = width / videoAspect;
           offsetX = 0;
           offsetY = (drawHeight - height) / 2;
         }
 
-        ctx.save();
-        ctx.scale(-1, 1);
         ctx.drawImage(
           videoEl,
           0,
           0,
           videoEl.videoWidth,
-          videoEl.videoHeight,
+          videoEl.videoHeight, // source
           -drawWidth + offsetX + width,
           -offsetY,
           drawWidth,
-          drawHeight
+          drawHeight // destination mirrored
         );
         ctx.restore();
 
-        // --- Draw AR mask on top ---
+        // --- Draw AR mask layer (not mirrored) ---
         ctx.drawImage(
           screenshotCanvas,
           0,
@@ -225,7 +222,7 @@
           height
         );
 
-        // Save
+        // Save result
         const link = document.createElement("a");
         link.download = "ar-screenshot.png";
         link.href = finalCanvas.toDataURL("image/png");
