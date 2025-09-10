@@ -55,8 +55,6 @@ body {
   justify-content: center;
   z-index: 1000;
   width: 75vw;
-  left: 10px;
-  right: 10px;
 }
 
 .carousel-container {
