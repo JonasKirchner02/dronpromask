@@ -191,9 +191,10 @@
         button,
         select,
         input[type="text"],
-        #paintingList,
-        #paintingName {
-          font-size: 18px; /* safely above Safari’s zoom threshold */
+        #paintingList {
+          font-size: 18px; /* >=16px → stops Safari zoom */
+          transform: scale(0.9); /* visually matches clamp() look */
+          transform-origin: center center;
         }
       }
 
