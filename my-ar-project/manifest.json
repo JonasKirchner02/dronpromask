@@ -1,14 +1,14 @@
 {
   "name": "DRON PRO MASK",
-  "short_name": "DronMask",
+  "short_name": "DRON PRO MASK",
   "icons": [
     {
-      "src": "/my-ar-project/faviconadron.png",
+      "src": "/faviconadron.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/my-ar-project/faviconadron.png",
+      "src": "/faviconadron.png",
       "sizes": "512x512",
       "type": "image/png"
     }
