@@ -199,14 +199,15 @@
 
         .apply-button {
           position: fixed;
-          bottom: 10rem; /* distance from bottom */
+          top: 3rem; /* move it towards the top */
           left: 50%;
           transform: translateX(-50%);
-          margin: 0; /* reset old margins */
-          z-index: 1000; /* stays above other stuff */
+          margin: 0;
+          z-index: 2000; /* keep it above other elements */
         }
+
         .apply-button img {
-          width: clamp(80px, 10vw, 100px);
+          width: clamp(120px, 15vw, 160px); /* bigger than before */
           height: auto;
         }
       }
