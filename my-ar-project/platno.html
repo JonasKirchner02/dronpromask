@@ -187,6 +187,14 @@
       }
 
       @media (max-width: 768px) {
+        input[type="text"],
+        select,
+        button {
+          font-size: 16px; /* prevents zoom on focus */
+        }
+      }
+
+      @media (max-width: 768px) {
         .canvas-container {
           position: relative;
           width: min(95vw, 95vh);
