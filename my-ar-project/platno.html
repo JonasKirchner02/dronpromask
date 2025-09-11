@@ -186,6 +186,20 @@
         margin: -2rem 0 1rem 0;
       }
 
+      .apply-button {
+        position: fixed;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        z-index: 1000;
+      }
+
+      .apply-button img {
+        width: clamp(60px, 8vw, 100px);
+        height: auto;
+      }
+
       @media (max-width: 768px) {
         .canvas-container {
           position: relative;
@@ -198,33 +212,17 @@
         }
 
         .apply-button {
-          position: fixed;
-          bottom: 2rem; /* keep it closer to the bottom */
-          left: 50%;
-          transform: translateX(-50%);
-          margin: 0;
-          z-index: 2000;
+          bottom: 4rem !important; /* move it a bit higher */
+          z-index: 2000 !important;
         }
 
         .apply-button img {
-          width: clamp(80px, 25vw, 160px); /* larger target on mobile */
-          height: auto;
+          width: clamp(
+            120px,
+            30vw,
+            200px
+          ) !important; /* much bigger for tapping */
         }
-      }
-
-      /* Apply button */
-      .apply-button {
-        position: fixed;
-        bottom: 1rem; /* distance from bottom */
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0; /* reset old margins */
-        z-index: 1000; /* stays above other stuff */
-      }
-
-      .apply-button img {
-        width: clamp(60px, 8vw, 100px);
-        height: auto;
       }
 
       /* Canvas layers */
