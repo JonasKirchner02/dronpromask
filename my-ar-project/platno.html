@@ -187,11 +187,14 @@
       }
 
       @media (max-width: 768px) {
+        label,
+        button,
+        select,
         input[type="text"],
-        #paintingName {
-          font-size: 18px; /* stops zoom */
-          transform: scale(0.9); /* make it look smaller */
-          transform-origin: left center;
+        #paintingList {
+          font-size: 18px; /* safely above Safari’s zoom threshold */
+          transform: scale(0.9); /* visually bring it back in line */
+          transform-origin: center center; /* keeps scaling balanced */
         }
       }
 
