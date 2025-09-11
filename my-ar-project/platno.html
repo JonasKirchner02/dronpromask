@@ -199,15 +199,15 @@
 
         .apply-button {
           position: fixed;
-          bottom: 20rem; /* move it towards the top */
+          bottom: 2rem; /* keep it closer to the bottom */
           left: 50%;
           transform: translateX(-50%);
-          margin: 2em;
-          z-index: 2000; /* keep it above other elements */
+          margin: 0;
+          z-index: 2000;
         }
 
         .apply-button img {
-          width: clamp(120px, 15vw, 160px); /* bigger than before */
+          width: clamp(80px, 25vw, 160px); /* larger target on mobile */
           height: auto;
         }
       }
