@@ -346,189 +346,159 @@
       document
         .getElementById("cameraBtn")
         .addEventListener("click", async () => {
-          // toggle recording
-          if (!recording) {
-            // START
-            try {
-              const scene = document.querySelector("a-scene");
-              if (!scene) throw new Error("<a-scene> not found on the page.");
-              const videoEl = findVideoElement();
-              if (!videoEl)
-                throw new Error(
-                  "No <video> element found (looked inside .example-container then document)."
-                );
+          if (recording) {
+            // already recording → ignore extra clicks
+            return;
+          }
 
-              // wait for scene canvas to exist
-              await waitFor(() => scene.canvas || scene.hasLoaded, 3000).catch(
-                () => null
+          try {
+            const scene = document.querySelector("a-scene");
+            if (!scene) throw new Error("<a-scene> not found on the page.");
+            const videoEl = findVideoElement();
+            if (!videoEl)
+              throw new Error(
+                "No <video> element found (looked inside .example-container then document)."
               );
-              const sceneCanvas =
-                scene.canvas || (scene.renderer && scene.renderer.domElement);
-              if (!sceneCanvas)
-                throw new Error(
-                  "Scene WebGL canvas not available (scene.canvas is null)."
-                );
 
-              // ensure video ready
-              if (videoEl.readyState < 2) {
-                await new Promise((res) =>
-                  videoEl.addEventListener("loadedmetadata", res, {
-                    once: true,
-                  })
-                );
-              }
-              const { w: vw, h: vh } = getVideoDims(videoEl);
+            // wait for scene canvas
+            await waitFor(() => scene.canvas || scene.hasLoaded, 3000).catch(
+              () => null
+            );
+            const sceneCanvas =
+              scene.canvas || (scene.renderer && scene.renderer.domElement);
+            if (!sceneCanvas)
+              throw new Error(
+                "Scene WebGL canvas not available (scene.canvas is null)."
+              );
 
-              // prepare final canvas (video-sized)
-              const finalCanvas = document.createElement("canvas");
-              finalCanvas.width = vw;
-              finalCanvas.height = vh;
-              const ctx = finalCanvas.getContext("2d");
+            // ensure video ready
+            if (videoEl.readyState < 2) {
+              await new Promise((res) =>
+                videoEl.addEventListener("loadedmetadata", res, { once: true })
+              );
+            }
+            const { w: vw, h: vh } = getVideoDims(videoEl);
 
-              // store in recordingState for stop
-              recordingState.finalCanvas = finalCanvas;
-              recordingState.ctx = ctx;
+            // prepare final canvas
+            const finalCanvas = document.createElement("canvas");
+            finalCanvas.width = vw;
+            finalCanvas.height = vh;
+            const ctx = finalCanvas.getContext("2d");
 
-              // setup MediaRecorder with decent fallback
-              const stream = finalCanvas.captureStream(30);
-              let mimeType = "video/mp4;codecs=vp9";
+            recordingState.finalCanvas = finalCanvas;
+            recordingState.ctx = ctx;
+
+            // setup MediaRecorder
+            const stream = finalCanvas.captureStream(30);
+            let mimeType = "video/mp4;codecs=vp9";
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+              mimeType = "video/mp4;codecs=vp8";
               if (!MediaRecorder.isTypeSupported(mimeType)) {
-                mimeType = "video/mp4;codecs=vp8";
-                if (!MediaRecorder.isTypeSupported(mimeType)) {
-                  mimeType = "video/mp4";
-                  if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = "";
-                }
+                mimeType = "video/mp4";
+                if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = "";
               }
-              const options = mimeType ? { mimeType } : undefined;
-              recordedChunks = [];
-              mediaRecorder = options
-                ? new MediaRecorder(stream, options)
-                : new MediaRecorder(stream);
+            }
+            const options = mimeType ? { mimeType } : undefined;
+            recordedChunks = [];
+            mediaRecorder = options
+              ? new MediaRecorder(stream, options)
+              : new MediaRecorder(stream);
 
-              mediaRecorder.ondataavailable = (e) => {
-                if (e.data && e.data.size) recordedChunks.push(e.data);
-              };
+            mediaRecorder.ondataavailable = (e) => {
+              if (e.data && e.data.size) recordedChunks.push(e.data);
+            };
 
-              mediaRecorder.onstop = () => {
-                try {
-                  const blob = new Blob(recordedChunks, {
-                    type: recordedChunks[0]?.type || "video/mp4",
-                  });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = "DRON_RECORDING.mp4";
-                  a.click();
-                  // revoke after a bit
-                  setTimeout(() => URL.revokeObjectURL(url), 5000);
-                } catch (ex) {
-                  console.error("Failed to save recording:", ex);
-                  alert("Recording saved failed. See console for details.");
-                }
-              };
+            mediaRecorder.onstop = () => {
+              try {
+                const blob = new Blob(recordedChunks, {
+                  type: recordedChunks[0]?.type || "video/mp4",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "DRON_RECORDING.mp4";
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+              } catch (ex) {
+                console.error("Failed to save recording:", ex);
+                alert("Recording save failed. See console for details.");
+              }
+            };
 
-              // frame drawing loop
-              function drawFrame() {
-                // clear
-                ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+            // frame drawing loop
+            function drawFrame() {
+              ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-                // Draw mirrored video first
-                ctx.save();
-                ctx.scale(-1, 1);
+              // draw mirrored video
+              ctx.save();
+              ctx.scale(-1, 1);
+              ctx.drawImage(
+                videoEl,
+                0,
+                0,
+                videoEl.videoWidth || vw,
+                videoEl.videoHeight || vh,
+                -vw,
+                0,
+                vw,
+                vh
+              );
+              ctx.restore();
+
+              // draw AR overlay
+              try {
                 ctx.drawImage(
-                  videoEl,
+                  scene.canvas,
                   0,
                   0,
-                  videoEl.videoWidth || vw,
-                  videoEl.videoHeight || vh,
-                  -vw,
+                  scene.canvas.width,
+                  scene.canvas.height,
+                  0,
                   0,
                   vw,
                   vh
                 );
-                ctx.restore();
+              } catch (ex) {
+                console.error("Failed to draw scene canvas:", ex);
+                stopRecordingDueToError("Canvas draw failed. See console.");
+                return;
+              }
 
-                // Draw live scene canvas ON TOP (this should update each frame)
-                // If your WebGL canvas is a different size, it will be scaled to finalCanvas
-                try {
-                  ctx.drawImage(
-                    scene.canvas,
-                    0,
-                    0,
-                    scene.canvas.width,
-                    scene.canvas.height,
-                    0,
-                    0,
-                    vw,
-                    vh
-                  );
-                } catch (ex) {
-                  // drawing might throw if canvas is tainted - stop recording and alert user
-                  console.error(
-                    "Failed to draw scene canvas onto final canvas:",
-                    ex
-                  );
-                  stopRecordingDueToError(
-                    "Canvas draw failed (possible cross-origin/tainting). See console."
-                  );
-                  return;
+              recordingState.rafId = requestAnimationFrame(drawFrame);
+            }
+
+            // start recording
+            mediaRecorder.start();
+            recording = true;
+            showRecordIndicator();
+            drawFrame();
+
+            // auto-stop after 10s
+            setTimeout(() => {
+              if (recording) {
+                if (recordingState.rafId)
+                  cancelAnimationFrame(recordingState.rafId);
+                recordingState.rafId = null;
+
+                if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                  mediaRecorder.stop();
                 }
 
-                recordingState.rafId = requestAnimationFrame(drawFrame);
+                recording = false;
+                hideRecordIndicator();
               }
-
-              // start recorder and loop
-              mediaRecorder.start();
-              recording = true;
-              showRecordIndicator();
-              drawFrame();
-            } catch (ex) {
-              console.error("Failed to start recording:", ex);
-
-              // cleanup just in case
-              if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                try {
-                  mediaRecorder.stop();
-                } catch (e) {}
-              }
-              recording = false;
-              hideRecordIndicator();
-            }
-          } else {
-            // STOP
-            try {
-              // stop the RAF
-              if (recordingState.rafId)
-                cancelAnimationFrame(recordingState.rafId);
-              recordingState.rafId = null;
-
-              // stop mediaRecorder
-              if (mediaRecorder && mediaRecorder.state !== "inactive") {
+            }, 10000);
+          } catch (ex) {
+            console.error("Failed to start recording:", ex);
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+              try {
                 mediaRecorder.stop();
-              }
-
-              // cleanup
-              recording = false;
-              hideRecordIndicator();
-            } catch (ex) {
-              console.error("Error stopping recording:", ex);
+              } catch (e) {}
             }
+            recording = false;
+            hideRecordIndicator();
           }
         });
-
-      // helper: stop when a drawing error happens
-      function stopRecordingDueToError(msg) {
-        try {
-          if (recordingState.rafId) cancelAnimationFrame(recordingState.rafId);
-          if (mediaRecorder && mediaRecorder.state !== "inactive")
-            mediaRecorder.stop();
-        } catch (e) {
-          /* ignore */
-        }
-        recording = false;
-        hideRecordIndicator();
-        alert(msg);
-      }
 
       document.addEventListener("DOMContentLoaded", function () {
         const list = ["maska1", "maska3", "maska2", "maskaown"];
