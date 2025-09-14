@@ -127,7 +127,7 @@ body {
   transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
   background-color: aquamarine;
   opacity: 0.6;
-  border-radius: clamp(6px, 0.6vw, 10px);
+  border-radius: clamp(3px, 0.3vw, 5px);
   border: none;
 }
 
