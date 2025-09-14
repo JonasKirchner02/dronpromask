@@ -391,11 +391,11 @@
 
               // setup MediaRecorder with decent fallback
               const stream = finalCanvas.captureStream(30);
-              let mimeType = "video/webm;codecs=vp9";
+              let mimeType = "video/mp4;codecs=vp9";
               if (!MediaRecorder.isTypeSupported(mimeType)) {
-                mimeType = "video/webm;codecs=vp8";
+                mimeType = "video/mp4;codecs=vp8";
                 if (!MediaRecorder.isTypeSupported(mimeType)) {
-                  mimeType = "video/webm";
+                  mimeType = "video/mp4";
                   if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = "";
                 }
               }
@@ -412,12 +412,12 @@
               mediaRecorder.onstop = () => {
                 try {
                   const blob = new Blob(recordedChunks, {
-                    type: recordedChunks[0]?.type || "video/webm",
+                    type: recordedChunks[0]?.type || "video/mp4",
                   });
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a");
                   a.href = url;
-                  a.download = "ar-recording.webm";
+                  a.download = "ar-recording.mp4";
                   a.click();
                   // revoke after a bit
                   setTimeout(() => URL.revokeObjectURL(url), 5000);
@@ -482,14 +482,9 @@
               recording = true;
               showRecordIndicator();
               drawFrame();
-
-              alert("Recording started (click camera button again to stop).");
             } catch (ex) {
               console.error("Failed to start recording:", ex);
-              alert(
-                "Could not start recording: " +
-                  (ex && ex.message ? ex.message : ex)
-              );
+
               // cleanup just in case
               if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 try {
@@ -515,13 +510,8 @@
               // cleanup
               recording = false;
               hideRecordIndicator();
-              alert("Recording stopped — saving file...");
             } catch (ex) {
               console.error("Error stopping recording:", ex);
-              alert(
-                "Error stopping recording: " +
-                  (ex && ex.message ? ex.message : ex)
-              );
             }
           }
         });
