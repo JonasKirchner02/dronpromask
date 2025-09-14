@@ -324,7 +324,7 @@
             // try download — if canvas is tainted this will throw (security error)
             try {
               const link = document.createElement("a");
-              link.download = "ar-screenshot.png";
+              link.download = "DRON_SCREENSHOT.png";
               link.href = finalCanvas.toDataURL("image/png");
               link.click();
             } catch (ex) {
@@ -417,7 +417,7 @@
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a");
                   a.href = url;
-                  a.download = "ar-recording.mp4";
+                  a.download = "DRON_RECORDING.mp4";
                   a.click();
                   // revoke after a bit
                   setTimeout(() => URL.revokeObjectURL(url), 5000);
