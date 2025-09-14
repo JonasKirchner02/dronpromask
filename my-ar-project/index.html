@@ -210,15 +210,66 @@
       let recordedChunks = [];
       let recording = false;
 
-      document.getElementById("cameraBtn").addEventListener("click", () => {
+      document.getElementById("screenshotBtn").addEventListener("click", () => {
         const scene = document.querySelector("a-scene");
-        const screenshotCanvas =
-          scene.components.screenshot.getCanvas("perspective");
+        const sceneCanvas = scene.canvas; // live WebGL canvas
         const container = document.querySelector(".example-container");
         const videoEl = container.querySelector("video");
 
-        if (!screenshotCanvas || !videoEl || !container) {
-          alert("Could not find scene screenshot, video, or container");
+        if (!sceneCanvas || !videoEl || !container) {
+          alert("Could not find scene canvas, video, or container");
+          return;
+        }
+
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = videoEl.videoWidth;
+        finalCanvas.height = videoEl.videoHeight;
+        const ctx = finalCanvas.getContext("2d");
+
+        // Draw mirrored video
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(
+          videoEl,
+          0,
+          0,
+          videoEl.videoWidth,
+          videoEl.videoHeight,
+          -videoEl.videoWidth,
+          0,
+          videoEl.videoWidth,
+          videoEl.videoHeight
+        );
+        ctx.restore();
+
+        // Draw AR scene (dynamic)
+        ctx.drawImage(
+          sceneCanvas,
+          0,
+          0,
+          sceneCanvas.width,
+          sceneCanvas.height,
+          0,
+          0,
+          finalCanvas.width,
+          finalCanvas.height
+        );
+
+        // Save image
+        const link = document.createElement("a");
+        link.download = "ar-screenshot.png";
+        link.href = finalCanvas.toDataURL("image/png");
+        link.click();
+      });
+
+      document.getElementById("cameraBtn").addEventListener("click", () => {
+        const scene = document.querySelector("a-scene");
+        const sceneCanvas = scene.canvas;
+        const container = document.querySelector(".example-container");
+        const videoEl = container.querySelector("video");
+
+        if (!sceneCanvas || !videoEl || !container) {
+          alert("Could not find scene canvas, video, or container");
           return;
         }
 
@@ -247,17 +298,17 @@
           );
           ctx.restore();
 
-          // Draw AR mask
+          // Draw AR scene (dynamic)
           ctx.drawImage(
-            screenshotCanvas,
+            sceneCanvas,
             0,
             0,
-            screenshotCanvas.width,
-            screenshotCanvas.height,
+            sceneCanvas.width,
+            sceneCanvas.height,
             0,
             0,
-            videoEl.videoWidth,
-            videoEl.videoHeight
+            finalCanvas.width,
+            finalCanvas.height
           );
 
           if (recording) requestAnimationFrame(drawFrame);
