@@ -470,7 +470,10 @@
             // start recording
             mediaRecorder.start();
             recording = true;
-            showRecordIndicator();
+
+            // change button image to "recording" version
+            document.getElementById("cameraBtn").src = "/REC.png";
+
             drawFrame();
 
             // auto-stop after 10s
@@ -485,7 +488,9 @@
                 }
 
                 recording = false;
-                hideRecordIndicator();
+
+                // change button image back to start version
+                document.getElementById("cameraBtn").src = "/START2.png";
               }
             }, 10000);
           } catch (ex) {
