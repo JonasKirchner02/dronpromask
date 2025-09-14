@@ -76,6 +76,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: clamp(6px, 0.6vw, 10px);
+  border: none;
 }
 
 .obrazky {
@@ -88,6 +89,7 @@ body {
   background-color: aquamarine;
   opacity: 0.6;
   border-radius: clamp(6px, 0.6vw, 10px);
+  border: none;
 }
 
 .obrazky.active {
