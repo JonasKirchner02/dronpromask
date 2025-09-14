@@ -153,197 +153,392 @@
     </div>
 
     <script>
-      document.getElementById("screenshotBtn").addEventListener("click", () => {
-        const scene = document.querySelector("a-scene");
-        const screenshotCanvas =
-          scene.components.screenshot.getCanvas("perspective");
-        const container = document.querySelector(".example-container");
-        const videoEl = container.querySelector("video");
+      // robust AR screenshot + recording (separate flows)
+      // Assumes: <img id="screenshotBtn"> and <img id="cameraBtn"> exist,
+      // an <a-scene> exists, and your camera video element is either inside .example-container or available via document.querySelector('video').
 
-        if (!screenshotCanvas || !videoEl || !container) {
-          alert("Could not find scene screenshot, video, or container");
-          return;
-        }
-
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = videoEl.videoWidth;
-        finalCanvas.height = videoEl.videoHeight;
-        const ctx = finalCanvas.getContext("2d");
-
-        // Draw mirrored video
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.drawImage(
-          videoEl,
-          0,
-          0,
-          videoEl.videoWidth,
-          videoEl.videoHeight,
-          -videoEl.videoWidth,
-          0,
-          videoEl.videoWidth,
-          videoEl.videoHeight
-        );
-        ctx.restore();
-
-        // Draw AR mask (no mirroring)
-        ctx.drawImage(
-          screenshotCanvas,
-          0,
-          0,
-          screenshotCanvas.width,
-          screenshotCanvas.height,
-          0,
-          0,
-          videoEl.videoWidth,
-          videoEl.videoHeight
-        );
-
-        // Save image
-        const link = document.createElement("a");
-        link.download = "ar-screenshot.png";
-        link.href = finalCanvas.toDataURL("image/png");
-        link.click();
-      });
-
-      let mediaRecorder;
+      let mediaRecorder = null;
       let recordedChunks = [];
       let recording = false;
+      let recordingState = { finalCanvas: null, ctx: null, rafId: null };
 
-      document.getElementById("screenshotBtn").addEventListener("click", () => {
-        const scene = document.querySelector("a-scene");
-        const sceneCanvas = scene.canvas; // live WebGL canvas
+      // utility: wait until conditionFn() returns truthy or timeout
+      function waitFor(conditionFn, timeout = 3000, interval = 100) {
+        return new Promise((resolve, reject) => {
+          const start = Date.now();
+          (function check() {
+            try {
+              const v = conditionFn();
+              if (v) return resolve(v);
+            } catch (e) {
+              // ignore
+            }
+            if (Date.now() - start > timeout)
+              return reject(new Error("timeout"));
+            setTimeout(check, interval);
+          })();
+        });
+      }
+
+      // find the best video element
+      function findVideoElement() {
         const container = document.querySelector(".example-container");
-        const videoEl = container.querySelector("video");
-
-        if (!sceneCanvas || !videoEl || !container) {
-          alert("Could not find scene canvas, video, or container");
-          return;
+        if (container) {
+          const v = container.querySelector("video");
+          if (v) return v;
         }
+        // fallback
+        return document.querySelector("video");
+      }
 
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = videoEl.videoWidth;
-        finalCanvas.height = videoEl.videoHeight;
-        const ctx = finalCanvas.getContext("2d");
+      // safe dims: fallback to client size if video metadata not ready
+      function getVideoDims(video) {
+        const w = video.videoWidth || video.clientWidth || 640;
+        const h = video.videoHeight || video.clientHeight || 480;
+        return { w, h };
+      }
 
-        // Draw mirrored video
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.drawImage(
-          videoEl,
-          0,
-          0,
-          videoEl.videoWidth,
-          videoEl.videoHeight,
-          -videoEl.videoWidth,
-          0,
-          videoEl.videoWidth,
-          videoEl.videoHeight
-        );
-        ctx.restore();
-
-        // Draw AR scene (dynamic)
-        ctx.drawImage(
-          sceneCanvas,
-          0,
-          0,
-          sceneCanvas.width,
-          sceneCanvas.height,
-          0,
-          0,
-          finalCanvas.width,
-          finalCanvas.height
-        );
-
-        // Save image
-        const link = document.createElement("a");
-        link.download = "ar-screenshot.png";
-        link.href = finalCanvas.toDataURL("image/png");
-        link.click();
-      });
-
-      document.getElementById("cameraBtn").addEventListener("click", () => {
-        const scene = document.querySelector("a-scene");
-        const sceneCanvas = scene.canvas;
-        const container = document.querySelector(".example-container");
-        const videoEl = container.querySelector("video");
-
-        if (!sceneCanvas || !videoEl || !container) {
-          alert("Could not find scene canvas, video, or container");
-          return;
+      // small visual record indicator
+      function showRecordIndicator() {
+        let el = document.getElementById("record-indicator");
+        if (!el) {
+          el = document.createElement("div");
+          el.id = "record-indicator";
+          el.textContent = "● REC";
+          Object.assign(el.style, {
+            position: "fixed",
+            right: "12px",
+            top: "12px",
+            zIndex: 99999,
+            background: "rgba(0,0,0,0.6)",
+            color: "white",
+            padding: "6px 8px",
+            borderRadius: "12px",
+            fontFamily: "monospace",
+            fontSize: "13px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          });
+          document.body.appendChild(el);
         }
+        el.style.display = "flex";
+      }
+      function hideRecordIndicator() {
+        const el = document.getElementById("record-indicator");
+        if (el) el.style.display = "none";
+      }
 
-        // Create canvas for recording
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = videoEl.videoWidth;
-        finalCanvas.height = videoEl.videoHeight;
-        const ctx = finalCanvas.getContext("2d");
+      // --------------------- SCREENSHOT (uses screenshot component) ---------------------
+      document
+        .getElementById("screenshotBtn")
+        .addEventListener("click", async () => {
+          try {
+            const scene = document.querySelector("a-scene");
+            if (!scene) throw new Error("<a-scene> not found on the page.");
+            const videoEl = findVideoElement();
+            if (!videoEl)
+              throw new Error(
+                "No <video> element found (looked inside .example-container then document)."
+              );
 
-        function drawFrame() {
-          ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+            // wait for screenshot component or scene load
+            await waitFor(
+              () =>
+                (scene.components && scene.components.screenshot) ||
+                scene.hasLoaded,
+              3000
+            ).catch(() => null);
 
-          // Draw mirrored video
-          ctx.save();
-          ctx.scale(-1, 1);
-          ctx.drawImage(
-            videoEl,
-            0,
-            0,
-            videoEl.videoWidth,
-            videoEl.videoHeight,
-            -videoEl.videoWidth,
-            0,
-            videoEl.videoWidth,
-            videoEl.videoHeight
-          );
-          ctx.restore();
+            // ensure video metadata available
+            if (videoEl.readyState < 2) {
+              await new Promise((res) =>
+                videoEl.addEventListener("loadedmetadata", res, { once: true })
+              );
+            }
+            const { w: vw, h: vh } = getVideoDims(videoEl);
 
-          // Draw AR scene (dynamic)
-          ctx.drawImage(
-            sceneCanvas,
-            0,
-            0,
-            sceneCanvas.width,
-            sceneCanvas.height,
-            0,
-            0,
-            finalCanvas.width,
-            finalCanvas.height
-          );
+            // prefer screenshot component (it gives correct mask flattening)
+            let screenshotCanvas = null;
+            if (
+              scene.components &&
+              scene.components.screenshot &&
+              typeof scene.components.screenshot.getCanvas === "function"
+            ) {
+              try {
+                screenshotCanvas =
+                  scene.components.screenshot.getCanvas("perspective");
+              } catch (e) {
+                // continue to fallback
+                console.warn("screenshot.getCanvas error:", e);
+              }
+            }
 
-          if (recording) requestAnimationFrame(drawFrame);
+            // fallback: try scene.canvas (may or may not include correct alpha depending on your setup)
+            if (!screenshotCanvas) {
+              console.warn(
+                "screenshot component not available or returned null — falling back to scene.canvas (may not composite as expected)."
+              );
+              if (!scene.canvas)
+                throw new Error(
+                  "Neither screenshot component canvas nor scene.canvas is available."
+                );
+              screenshotCanvas = scene.canvas;
+            }
+
+            // compose final canvas (video mirrored + mask)
+            const finalCanvas = document.createElement("canvas");
+            finalCanvas.width = vw;
+            finalCanvas.height = vh;
+            const ctx = finalCanvas.getContext("2d");
+
+            // mirrored webcam
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+              videoEl,
+              0,
+              0,
+              videoEl.videoWidth || vw,
+              videoEl.videoHeight || vh,
+              -vw,
+              0,
+              vw,
+              vh
+            );
+            ctx.restore();
+
+            // draw AR mask / scene on top
+            ctx.drawImage(
+              screenshotCanvas,
+              0,
+              0,
+              screenshotCanvas.width || vw,
+              screenshotCanvas.height || vh,
+              0,
+              0,
+              vw,
+              vh
+            );
+
+            // try download — if canvas is tainted this will throw (security error)
+            try {
+              const link = document.createElement("a");
+              link.download = "ar-screenshot.png";
+              link.href = finalCanvas.toDataURL("image/png");
+              link.click();
+            } catch (ex) {
+              console.error("Canvas export failed (tainted?):", ex);
+              alert(
+                "Screenshot failed: canvas is tainted or blocked. See console for details."
+              );
+            }
+          } catch (err) {
+            console.error(err);
+            alert(
+              "Screenshot failed: " +
+                (err && err.message ? err.message : String(err))
+            );
+          }
+        });
+
+      // --------------------- RECORDING (uses live scene.canvas) ---------------------
+      document
+        .getElementById("cameraBtn")
+        .addEventListener("click", async () => {
+          // toggle recording
+          if (!recording) {
+            // START
+            try {
+              const scene = document.querySelector("a-scene");
+              if (!scene) throw new Error("<a-scene> not found on the page.");
+              const videoEl = findVideoElement();
+              if (!videoEl)
+                throw new Error(
+                  "No <video> element found (looked inside .example-container then document)."
+                );
+
+              // wait for scene canvas to exist
+              await waitFor(() => scene.canvas || scene.hasLoaded, 3000).catch(
+                () => null
+              );
+              const sceneCanvas =
+                scene.canvas || (scene.renderer && scene.renderer.domElement);
+              if (!sceneCanvas)
+                throw new Error(
+                  "Scene WebGL canvas not available (scene.canvas is null)."
+                );
+
+              // ensure video ready
+              if (videoEl.readyState < 2) {
+                await new Promise((res) =>
+                  videoEl.addEventListener("loadedmetadata", res, {
+                    once: true,
+                  })
+                );
+              }
+              const { w: vw, h: vh } = getVideoDims(videoEl);
+
+              // prepare final canvas (video-sized)
+              const finalCanvas = document.createElement("canvas");
+              finalCanvas.width = vw;
+              finalCanvas.height = vh;
+              const ctx = finalCanvas.getContext("2d");
+
+              // store in recordingState for stop
+              recordingState.finalCanvas = finalCanvas;
+              recordingState.ctx = ctx;
+
+              // setup MediaRecorder with decent fallback
+              const stream = finalCanvas.captureStream(30);
+              let mimeType = "video/webm;codecs=vp9";
+              if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = "video/webm;codecs=vp8";
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                  mimeType = "video/webm";
+                  if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = "";
+                }
+              }
+              const options = mimeType ? { mimeType } : undefined;
+              recordedChunks = [];
+              mediaRecorder = options
+                ? new MediaRecorder(stream, options)
+                : new MediaRecorder(stream);
+
+              mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size) recordedChunks.push(e.data);
+              };
+
+              mediaRecorder.onstop = () => {
+                try {
+                  const blob = new Blob(recordedChunks, {
+                    type: recordedChunks[0]?.type || "video/webm",
+                  });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "ar-recording.webm";
+                  a.click();
+                  // revoke after a bit
+                  setTimeout(() => URL.revokeObjectURL(url), 5000);
+                } catch (ex) {
+                  console.error("Failed to save recording:", ex);
+                  alert("Recording saved failed. See console for details.");
+                }
+              };
+
+              // frame drawing loop
+              function drawFrame() {
+                // clear
+                ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+                // Draw mirrored video first
+                ctx.save();
+                ctx.scale(-1, 1);
+                ctx.drawImage(
+                  videoEl,
+                  0,
+                  0,
+                  videoEl.videoWidth || vw,
+                  videoEl.videoHeight || vh,
+                  -vw,
+                  0,
+                  vw,
+                  vh
+                );
+                ctx.restore();
+
+                // Draw live scene canvas ON TOP (this should update each frame)
+                // If your WebGL canvas is a different size, it will be scaled to finalCanvas
+                try {
+                  ctx.drawImage(
+                    scene.canvas,
+                    0,
+                    0,
+                    scene.canvas.width,
+                    scene.canvas.height,
+                    0,
+                    0,
+                    vw,
+                    vh
+                  );
+                } catch (ex) {
+                  // drawing might throw if canvas is tainted - stop recording and alert user
+                  console.error(
+                    "Failed to draw scene canvas onto final canvas:",
+                    ex
+                  );
+                  stopRecordingDueToError(
+                    "Canvas draw failed (possible cross-origin/tainting). See console."
+                  );
+                  return;
+                }
+
+                recordingState.rafId = requestAnimationFrame(drawFrame);
+              }
+
+              // start recorder and loop
+              mediaRecorder.start();
+              recording = true;
+              showRecordIndicator();
+              drawFrame();
+
+              alert("Recording started (click camera button again to stop).");
+            } catch (ex) {
+              console.error("Failed to start recording:", ex);
+              alert(
+                "Could not start recording: " +
+                  (ex && ex.message ? ex.message : ex)
+              );
+              // cleanup just in case
+              if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                try {
+                  mediaRecorder.stop();
+                } catch (e) {}
+              }
+              recording = false;
+              hideRecordIndicator();
+            }
+          } else {
+            // STOP
+            try {
+              // stop the RAF
+              if (recordingState.rafId)
+                cancelAnimationFrame(recordingState.rafId);
+              recordingState.rafId = null;
+
+              // stop mediaRecorder
+              if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+              }
+
+              // cleanup
+              recording = false;
+              hideRecordIndicator();
+              alert("Recording stopped — saving file...");
+            } catch (ex) {
+              console.error("Error stopping recording:", ex);
+              alert(
+                "Error stopping recording: " +
+                  (ex && ex.message ? ex.message : ex)
+              );
+            }
+          }
+        });
+
+      // helper: stop when a drawing error happens
+      function stopRecordingDueToError(msg) {
+        try {
+          if (recordingState.rafId) cancelAnimationFrame(recordingState.rafId);
+          if (mediaRecorder && mediaRecorder.state !== "inactive")
+            mediaRecorder.stop();
+        } catch (e) {
+          /* ignore */
         }
-
-        if (!recording) {
-          // Start recording
-          const stream = finalCanvas.captureStream(30); // 30 FPS
-          mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-          recordedChunks = [];
-
-          mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) recordedChunks.push(e.data);
-          };
-
-          mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedChunks, { type: "video/webm" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "ar-recording.mp4";
-            a.click();
-          };
-
-          mediaRecorder.start();
-          recording = true;
-          drawFrame();
-          alert("Recording started...");
-        } else {
-          // Stop recording
-          mediaRecorder.stop();
-          recording = false;
-          alert("Recording stopped, video saved!");
-        }
-      });
+        recording = false;
+        hideRecordIndicator();
+        alert(msg);
+      }
 
       document.addEventListener("DOMContentLoaded", function () {
         const list = ["maska1", "maska3", "maska2", "maskaown"];
