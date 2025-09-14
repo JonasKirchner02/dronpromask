@@ -39,6 +39,12 @@
           src="/photo.png"
           alt="Photo Icon"
         />
+        <img
+          class="edit-button"
+          id="cameraBtn"
+          src="/photo.png"
+          alt="Photo Icon"
+        />
       </div>
     </div>
 
@@ -198,6 +204,94 @@
         link.download = "ar-screenshot.png";
         link.href = finalCanvas.toDataURL("image/png");
         link.click();
+      });
+
+      let mediaRecorder;
+      let recordedChunks = [];
+      let recording = false;
+
+      document.getElementById("cameraBtn").addEventListener("click", () => {
+        const scene = document.querySelector("a-scene");
+        const screenshotCanvas =
+          scene.components.screenshot.getCanvas("perspective");
+        const container = document.querySelector(".example-container");
+        const videoEl = container.querySelector("video");
+
+        if (!screenshotCanvas || !videoEl || !container) {
+          alert("Could not find scene screenshot, video, or container");
+          return;
+        }
+
+        // Create canvas for recording
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = videoEl.videoWidth;
+        finalCanvas.height = videoEl.videoHeight;
+        const ctx = finalCanvas.getContext("2d");
+
+        function drawFrame() {
+          ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+          // Draw mirrored video
+          ctx.save();
+          ctx.scale(-1, 1);
+          ctx.drawImage(
+            videoEl,
+            0,
+            0,
+            videoEl.videoWidth,
+            videoEl.videoHeight,
+            -videoEl.videoWidth,
+            0,
+            videoEl.videoWidth,
+            videoEl.videoHeight
+          );
+          ctx.restore();
+
+          // Draw AR mask
+          ctx.drawImage(
+            screenshotCanvas,
+            0,
+            0,
+            screenshotCanvas.width,
+            screenshotCanvas.height,
+            0,
+            0,
+            videoEl.videoWidth,
+            videoEl.videoHeight
+          );
+
+          if (recording) requestAnimationFrame(drawFrame);
+        }
+
+        if (!recording) {
+          // Start recording
+          const stream = finalCanvas.captureStream(30); // 30 FPS
+          mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: "video/webm" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "ar-recording.webm";
+            a.click();
+          };
+
+          mediaRecorder.start();
+          recording = true;
+          drawFrame();
+          alert("Recording started...");
+        } else {
+          // Stop recording
+          mediaRecorder.stop();
+          recording = false;
+          alert("Recording stopped, video saved!");
+        }
       });
 
       document.addEventListener("DOMContentLoaded", function () {
